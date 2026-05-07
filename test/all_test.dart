@@ -17,6 +17,18 @@ import 'core/layout_test.dart' as layout;
 import 'renderer/frame_test.dart' as frame;
 import 'renderer/line_renderer_test.dart' as lineRenderer;
 import 'renderer/sync_renderer_test.dart' as syncRenderer;
+import 'widgets/basic/spacer_test.dart' as spacer;
+import 'widgets/basic/text_test.dart' as text;
+import 'widgets/basic/box_test.dart' as box;
+import 'widgets/container/row_test.dart' as row;
+import 'widgets/container/column_test.dart' as column;
+import 'widgets/renderer_test.dart' as widgetRenderer;
+import 'widgets/visual/progress_test.dart' as progress;
+import 'widgets/visual/spinner_test.dart' as spinner;
+import 'widgets/visual/table_test.dart' as table;
+import 'widgets/visual/dialog_test.dart' as dialog;
+import 'widgets/interactive/list_test.dart' as listView;
+import 'widgets/interactive/text_input_test.dart' as textInput;
 
 void main() {
   ansi.main();
@@ -38,4 +50,16 @@ void main() {
   frame.main();
   lineRenderer.main();
   syncRenderer.main();
+  spacer.main();
+  text.main();
+  box.main();
+  row.main();
+  column.main();
+  widgetRenderer.main();
+  progress.main();
+  spinner.main();
+  table.main();
+  dialog.main();
+  listView.main();
+  textInput.main();
 }

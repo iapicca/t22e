@@ -11,6 +11,8 @@ import '../parser/parser.dart' show TerminalParser;
 import '../renderer/frame.dart' show Frame, DiffResult, diff;
 import '../renderer/sync_renderer.dart' show SyncRenderer;
 import '../terminal/runner.dart' show TerminalRunner;
+import '../widgets/widget.dart' show Widget;
+import '../widgets/renderer.dart' show WidgetRenderer;
 import 'cmd.dart' show Cmd;
 import 'model.dart' show Model;
 import 'msg.dart';
@@ -53,6 +55,8 @@ class Program<M extends Model<M>> {
   Frame? _previousFrame;
   bool _inEscapeSequence = false;
   Timer? _escTimer;
+  int _termWidth = 80;
+  int _termHeight = 24;
 
   Program(this._model, {
     int fps = WellKnown.defaultFps,
@@ -139,7 +143,9 @@ class Program<M extends Model<M>> {
     switch (msg) {
       case QuitMsg():
         _running = false;
-      case WindowSizeMsg():
+      case WindowSizeMsg(:final width, :final height):
+        _termWidth = width;
+        _termHeight = height;
         _dispatchToModel(msg);
         _needsRender = true;
       case ClearScreenMsg():
@@ -170,9 +176,17 @@ class Program<M extends Model<M>> {
 
   void _renderFrame() {
     final view = _model.view();
-    if (view is! Surface) return;
+    late final Surface surface;
 
-    final currentFrame = Frame.fromSurface(view);
+    if (view is Widget) {
+      surface = WidgetRenderer.render(view, _termWidth, _termHeight);
+    } else if (view is Surface) {
+      surface = view;
+    } else {
+      return;
+    }
+
+    final currentFrame = Frame.fromSurface(surface);
     final diffResult = _previousFrame != null
         ? diff(_previousFrame!, currentFrame)
         : DiffResult(List.generate(currentFrame.height, (i) => i));
