@@ -1,4 +1,4 @@
-import 'dart:core';
+import '../loop/well_known.dart' show WellKnown;
 
 enum VtState { ground, escape, escapeIntermediate, csiEntry, csiParam, csiIntermediate, csiIgnore, oscString, dcsEntry, dcsParam, dcsIntermediate, dcsIgnore, dcsPassthrough }
 
@@ -38,21 +38,21 @@ final class DcsSequenceData extends SequenceData {
 }
 
 int _byteClass(int b) {
-  if (b == 0x1B) return 1;
-  if (b == 0x9B) return 2;
-  if (b == 0x9D) return 3;
-  if (b == 0x90) return 4;
-  if (b == 0x9F) return 5;
-  if (b == 0x07 || b == 0x9C) return 6;
-  if (b >= 0x20 && b <= 0x2F) return 8;
-  if (b >= 0x30 && b <= 0x3F) return 9;
-  if (b >= 0x40 && b <= 0x7E) return 10;
-  if (b >= 0x80 && b <= 0x8F) return 11;
-  if (b >= 0x90 && b <= 0x9A) return 11;
-  if (b >= 0x18 && b <= 0x1A) return 12;
-  if (b == 0x9C) return 6;
-  if (b >= 0x00 && b <= 0x17) return 13;
-  if (b >= 0x19 && b <= 0x1F) return 13;
+  if (b == WellKnown.escapeByte) return 1;
+  if (b == WellKnown.csiIntroducerByte) return 2;
+  if (b == WellKnown.oscIntroducerByte) return 3;
+  if (b == WellKnown.dcsIntroducerByte) return 4;
+  if (b == WellKnown.apcIntroducerByte) return 5;
+  if (b == WellKnown.bellByte || b == WellKnown.stringTerminatorByte) return 6;
+  if (b >= WellKnown.byteRangeGraphicLow && b <= WellKnown.byteRangeGraphicHigh) return 8;
+  if (b >= WellKnown.byteRangeParamLow && b <= WellKnown.byteRangeParamHigh) return 9;
+  if (b >= WellKnown.byteRangeUpperLow && b <= WellKnown.byteRangeUpperHigh) return 10;
+  if (b >= WellKnown.byteRangeC1Low && b <= WellKnown.byteRangeC1High) return 11;
+  if (b >= WellKnown.byteRangeC1bLow && b <= WellKnown.byteRangeC1bHigh) return 11;
+  if (b >= WellKnown.byteRangeControlSkipLow && b <= WellKnown.byteRangeControlSkipHigh) return 12;
+  if (b == WellKnown.stringTerminatorByte) return 6;
+  if (b >= WellKnown.byteRangeControlLow && b <= WellKnown.byteRangeControlHigh) return 13;
+  if (b >= WellKnown.byteRangeControlLow2 && b <= WellKnown.byteRangeControlHigh2) return 13;
   return 13;
 }
 
@@ -118,80 +118,80 @@ class Vt500Engine {
   }
 
   SequenceData? _onGround(int byte) {
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       return null;
     }
-    if (byte == 0x9B) {
+    if (byte == WellKnown.csiIntroducerByte) {
       _state = VtState.csiEntry;
       _params.clear();
       _intermediates.clear();
       return null;
     }
-    if (byte == 0x9D) {
+    if (byte == WellKnown.oscIntroducerByte) {
       _state = VtState.oscString;
       _oscBuffer.clear();
       return null;
     }
-    if (byte == 0x90) {
+    if (byte == WellKnown.dcsIntroducerByte) {
       _state = VtState.dcsEntry;
       _dcsParams.clear();
       _dcsIntermediates.clear();
       _dcsBuffer.clear();
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangePrintableLow && byte <= WellKnown.byteRangePrintableHigh) {
       return CharData(byte);
     }
-    if (byte >= 0x80 && byte <= 0x8F) {
+    if (byte >= WellKnown.byteRangeC1Low && byte <= WellKnown.byteRangeC1High) {
       return null;
     }
-    if (byte >= 0x00 && byte <= 0x1F && byte != 0x1B) {
+    if (byte >= WellKnown.byteRangeLowest && byte <= WellKnown.byteRangeControlHigh2 && byte != WellKnown.escapeByte) {
       return null;
     }
     return null;
   }
 
   SequenceData? _onEscape(int byte) {
-    if (byte == 0x5B) {
+    if (byte == WellKnown.csiEntryByte) {
       _state = VtState.csiEntry;
       _params.clear();
       _intermediates.clear();
       return null;
     }
-    if (byte == 0x5D) {
+    if (byte == WellKnown.oscEntryByte) {
       _state = VtState.oscString;
       _oscBuffer.clear();
       return null;
     }
-    if (byte == 0x50) {
+    if (byte == WellKnown.dcsEntryByte) {
       _state = VtState.dcsEntry;
       _dcsParams.clear();
       _dcsIntermediates.clear();
       _dcsBuffer.clear();
       return null;
     }
-    if (byte == 0x4F) {
+    if (byte == WellKnown.ss3Byte) {
       _intermediates.add(byte);
       _state = VtState.escapeIntermediate;
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _intermediates.add(byte);
       _state = VtState.escapeIntermediate;
       return null;
     }
-    if (byte >= 0x30 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeParamLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       final data = EscSequenceData(List.unmodifiable(_intermediates), byte);
       _intermediates.clear();
       return data;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _intermediates.clear();
       return null;
     }
-    if (byte == 0x07 || byte == 0x9C) {
+    if (byte == WellKnown.bellByte || byte == WellKnown.stringTerminatorByte) {
       _state = VtState.ground;
       _intermediates.clear();
       return null;
@@ -202,17 +202,17 @@ class Vt500Engine {
   }
 
   SequenceData? _onEscapeIntermediate(int byte) {
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _intermediates.add(byte);
       return null;
     }
-    if (byte >= 0x30 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeParamLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       final data = EscSequenceData(List.unmodifiable(_intermediates), byte);
       _intermediates.clear();
       return data;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       _intermediates.clear();
       return null;
@@ -223,33 +223,33 @@ class Vt500Engine {
   }
 
   SequenceData? _onCsiEntry(int byte) {
-    if (byte >= 0x30 && byte <= 0x3F) {
-      if (byte >= 0x30 && byte <= 0x39) {
-        _params.add(byte - 0x30);
-      } else if (byte == 0x3B) {
+    if (byte >= WellKnown.byteRangeParamLow && byte <= WellKnown.byteRangeParamHigh) {
+      if (byte >= WellKnown.byteRangeDigitLow && byte <= WellKnown.byteRangeDigitHigh) {
+        _params.add(byte - WellKnown.byteRangeDigitLow);
+      } else if (byte == WellKnown.semicolonByte) {
         _params.add(0);
-      } else if (byte >= 0x3C && byte <= 0x3F) {
+      } else if (byte >= WellKnown.intermediatePrefixByte && byte <= WellKnown.byteRangeParamHigh) {
         _intermediates.add(byte);
       }
       _state = VtState.csiParam;
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _intermediates.add(byte);
       _state = VtState.csiIntermediate;
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       final data = CsiSequenceData(List.unmodifiable(_params), List.unmodifiable(_intermediates), byte);
       _params.clear();
       _intermediates.clear();
       return data;
     }
-    if (byte >= 0x00 && byte <= 0x1F && byte != 0x1B) {
+    if (byte >= WellKnown.byteRangeLowest && byte <= WellKnown.byteRangeControlHigh2 && byte != WellKnown.escapeByte) {
       return null;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       _params.clear();
       _intermediates.clear();
@@ -262,33 +262,33 @@ class Vt500Engine {
   }
 
   SequenceData? _onCsiParam(int byte) {
-    if (byte >= 0x30 && byte <= 0x39) {
+    if (byte >= WellKnown.byteRangeDigitLow && byte <= WellKnown.byteRangeDigitHigh) {
       final last = _params.isEmpty ? 0 : _params.removeLast();
-      _params.add(last * 10 + (byte - 0x30));
+      _params.add(last * 10 + (byte - WellKnown.byteRangeDigitLow));
       return null;
     }
-    if (byte == 0x3B) {
+    if (byte == WellKnown.semicolonByte) {
       _params.add(0);
       return null;
     }
-    if (byte >= 0x3C && byte <= 0x3F) {
+    if (byte >= WellKnown.intermediatePrefixByte && byte <= WellKnown.byteRangeParamHigh) {
       _intermediates.add(byte);
       _state = VtState.csiParam;
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _intermediates.add(byte);
       _state = VtState.csiIntermediate;
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       final data = CsiSequenceData(List.unmodifiable(_params), List.unmodifiable(_intermediates), byte);
       _params.clear();
       _intermediates.clear();
       return data;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       _params.clear();
       _intermediates.clear();
@@ -301,18 +301,18 @@ class Vt500Engine {
   }
 
   SequenceData? _onCsiIntermediate(int byte) {
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _intermediates.add(byte);
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       final data = CsiSequenceData(List.unmodifiable(_params), List.unmodifiable(_intermediates), byte);
       _params.clear();
       _intermediates.clear();
       return data;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       _params.clear();
       _intermediates.clear();
@@ -325,11 +325,11 @@ class Vt500Engine {
   }
 
   SequenceData? _onCsiIgnore(int byte) {
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _state = VtState.ground;
       return null;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _state = VtState.escape;
       return null;
     }
@@ -339,35 +339,35 @@ class Vt500Engine {
   SequenceData? _onOscString(int byte) {
     if (_oscExpectSt) {
       _oscExpectSt = false;
-      if (byte == 0x5C) {
+      if (byte == WellKnown.dcsStByte) {
         _state = VtState.ground;
         final content = _oscBuffer.toString();
         _oscBuffer.clear();
         return OscSequenceData(content);
       }
-      _oscBuffer.writeCharCode(0x1B);
-      if (byte >= 0x20 && byte <= 0x7F) {
+      _oscBuffer.writeCharCode(WellKnown.escapeByte);
+      if (byte >= WellKnown.byteRangePrintableLow && byte <= 0x7F) {
         _oscBuffer.writeCharCode(byte);
       }
       return null;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _oscExpectSt = true;
       return null;
     }
-    if (byte == 0x07) {
+    if (byte == WellKnown.bellByte) {
       _state = VtState.ground;
       final content = _oscBuffer.toString();
       _oscBuffer.clear();
       return OscSequenceData(content);
     }
-    if (byte == 0x9C) {
+    if (byte == WellKnown.stringTerminatorByte) {
       _state = VtState.ground;
       final content = _oscBuffer.toString();
       _oscBuffer.clear();
       return OscSequenceData(content);
     }
-    if (byte >= 0x20 && byte <= 0x7F) {
+    if (byte >= WellKnown.byteRangePrintableLow && byte <= 0x7F) {
       _oscBuffer.writeCharCode(byte);
       return null;
     }
@@ -375,19 +375,19 @@ class Vt500Engine {
   }
 
   SequenceData? _onDcsEntry(int byte) {
-    if (byte >= 0x30 && byte <= 0x3F) {
-      if (byte >= 0x30 && byte <= 0x39) {
-        _dcsParams.add(byte - 0x30);
+    if (byte >= WellKnown.byteRangeParamLow && byte <= WellKnown.byteRangeParamHigh) {
+      if (byte >= WellKnown.byteRangeDigitLow && byte <= WellKnown.byteRangeDigitHigh) {
+        _dcsParams.add(byte - WellKnown.byteRangeDigitLow);
       }
       _state = VtState.dcsParam;
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _dcsIntermediates.add(byte);
       _state = VtState.dcsIntermediate;
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _dcsFinalByte = byte;
       _state = VtState.dcsPassthrough;
       return null;
@@ -397,21 +397,21 @@ class Vt500Engine {
   }
 
   SequenceData? _onDcsParam(int byte) {
-    if (byte >= 0x30 && byte <= 0x39) {
+    if (byte >= WellKnown.byteRangeDigitLow && byte <= WellKnown.byteRangeDigitHigh) {
       final last = _dcsParams.isEmpty ? 0 : _dcsParams.removeLast();
-      _dcsParams.add(last * 10 + (byte - 0x30));
+      _dcsParams.add(last * 10 + (byte - WellKnown.byteRangeDigitLow));
       return null;
     }
-    if (byte == 0x3B) {
+    if (byte == WellKnown.semicolonByte) {
       _dcsParams.add(0);
       return null;
     }
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _dcsIntermediates.add(byte);
       _state = VtState.dcsIntermediate;
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _dcsFinalByte = byte;
       _state = VtState.dcsPassthrough;
       return null;
@@ -421,11 +421,11 @@ class Vt500Engine {
   }
 
   SequenceData? _onDcsIntermediate(int byte) {
-    if (byte >= 0x20 && byte <= 0x2F) {
+    if (byte >= WellKnown.byteRangeGraphicLow && byte <= WellKnown.byteRangeGraphicHigh) {
       _dcsIntermediates.add(byte);
       return null;
     }
-    if (byte >= 0x40 && byte <= 0x7E) {
+    if (byte >= WellKnown.byteRangeUpperLow && byte <= WellKnown.byteRangeUpperHigh) {
       _dcsFinalByte = byte;
       _state = VtState.dcsPassthrough;
       return null;
@@ -435,11 +435,11 @@ class Vt500Engine {
   }
 
   SequenceData? _onDcsIgnore(int byte) {
-    if (byte == 0x07 || byte == 0x9C) {
+    if (byte == WellKnown.bellByte || byte == WellKnown.stringTerminatorByte) {
       _state = VtState.ground;
       return null;
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       return _onGround(byte);
     }
     return null;
@@ -448,7 +448,7 @@ class Vt500Engine {
   SequenceData? _onDcsPassthrough(int byte) {
     if (_dcsExpectSt) {
       _dcsExpectSt = false;
-      if (byte == 0x5C) {
+      if (byte == WellKnown.dcsStByte) {
         _state = VtState.ground;
         final data = _dcsBuffer.toString();
         _dcsBuffer.clear();
@@ -457,14 +457,14 @@ class Vt500Engine {
       }
       return null;
     }
-    if (byte == 0x07 || byte == 0x9C) {
+    if (byte == WellKnown.bellByte || byte == WellKnown.stringTerminatorByte) {
       _state = VtState.ground;
       final data = _dcsBuffer.toString();
       _dcsBuffer.clear();
       if (data.isEmpty) return null;
       return DcsSequenceData(List.unmodifiable(_dcsParams), List.unmodifiable(_dcsIntermediates), _dcsFinalByte, data);
     }
-    if (byte == 0x1B) {
+    if (byte == WellKnown.escapeByte) {
       _dcsExpectSt = true;
       return null;
     }

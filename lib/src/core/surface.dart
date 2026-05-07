@@ -3,7 +3,7 @@ import 'geometry.dart';
 import 'style.dart';
 import '../unicode/grapheme.dart' show graphemeClusters;
 import '../unicode/width.dart' show charWidth, stringWidth;
-import '../ansi/codes.dart' show resetAll;
+import '../ansi/codes.dart' show bold, dim, italic, underline, blink, reverse, strikethrough, overLine, resetAll;
 
 class Surface {
   final int width;
@@ -185,14 +185,14 @@ class Surface {
 
   static String _styleToAnsi(TextStyle s) {
     final buf = StringBuffer();
-    if (s.bold == true) buf.write('\x1b[1m');
-    if (s.dim == true) buf.write('\x1b[2m');
-    if (s.italic == true) buf.write('\x1b[3m');
-    if (s.underline == true) buf.write('\x1b[4m');
-    if (s.blink == true) buf.write('\x1b[5m');
-    if (s.reverse == true) buf.write('\x1b[7m');
-    if (s.strikethrough == true) buf.write('\x1b[9m');
-    if (s.overline == true) buf.write('\x1b[53m');
+    if (s.bold == true) buf.write(bold(true));
+    if (s.dim == true) buf.write(dim(true));
+    if (s.italic == true) buf.write(italic(true));
+    if (s.underline == true) buf.write(underline(true));
+    if (s.blink == true) buf.write(blink(true));
+    if (s.reverse == true) buf.write(reverse(true));
+    if (s.strikethrough == true) buf.write(strikethrough(true));
+    if (s.overline == true) buf.write(overLine(true));
     if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
     if (s.background != null) buf.write(s.background!.sgrSequence(background: true));
     return buf.toString();

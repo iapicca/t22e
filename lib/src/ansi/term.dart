@@ -17,4 +17,7 @@ String disableKittyKeyboard() => '\x1b[<u';
 String queryKittyKeyboard() => '\x1b[?u';
 String queryForegroundColor() => '\x1b]10;?\x07';
 String queryBackgroundColor() => '\x1b]11;?\x07';
+String queryCursorPosition() => '\x1b[6n';
+String queryDa1() => '\x1b[c';
+String querySyncUpdate() => '\x1b[?2026\$p';
 String softReset() => '\x1b[!p';
