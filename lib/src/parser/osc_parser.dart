@@ -18,7 +18,7 @@ final class OscParser {
       8 => _parseHyperlink(value),
       10 => _parseColor(value, 10),
       11 => _parseColor(value, 11),
-      52 => InternalEvent('clipboard', {'data': value}),
+       52 => _parseClipboard(value),
       _ => null,
     };
   }
@@ -28,6 +28,14 @@ final class OscParser {
     if (firstSemicolon == -1) return null;
     final uri = value.substring(firstSemicolon + 1);
     return InternalEvent('hyperlink', {'uri': uri});
+  }
+
+  ClipboardEvent? _parseClipboard(String value) {
+    final semicolon = value.indexOf(';');
+    if (semicolon == -1) return null;
+    final clipboard = value.substring(0, semicolon);
+    final base64 = value.substring(semicolon + 1);
+    return ClipboardEvent(clipboard, base64.isEmpty ? null : base64);
   }
 
   ColorQueryEvent? _parseColor(String value, int colorNumber) {

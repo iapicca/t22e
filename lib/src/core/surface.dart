@@ -4,6 +4,7 @@ import 'style.dart';
 import '../unicode/grapheme.dart' show graphemeClusters;
 import '../unicode/width.dart' show charWidth, stringWidth;
 import '../ansi/codes.dart' show bold, dim, italic, underline, blink, reverse, strikethrough, overLine, resetAll;
+import '../ansi/term.dart' show hyperlink;
 
 class Surface {
   final int width;
@@ -162,13 +163,26 @@ class Surface {
     return grid.map((row) {
       final buf = StringBuffer();
       TextStyle? lastStyle;
+      String? lastHyperlink;
       for (final cell in row) {
         if (cell.wideContinuation) continue;
-        if (cell.style != lastStyle) {
+        if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
+          if (lastHyperlink != null && cell.hyperlink == null) {
+            buf.write('\x1b]8;;\x07');
+          }
           buf.write(_styleToAnsi(cell.style));
           lastStyle = cell.style;
+          if (cell.hyperlink != null && cell.hyperlink != lastHyperlink) {
+            buf.write(hyperlink(cell.hyperlink!, ''));
+            lastHyperlink = cell.hyperlink;
+          } else if (cell.hyperlink == null) {
+            lastHyperlink = null;
+          }
         }
         buf.write(cell.char);
+      }
+      if (lastHyperlink != null) {
+        buf.write('\x1b]8;;\x07');
       }
       if (lastStyle != null && !lastStyle.isClear) {
         buf.write(resetAll());

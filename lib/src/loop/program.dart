@@ -9,8 +9,10 @@ import '../lifecycle/terminal_guard.dart' show TerminalGuard;
 import '../parser/events.dart' show Event, KeyCode, KeyEvent, MouseEvent, WindowResizeEvent;
 import '../parser/parser.dart' show TerminalParser;
 import '../renderer/frame.dart' show Frame, DiffResult, diff;
+import '../renderer/cell_renderer.dart' show CellRenderer;
 import '../renderer/sync_renderer.dart' show SyncRenderer;
 import '../terminal/runner.dart' show TerminalRunner;
+import '../ansi/term.dart' show enableKittyKeyboard, disableKittyKeyboard, enableMouse, disableMouse;
 import '../widgets/widget.dart' show Widget;
 import '../widgets/renderer.dart' show WidgetRenderer;
 import 'cmd.dart' show Cmd;
@@ -48,7 +50,11 @@ class Program<M extends Model<M>> {
   late final AltScreenManager _altScreen;
   late final SignalHandler _signalHandler;
   final TerminalParser _parser = TerminalParser();
-  final SyncRenderer _renderer;
+  final SyncRenderer _lineRenderer;
+  final CellRenderer _cellRenderer;
+  final bool _useCellRenderer;
+  final bool _useKittyKeyboard;
+  final bool _useMouse;
   StreamSubscription<List<int>>? _stdinSub;
   bool _running = true;
   bool _needsRender = true;
@@ -61,8 +67,15 @@ class Program<M extends Model<M>> {
   Program(this._model, {
     int fps = WellKnown.defaultFps,
     bool syncSupported = false,
+    bool useCellRenderer = false,
+    bool useKittyKeyboard = false,
+    bool useMouse = false,
   })  : _fpsThrottle = FpsThrottle(fps: fps),
-      _renderer = SyncRenderer(syncSupported: syncSupported) {
+      _lineRenderer = SyncRenderer(syncSupported: syncSupported),
+      _cellRenderer = const CellRenderer(),
+      _useCellRenderer = useCellRenderer,
+      _useKittyKeyboard = useKittyKeyboard,
+      _useMouse = useMouse {
     _altScreen = AltScreenManager(stdout);
     _guard = TerminalGuard(_runner, _altScreen);
     _signalHandler = SignalHandler(
@@ -78,6 +91,13 @@ class Program<M extends Model<M>> {
   void run() {
     _runner.enterRawMode();
     _altScreen.enter();
+    if (_useMouse) {
+      stdout.write(enableMouse());
+    }
+    if (_useKittyKeyboard) {
+      stdout.write(enableKittyKeyboard(3));
+    }
+    stdout.flush();
     _guard.arm();
     _signalHandler.install();
 
@@ -186,25 +206,54 @@ class Program<M extends Model<M>> {
       return;
     }
 
-    final currentFrame = Frame.fromSurface(surface);
-    final diffResult = _previousFrame != null
-        ? diff(_previousFrame!, currentFrame)
-        : DiffResult(List.generate(currentFrame.height, (i) => i));
-
-    if (diffResult.hasChanges) {
-      final output = _renderer.render(diffResult, currentFrame);
-      if (output.isNotEmpty) {
-        stdout.write(output);
-        stdout.flush();
+    if (_useCellRenderer) {
+      final currentFrame = Frame.fromSurface(surface, includeCells: true);
+      if (_previousFrame != null) {
+        final output = _cellRenderer.render(_previousFrame!, currentFrame);
+        if (output.isNotEmpty) {
+          stdout.write(output);
+          stdout.flush();
+        }
+      } else {
+        final frame = Frame.fromSurface(surface);
+        final output = _lineRenderer.render(
+          DiffResult(List.generate(frame.height, (i) => i)),
+          frame,
+        );
+        if (output.isNotEmpty) {
+          stdout.write(output);
+          stdout.flush();
+        }
       }
-    }
+      _previousFrame = currentFrame;
+    } else {
+      final currentFrame = Frame.fromSurface(surface);
+      final diffResult = _previousFrame != null
+          ? diff(_previousFrame!, currentFrame)
+          : DiffResult(List.generate(currentFrame.height, (i) => i));
 
-    _previousFrame = currentFrame;
+      if (diffResult.hasChanges) {
+        final output = _lineRenderer.render(diffResult, currentFrame);
+        if (output.isNotEmpty) {
+          stdout.write(output);
+          stdout.flush();
+        }
+      }
+
+      _previousFrame = currentFrame;
+    }
   }
 
   void _shutdown() {
     _stdinSub?.cancel();
     _escTimer?.cancel();
+    if (_useKittyKeyboard) {
+      stdout.write(disableKittyKeyboard());
+    }
+    if (_useMouse) {
+      stdout.write(disableMouse());
+    }
+    stdout.flush();
     _signalHandler.dispose();
     _guard.restore();
   }

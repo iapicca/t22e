@@ -125,6 +125,13 @@ class TextStyle {
     );
   }
 
+  factory TextStyle.link({String? uri}) {
+    return TextStyle(
+      foreground: const Color.rgb(0, 102, 204),
+      underline: true,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
