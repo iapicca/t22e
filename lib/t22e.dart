@@ -47,3 +47,20 @@ export 'src/capability/pipeline.dart' show ProbePipeline;
 export 'src/lifecycle/terminal_guard.dart' show TerminalGuard;
 export 'src/lifecycle/signal_handler.dart' show SignalHandler;
 export 'src/lifecycle/alt_screen_manager.dart' show AltScreenManager;
+
+// Widget Library
+export 'src/widgets/enums.dart';
+export 'src/widgets/widget.dart' show Widget, PaintingContext;
+export 'src/widgets/renderer.dart' show WidgetRenderer;
+export 'src/widgets/basic/text.dart' show Text;
+export 'src/widgets/basic/box.dart' show Box;
+export 'src/widgets/basic/spacer.dart' show Spacer;
+export 'src/widgets/container/row.dart' show Row;
+export 'src/widgets/container/column.dart' show Column;
+export 'src/widgets/interactive/scrollable.dart' show Scrollable;
+export 'src/widgets/interactive/text_input.dart' show TextInput;
+export 'src/widgets/interactive/list.dart' show ListView, ListItem;
+export 'src/widgets/visual/progress.dart' show ProgressBar;
+export 'src/widgets/visual/spinner.dart' show Spinner;
+export 'src/widgets/visual/table.dart' show Table;
+export 'src/widgets/visual/dialog.dart' show Dialog, DialogButton, SizedBox;

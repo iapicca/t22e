@@ -77,3 +77,33 @@ final class MouseMsg extends Msg {
   @override
   int get hashCode => event.hashCode;
 }
+
+// Widget Library Messages
+
+final class ProgressTickMsg extends Msg {
+  const ProgressTickMsg();
+}
+
+final class SpinnerTickMsg extends Msg {
+  const SpinnerTickMsg();
+}
+
+final class CursorBlinkMsg extends Msg {
+  const CursorBlinkMsg();
+}
+
+final class ListEnterMsg extends Msg {
+  final int index;
+  final String label;
+  const ListEnterMsg(this.index, this.label);
+}
+
+final class DialogCloseMsg extends Msg {
+  const DialogCloseMsg();
+}
+
+final class DialogButtonMsg extends Msg {
+  final int index;
+  final String label;
+  const DialogButtonMsg(this.index, this.label);
+}
