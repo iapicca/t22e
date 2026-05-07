@@ -8,6 +8,15 @@ import 'parser/osc_parser_test.dart' as osc;
 import 'parser/dcs_parser_test.dart' as dcs;
 import 'parser/parser_test.dart' as parser;
 import 'terminal/terminal_test.dart' as terminal;
+import 'core/geometry_test.dart' as geometry;
+import 'core/color_test.dart' as color;
+import 'core/cell_test.dart' as cell;
+import 'core/style_test.dart' as style;
+import 'core/surface_test.dart' as surface;
+import 'core/layout_test.dart' as layout;
+import 'renderer/frame_test.dart' as frame;
+import 'renderer/line_renderer_test.dart' as lineRenderer;
+import 'renderer/sync_renderer_test.dart' as syncRenderer;
 
 void main() {
   ansi.main();
@@ -20,4 +29,13 @@ void main() {
   dcs.main();
   parser.main();
   terminal.main();
+  geometry.main();
+  color.main();
+  cell.main();
+  style.main();
+  surface.main();
+  layout.main();
+  frame.main();
+  lineRenderer.main();
+  syncRenderer.main();
 }

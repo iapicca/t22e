@@ -20,3 +20,14 @@ export 'src/parser/esc_parser.dart' show EscParser;
 export 'src/parser/osc_parser.dart' show OscParser;
 export 'src/parser/dcs_parser.dart' show DcsParser;
 export 'src/parser/parser.dart' show TerminalParser;
+
+export 'src/core/geometry.dart';
+export 'src/core/color.dart';
+export 'src/core/cell.dart';
+export 'src/core/style.dart';
+export 'src/core/surface.dart';
+export 'src/core/layout.dart';
+
+export 'src/renderer/frame.dart';
+export 'src/renderer/line_renderer.dart';
+export 'src/renderer/sync_renderer.dart';
