@@ -7,6 +7,7 @@ final class CsiParser {
     final intermediates = data.intermediates;
     final fb = data.finalByte;
 
+    // CSI final bytes are ASCII characters
     if (intermediates.contains(0x3C)) {
       return _parseExtended(params, fb);
     }
@@ -20,12 +21,13 @@ final class CsiParser {
       0x46 => _keyEvent(KeyCode.end, params),
       0x50 => _fKey(1, params),
       0x51 => _fKey(2, params),
-     0x52 when params.length >= 2 => CursorPositionEvent(params[0], params[1]),
-     0x52 => _fKey(3, params),
-     0x53 => _fKey(4, params),
-     0x7E => _parseTilde(params),
-     0x4D => _parseSgrMouse(params),
-      0x63 when intermediates.contains(0x3E) => PrimaryDeviceAttributesEvent(List.unmodifiable(params.length >= 2 ? params.sublist(1) : params)),
+      0x52 when params.length >= 2 => CursorPositionEvent(params[0], params[1]),
+      0x52 => _fKey(3, params),
+      0x53 => _fKey(4, params),
+      0x7E => _parseTilde(params),
+      0x4D => _parseSgrMouse(params),
+      0x63 when intermediates.contains(0x3E) =>
+          PrimaryDeviceAttributesEvent(List.unmodifiable(params.length >= 2 ? params.sublist(1) : params)),
       _ => null,
     };
   }
@@ -72,7 +74,7 @@ final class CsiParser {
     final mods = _kittyModifiers(modifiers);
     final type = eventType == 2 ? KeyEventType.up : (eventType == 3 ? KeyEventType.repeat : KeyEventType.down);
 
-    if (code >= 0x20 && code <= 0x7E) {
+    if (code >= ' '.codeUnitAt(0) && code <= '~'.codeUnitAt(0)) {
       return KeyEvent(keyCode: KeyCode.char, modifiers: mods, type: type, codepoint: code);
     }
 

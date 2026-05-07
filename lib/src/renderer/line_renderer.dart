@@ -1,4 +1,4 @@
-import '../core/surface.dart' show Surface;
+import '../ansi/cursor.dart' show moveTo;
 import 'frame.dart';
 
 class LineRenderer {
@@ -8,7 +8,7 @@ class LineRenderer {
     final buf = StringBuffer();
     for (final row in diff.changedRows) {
       if (row < currentFrame.height) {
-        buf.write('\x1b[${row + 1};0H');
+        buf.write(moveTo(row + 1, 0));
         buf.write(currentFrame.styledLines[row]);
       }
     }

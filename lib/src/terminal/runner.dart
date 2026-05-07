@@ -47,9 +47,4 @@ class TerminalRunner {
       exitRawMode();
     }
   }
-
-  void installSignalHandlers() {
-    ProcessSignal.sigint.watch().listen((_) => exitRawMode());
-    ProcessSignal.sigterm.watch().listen((_) => exitRawMode());
-  }
 }

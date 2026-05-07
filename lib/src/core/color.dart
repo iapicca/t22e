@@ -1,4 +1,5 @@
 import 'dart:math' show sqrt;
+import '../ansi/codes.dart' show csi;
 
 enum ColorKind { noColor, ansi, indexed, rgb }
 
@@ -149,15 +150,15 @@ class Color {
     final prefix = background ? 48 : 38;
     switch (kind) {
       case ColorKind.noColor:
-        return background ? '\x1b[49m' : '\x1b[39m';
+        return background ? '${csi}49m' : '${csi}39m';
       case ColorKind.ansi:
         final off = background ? 40 : 30;
-        if (value < 8) return '\x1b[${off + value}m';
-        return '\x1b[${off + 60 + value - 8}m';
+        if (value < 8) return '${csi}${off + value}m';
+        return '${csi}${off + 60 + value - 8}m';
       case ColorKind.indexed:
-        return '\x1b[$prefix;5;${value}m';
+        return '${csi}$prefix;5;${value}m';
       case ColorKind.rgb:
-        return '\x1b[$prefix;2;$red;$green;${blue}m';
+        return '${csi}$prefix;2;$red;$green;${blue}m';
     }
   }
 
