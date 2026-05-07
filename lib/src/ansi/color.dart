@@ -1,0 +1,9 @@
+String setForegroundRgb(int r, int g, int b) => '\x1b[38;2;$r;$g;${b}m';
+String setBackgroundRgb(int r, int g, int b) => '\x1b[48;2;$r;$g;${b}m';
+String setForeground256(int index) => '\x1b[38;5;${index}m';
+String setBackground256(int index) => '\x1b[48;5;${index}m';
+String foregroundAnsi(int color) => '\x1b[${30 + color}m';
+String backgroundAnsi(int color) => '\x1b[${40 + color}m';
+String foregroundBrightAnsi(int color) => '\x1b[${90 + color}m';
+String backgroundBrightAnsi(int color) => '\x1b[${100 + color}m';
+String resetColor() => '\x1b[39;49m';
