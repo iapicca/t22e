@@ -1,0 +1,14 @@
+name: t22e
+description: A terminal user interface written in Dart.
+version: 0.0.1
+repository: https://github.com/iapicca/t22e
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  path: ^1.9.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
