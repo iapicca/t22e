@@ -11,7 +11,10 @@ String disableBracketedPaste() => '\x1b[?2004l';
 String enableFocusTracking() => '\x1b[?1004h';
 String disableFocusTracking() => '\x1b[?1004l';
 String setTitle(String title) => '\x1b]0;${title}\x07';
-String hyperlink(String uri, String text) => '\x1b]8;;${uri}\x07${text}\x1b]8;;\x07';
+String hyperlink(String uri, String text, {String? id}) {
+  final params = id != null ? 'id=$id' : '';
+  return '\x1b]8;$params;$uri\x07$text\x1b]8;;\x07';
+}
 String enableKittyKeyboard(int flags) => '\x1b[>${flags}u';
 String disableKittyKeyboard() => '\x1b[<u';
 String queryKittyKeyboard() => '\x1b[?u';
@@ -21,3 +24,8 @@ String queryCursorPosition() => '\x1b[6n';
 String queryDa1() => '\x1b[c';
 String querySyncUpdate() => '\x1b[?2026\$p';
 String softReset() => '\x1b[!p';
+String writeClipboard(String base64Data, {String clipboard = 'c'}) =>
+    '\x1b]52;$clipboard;$base64Data\x07';
+String queryClipboard({String clipboard = 'c'}) =>
+    '\x1b]52;$clipboard;?\x07';
+String enableMouse() => '\x1b[?1000h\x1b[?1002h\x1b[?1006h';

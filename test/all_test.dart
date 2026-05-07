@@ -29,6 +29,11 @@ import 'widgets/visual/table_test.dart' as table;
 import 'widgets/visual/dialog_test.dart' as dialog;
 import 'widgets/interactive/list_test.dart' as listView;
 import 'widgets/interactive/text_input_test.dart' as textInput;
+import 'widgets/basic/link_test.dart' as link;
+import 'renderer/cell_renderer_test.dart' as cellRenderer;
+import 'renderer/benchmark_test.dart' as benchmark;
+import 'testing/virtual_terminal_test.dart' as virtualTerminal;
+import 'testing/widget_tester_test.dart' as widgetTester;
 
 void main() {
   ansi.main();
@@ -62,4 +67,9 @@ void main() {
   dialog.main();
   listView.main();
   textInput.main();
+  link.main();
+  cellRenderer.main();
+  benchmark.main();
+  virtualTerminal.main();
+  widgetTester.main();
 }

@@ -1,13 +1,19 @@
+import '../core/cell.dart';
 import '../core/surface.dart';
 
 class Frame {
   final List<String> plainLines;
   final List<String> styledLines;
+  final List<List<Cell>>? cells;
 
-  Frame(this.plainLines, this.styledLines);
+  Frame(this.plainLines, this.styledLines, {this.cells});
 
-  factory Frame.fromSurface(Surface surface) {
-    return Frame(surface.toPlainLines(), surface.toAnsiLines());
+  factory Frame.fromSurface(Surface surface, {bool includeCells = false}) {
+    return Frame(
+      surface.toPlainLines(),
+      surface.toAnsiLines(),
+      cells: includeCells ? surface.grid : null,
+    );
   }
 
   int get height => plainLines.length;

@@ -45,9 +45,10 @@ void main() {
   });
 
   test('clipboard', () {
-    final event = parser.parse(OscSequenceData('52;hello'));
-    expect(event, isA<InternalEvent>());
-    expect((event as InternalEvent).kind, equals('clipboard'));
+    final event = parser.parse(OscSequenceData('52;c;SGVsbG8='));
+    expect(event, isA<ClipboardEvent>());
+    expect((event as ClipboardEvent).clipboard, equals('c'));
+    expect((event as ClipboardEvent).base64, equals('SGVsbG8='));
   });
 
   test('unknown OSC command returns null', () {

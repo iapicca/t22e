@@ -12,6 +12,10 @@ final class CsiParser {
       return _parseExtended(params, fb);
     }
 
+    if (intermediates.contains(0x3E) && fb == 0x75) {
+      return _parseKittyKey(params);
+    }
+
     return switch (fb) {
       0x41 => _keyEvent(KeyCode.up, params),
       0x42 => _keyEvent(KeyCode.down, params),
@@ -120,16 +124,29 @@ final class CsiParser {
     final x = params[1] - 1;
     final y = params[2] - 1;
 
-    final button = switch (cb & 0x03) {
+    if (cb == 64) return MouseEvent(button: MouseButton.wheelUp, action: MouseAction.press, x: x, y: y);
+    if (cb == 65) return MouseEvent(button: MouseButton.wheelDown, action: MouseAction.press, x: x, y: y);
+
+    if ((cb & 32) != 0 && (cb & 3) != 3) {
+      final button = _mouseButtonFromCode(cb & 3);
+      return MouseEvent(button: button, action: MouseAction.drag, x: x, y: y);
+    }
+
+    if ((cb & 32) != 0) {
+      return MouseEvent(button: MouseButton.none, action: MouseAction.release, x: x, y: y);
+    }
+
+    final button = _mouseButtonFromCode(cb & 3);
+    return MouseEvent(button: button, action: MouseAction.press, x: x, y: y);
+  }
+
+  MouseButton _mouseButtonFromCode(int code) {
+    return switch (code) {
       0 => MouseButton.left,
       1 => MouseButton.middle,
       2 => MouseButton.right,
       _ => MouseButton.none,
     };
-
-    final action = (cb & 0x20) != 0 ? MouseAction.release : MouseAction.press;
-
-    return MouseEvent(button: button, action: action, x: x, y: y);
   }
 
   KeyEvent _keyEvent(KeyCode code, List<int> params) {

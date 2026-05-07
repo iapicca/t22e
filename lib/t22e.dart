@@ -30,6 +30,8 @@ export 'src/core/layout.dart';
 export 'src/renderer/frame.dart';
 export 'src/renderer/line_renderer.dart';
 export 'src/renderer/sync_renderer.dart';
+export 'src/renderer/cell_renderer.dart' show CellRenderer;
+export 'src/renderer/benchmark.dart' show BenchmarkSuite, BenchmarkResult;
 
 export 'src/loop/well_known.dart' show WellKnown;
 export 'src/loop/model.dart' show Model;
@@ -52,7 +54,11 @@ export 'src/lifecycle/alt_screen_manager.dart' show AltScreenManager;
 export 'src/widgets/enums.dart';
 export 'src/widgets/widget.dart' show Widget, PaintingContext;
 export 'src/widgets/renderer.dart' show WidgetRenderer;
+export 'src/testing/virtual_terminal.dart' show VirtualTerminal;
+export 'src/testing/widget_tester.dart' show WidgetTester;
+
 export 'src/widgets/basic/text.dart' show Text;
+export 'src/widgets/basic/link.dart' show Hyperlink;
 export 'src/widgets/basic/box.dart' show Box;
 export 'src/widgets/basic/spacer.dart' show Spacer;
 export 'src/widgets/container/row.dart' show Row;

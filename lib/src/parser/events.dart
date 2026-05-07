@@ -283,6 +283,25 @@ final class QuerySyncUpdateEvent extends Event {
   String toString() => 'QuerySyncUpdateEvent(supported=$supported)';
 }
 
+final class ClipboardEvent extends Event {
+  final String clipboard;
+  final String? base64;
+
+  const ClipboardEvent(this.clipboard, [this.base64]);
+
+  @override
+  bool operator ==(Object other) =>
+      other is ClipboardEvent &&
+      clipboard == other.clipboard &&
+      base64 == other.base64;
+
+  @override
+  int get hashCode => Object.hash(clipboard, base64);
+
+  @override
+  String toString() => 'ClipboardEvent($clipboard, ${base64 != null ? '${base64!.length} bytes' : 'query'})';
+}
+
 // --- utility ---
 
 final class ErrorEvent extends Event {
