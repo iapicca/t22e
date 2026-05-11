@@ -2,20 +2,9 @@ import 'dart:ffi';
 import 'dart:io';
 
 import '../well_known.dart' show WellKnown;
+import 'platform_service.dart';
 
-DynamicLibrary _loadLibc() {
-  if (Platform.isMacOS) return DynamicLibrary.open(WellKnown.libcMacOS);
-  if (Platform.isLinux) {
-    try {
-      return DynamicLibrary.open(WellKnown.libcLinux6);
-    } catch (_) {
-      return DynamicLibrary.open(WellKnown.libcLinux7);
-    }
-  }
-  throw UnsupportedError('FFI raw mode is not supported on this platform');
-}
-
-final DynamicLibrary _libc = _loadLibc();
+final DynamicLibrary _libc = PlatformService().library;
 
 final int Function(int fd, Pointer<Uint8> buf) tcGetAttr = _libc
     .lookupFunction<Int32 Function(Int32, Pointer<Uint8>),
