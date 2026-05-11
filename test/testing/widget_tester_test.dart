@@ -1,10 +1,7 @@
 import 'package:test/test.dart';
-import '../../lib/src/testing/widget_tester.dart';
-import '../../lib/src/widgets/basic/text.dart';
-import '../../lib/src/widgets/basic/box.dart';
-import '../../lib/src/widgets/basic/link.dart';
-import '../../lib/src/core/style.dart';
-import '../../lib/src/core/geometry.dart';
+import 'package:t22e/src/testing/widget_tester.dart';
+import 'package:t22e/src/widgets/basic/text.dart';
+import 'package:t22e/src/widgets/basic/link.dart';
 
 void main() {
   group('WidgetTester', () {

@@ -1,9 +1,8 @@
 import 'package:test/test.dart';
-import '../../lib/src/core/cell.dart';
-import '../../lib/src/core/style.dart';
-import '../../lib/src/core/surface.dart';
-import '../../lib/src/renderer/cell_renderer.dart';
-import '../../lib/src/renderer/frame.dart';
+import 'package:t22e/src/core/style.dart';
+import 'package:t22e/src/core/surface.dart';
+import 'package:t22e/src/renderer/cell_renderer.dart';
+import 'package:t22e/src/renderer/frame.dart';
 
 void main() {
   group('CellRenderer', () {

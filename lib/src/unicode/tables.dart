@@ -245,7 +245,7 @@ int _lookup(int codepoint) {
       (codepoint >= 0x1F950 && codepoint <= 0x1F96B) ||
       (codepoint >= 0x1F980 && codepoint <= 0x1F997) ||
       (codepoint >= 0x1F9C0 && codepoint <= 0x1F9C0) ||
-      (codepoint >= 0x1F9D0 && codepoint <= 0x1F9E6)) return _propE;
+      (codepoint >= 0x1F9D0 && codepoint <= 0x1F9E6)) { return _propE; }
   if (codepoint >= 0x20000 && codepoint <= 0x2A6DF) return _prop2;
   if (codepoint >= 0x2A700 && codepoint <= 0x2B73F) return _prop2;
   if (codepoint >= 0x2B740 && codepoint <= 0x2B81F) return _prop2;

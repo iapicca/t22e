@@ -1,4 +1,3 @@
-import 'dart:math' show sqrt;
 import '../ansi/codes.dart' show csi;
 
 enum ColorKind { noColor, ansi, indexed, rgb }
@@ -9,6 +8,8 @@ class Color {
   final ColorKind kind;
   final int value;
 
+  /// TODO: Private constructor for creating Color instances internally
+  // ignore: unused_element
   const Color._(this.kind, this.value);
 
   const Color.noColor() : kind = ColorKind.noColor, value = 0;
@@ -150,15 +151,15 @@ class Color {
     final prefix = background ? 48 : 38;
     switch (kind) {
       case ColorKind.noColor:
-        return background ? '${csi}49m' : '${csi}39m';
+        return background ? '$csi${49}m' : '$csi${39}m';
       case ColorKind.ansi:
         final off = background ? 40 : 30;
-        if (value < 8) return '${csi}${off + value}m';
-        return '${csi}${off + 60 + value - 8}m';
+        if (value < 8) return '$csi${off + value}m';
+        return '$csi${off + 60 + value - 8}m';
       case ColorKind.indexed:
-        return '${csi}$prefix;5;${value}m';
+        return '$csi$prefix;5;${value}m';
       case ColorKind.rgb:
-        return '${csi}$prefix;2;$red;$green;${blue}m';
+        return '$csi$prefix;2;$red;$green;${blue}m';
     }
   }
 

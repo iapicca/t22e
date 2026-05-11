@@ -1,10 +1,9 @@
 import 'package:test/test.dart';
-import '../../../lib/src/widgets/basic/link.dart' show Hyperlink;
-import '../../../lib/src/core/surface.dart';
-import '../../../lib/src/core/style.dart';
-import '../../../lib/src/core/cell.dart';
-import '../../../lib/src/core/layout.dart';
-import '../../../lib/src/widgets/widget.dart';
+import 'package:t22e/src/widgets/basic/link.dart' show Hyperlink;
+import 'package:t22e/src/core/surface.dart';
+import 'package:t22e/src/core/style.dart';
+import 'package:t22e/src/core/layout.dart';
+import 'package:t22e/src/widgets/widget.dart';
 
 void main() {
   group('Hyperlink', () {

@@ -3,21 +3,21 @@ import 'width.dart';
 typedef GraphemeCluster = ({int start, int end, int columnWidth});
 
 int _graphemeBreakProperty(int codepoint) {
-  if (codepoint == 0x200D) return 1;
-  if (codepoint >= 0xFE00 && codepoint <= 0xFE0F) return 2;
-  if (codepoint >= 0x1F1E6 && codepoint <= 0x1F1FF) return 3;
+  if (codepoint == 0x200D) { return 1; }
+  if (codepoint >= 0xFE00 && codepoint <= 0xFE0F) { return 2; }
+  if (codepoint >= 0x1F1E6 && codepoint <= 0x1F1FF) { return 3; }
   if ((codepoint >= 0x0300 && codepoint <= 0x036F) ||
       (codepoint >= 0x1AB0 && codepoint <= 0x1AFF) ||
       (codepoint >= 0x1DC0 && codepoint <= 0x1DFF) ||
       (codepoint >= 0x20D0 && codepoint <= 0x20FF) ||
-      (codepoint >= 0xFE20 && codepoint <= 0xFE2F)) return 4;
-  if (codepoint >= 0x1F3FB && codepoint <= 0x1F3FF) return 5;
-  if (codepoint == 0xE0020 || (codepoint >= 0xE0100 && codepoint <= 0xE01EF)) return 6;
-  if (codepoint >= 0x1100 && codepoint <= 0x115F) return 7;
+      (codepoint >= 0xFE20 && codepoint <= 0xFE2F)) { return 4; }
+  if (codepoint >= 0x1F3FB && codepoint <= 0x1F3FF) { return 5; }
+  if (codepoint == 0xE0020 || (codepoint >= 0xE0100 && codepoint <= 0xE01EF)) { return 6; }
+  if (codepoint >= 0x1100 && codepoint <= 0x115F) { return 7; }
   if ((codepoint >= 0x1160 && codepoint <= 0x11A2) ||
-      (codepoint >= 0xAC00 && codepoint <= 0xD7AF)) return 8;
-  if (codepoint >= 0x11A8 && codepoint <= 0x11F9) return 9;
-  if (codepoint >= 0x1F900 && codepoint <= 0x1F9FF) return 10;
+      (codepoint >= 0xAC00 && codepoint <= 0xD7AF)) { return 8; }
+  if (codepoint >= 0x11A8 && codepoint <= 0x11F9) { return 9; }
+  if (codepoint >= 0x1F900 && codepoint <= 0x1F9FF) { return 10; }
   if (codepoint == 0x00AD ||
       codepoint == 0x061C ||
       codepoint == 0x180E ||
@@ -30,7 +30,7 @@ int _graphemeBreakProperty(int codepoint) {
       codepoint == 0x2067 ||
       codepoint == 0x2068 ||
       (codepoint >= 0x2069 && codepoint <= 0x206F) ||
-      codepoint == 0xFEFF) return 11;
+      codepoint == 0xFEFF) { return 11; }
   return 0;
 }
 
@@ -40,6 +40,8 @@ List<GraphemeCluster> graphemeClusters(String text) {
 
   final runes = text.runes.toList();
   var clusterStart = 0;
+  /// TODO: Track column offset for grapheme cluster positioning
+  // ignore: unused_local_variable
   var colOffset = 0;
   var clusterWidth = 0;
 

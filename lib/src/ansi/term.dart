@@ -10,7 +10,7 @@ String enableBracketedPaste() => '\x1b[?2004h';
 String disableBracketedPaste() => '\x1b[?2004l';
 String enableFocusTracking() => '\x1b[?1004h';
 String disableFocusTracking() => '\x1b[?1004l';
-String setTitle(String title) => '\x1b]0;${title}\x07';
+String setTitle(String title) => '\x1b]0;$title\x07';
 String hyperlink(String uri, String text, {String? id}) {
   final params = id != null ? 'id=$id' : '';
   return '\x1b]8;$params;$uri\x07$text\x1b]8;;\x07';

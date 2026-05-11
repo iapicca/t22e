@@ -1,4 +1,3 @@
-import '../core/cell.dart' show Cell;
 import '../core/style.dart' show TextStyle;
 import '../ansi/term.dart' show hyperlink;
 import 'frame.dart' show Frame;
@@ -20,6 +19,8 @@ class CellRenderer {
       final curRow = currCells[r];
       final curWidth = curRow.length;
 
+      /// TODO: Track last style to optimize SGR sequence emission
+      // ignore: unused_local_variable
       TextStyle? lastStyle;
 
       for (var c = 0; c < curWidth; c++) {

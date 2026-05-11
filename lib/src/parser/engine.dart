@@ -37,6 +37,8 @@ final class DcsSequenceData extends SequenceData {
   const DcsSequenceData(this.params, this.intermediates, this.finalByte, [this.data]);
 }
 
+/// TODO: Classify bytes into categories for VT500 state machine transitions
+// ignore: unused_element
 int _byteClass(int b) {
   if (b == WellKnown.escapeByte) return 1;
   if (b == WellKnown.csiIntroducerByte) return 2;
@@ -113,6 +115,8 @@ class Vt500Engine {
     }
   }
 
+  /// TODO: Execute control characters (e.g., BEL, BS, CR, LF)
+  // ignore: unused_element
   SequenceData? _execute(int byte) {
     return null;
   }

@@ -2,9 +2,8 @@ import 'dart:io';
 import 'dart:convert';
 
 import '../core/cell.dart';
-import '../core/style.dart';
 import '../core/surface.dart';
-import 'frame.dart' show Frame, DiffResult, diff;
+import 'frame.dart' show Frame, diff;
 import 'line_renderer.dart';
 import 'cell_renderer.dart';
 

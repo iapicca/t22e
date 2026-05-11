@@ -1,7 +1,5 @@
 import 'package:test/test.dart';
-import '../../lib/src/testing/virtual_terminal.dart';
-import '../../lib/src/core/cell.dart';
-import '../../lib/src/core/style.dart';
+import 'package:t22e/src/testing/virtual_terminal.dart';
 
 void main() {
   group('VirtualTerminal', () {

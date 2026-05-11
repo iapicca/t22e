@@ -10,11 +10,11 @@ class AltScreenManager {
 
   AltScreenManager(this._stdout);
 
-  void enter({bool enableMouse = false}) {
+  void enter({bool captureMouse = false}) {
     if (_active) return;
     _stdout.write(enterAltScreen());
     _stdout.write(hideCursor());
-    if (enableMouse) {
+    if (captureMouse) {
       _stdout.write(enableMouse());
       _mouseEnabled = true;
     }

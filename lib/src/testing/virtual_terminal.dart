@@ -9,7 +9,11 @@ class VirtualTerminal {
   int _cursorX = 0;
   int _cursorY = 0;
   TextStyle _currentStyle = TextStyle.empty;
+  /// TODO: Track alternate screen state for buffer switching
+  // ignore: unused_field
   bool _altScreen = false;
+  /// TODO: Store the normal screen buffer when switching to alt screen
+  // ignore: unused_field
   List<List<Cell>>? _normalScreenBuffer;
 
   VirtualTerminal({this.width = 80, this.height = 24}) {
@@ -99,7 +103,7 @@ class VirtualTerminal {
   void _dispatchCsi(List<int> params, int fb) {
     switch (fb) {
       case 0x48: // CUP
-        _cursorY = (params.length > 0 ? params[0] : 1) - 1;
+        _cursorY = (params.isNotEmpty ? params[0] : 1) - 1;
         _cursorX = (params.length > 1 ? params[1] : 1) - 1;
         _clampCursor();
       case 0x41: // CUU

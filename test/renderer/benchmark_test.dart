@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:test/test.dart';
-import '../../lib/src/renderer/benchmark.dart';
-import '../../lib/src/core/surface.dart';
-import '../../lib/src/core/style.dart';
+import 'package:t22e/src/core/surface.dart';
+import 'package:t22e/src/renderer/benchmark.dart';
 
 void main() {
   group('BenchmarkSuite', () {
     test('measure records results', () {
       final suite = BenchmarkSuite();
       suite.measure('dummy', () {
+        /// TODO: Accumulate dummy computation result for benchmark validity
+        // ignore: unused_local_variable
         var x = 0;
         for (var i = 0; i < 100; i++) {
           x += i;

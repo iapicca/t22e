@@ -10,7 +10,7 @@ enum CursorStyle {
   const CursorStyle(this.value);
 }
 
-String moveTo(int row, int col) => '\x1b[${row};${col}H';
+String moveTo(int row, int col) => '\x1b[$row;${col}H';
 String moveUp(int n) => '\x1b[${n}A';
 String moveDown(int n) => '\x1b[${n}B';
 String moveRight(int n) => '\x1b[${n}C';
