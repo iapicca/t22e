@@ -2,7 +2,7 @@
 
 **Version:** 1
 **Feature:** Feat-5 Polish & Advanced
-**Phase:** 5 | **Priority:** P2 | **Scope:** 3 stories, 8 tasks
+**Phase:** 5 | **Priority:** P2 | **Scope:** 3 stories, 7 tasks
 **Depends on:** All prior features (Feat-1 through Feat-4)
 **Constraint:** No 3rd party dependencies — only Dart SDK (`dart:io`, `dart:async`, `dart:convert`, `dart:math`, `dart:collection`)
 
@@ -18,8 +18,8 @@ Feature 5 adds three major capabilities on top of the existing TUI framework:
 │                                                    │
 │  Story 5.1: Cell-Level Renderer                    │
 │  ┌──────────────────┐    ┌─────────────────────┐   │
-│  │ CellRenderer     │    │ Benchmark Suite     │   │
-│  │ (cell-level diff)│    │ (perf measurement)  │   │
+│  │ CellRenderer     │                         │   │
+│  │ (cell-level diff)│                         │   │
 │  └───────┬──────────┘    └─────────────────────┘   │
 │          │ uses                                     │
 │          ▼                                          │
@@ -62,9 +62,9 @@ Feature 5 adds three major capabilities on top of the existing TUI framework:
 
 | Principle | Application |
 |-----------|-------------|
-| **Single Responsibility** | Each file owns exactly one concern: `cell_renderer.dart` does diff, `frame.dart` (unchanged) provides diff results, benchmarks in dedicated files |
+| **Single Responsibility** | Each file owns exactly one concern: `cell_renderer.dart` does diff, `frame.dart` (unchanged) provides diff results |
 | **DRY** | Shared rendering patterns extracted; mouse/kitty parsing uses existing CSI parser patterns; virtual terminal reuses `Cell` and `TextStyle` |
-| **Pure functions where possible** | `CellRenderer.render()` is deterministic given two frames; benchmarks are pure measurement functions |
+| **Pure functions where possible** | `CellRenderer.render()` is deterministic given two frames |
 | **Sealed class exhaustiveness** | New events added to the existing sealed `Event` hierarchy; new messages to `Msg` hierarchy |
 | **Graceful degradation** | Every advanced protocol detects capability and falls back; no crashes on unsupported terminals |
 | **Testability** | Virtual terminal enables testing all rendering without a real terminal |
@@ -87,8 +87,7 @@ lib/
 │   ├── core/
 │   │   └── style.dart                                 # UPDATE: add TextStyle.link() convenience
 │   ├── renderer/
-│   │   ├── cell_renderer.dart                         # NEW  (5.1.1) — Cell-level diff renderer
-│   │   └── benchmark.dart                             # NEW  (5.1.2) — Performance benchmark suite
+│   │   └── cell_renderer.dart                         # NEW  (5.1.1) — Cell-level diff renderer
 │   ├── testing/
 │   │   ├── virtual_terminal.dart                      # NEW  (5.3.1) — In-memory ANSI terminal emulator
 │   │   └── widget_tester.dart                         # NEW  (5.3.2) — Widget test harness + assertions
@@ -98,8 +97,7 @@ lib/
 test/
 ├── all_test.dart                                      # UPDATE
 ├── renderer/
-│   ├── cell_renderer_test.dart                        # NEW  — cell-level renderer tests
-│   └── benchmark_test.dart                            # NEW  — benchmark tests
+│   └── cell_renderer_test.dart                        # NEW  — cell-level renderer tests
 ├── testing/
 │   ├── virtual_terminal_test.dart                     # NEW  — virtual terminal tests
 │   └── widget_tester_test.dart                        # NEW  — widget test utility tests
@@ -115,7 +113,7 @@ test/
 
 ---
 
-### Story 5.1 — Cell-Level Renderer (L, 2 tasks)
+### Story 5.1 — Cell-Level Renderer (L, 1 task)
 
 #### Task 5.1.1: Cell-Level Diff Renderer
 
@@ -175,58 +173,6 @@ For each row r in [0, max(current.height, previous.height)):
 - SGR optimization (same style across adjacent cells = no redundant SGR)
 
 ---
-
-#### Task 5.1.2: Performance Benchmarking
-
-**File:** `lib/src/renderer/benchmark.dart`
-
-**Purpose:** Measure rendering performance to establish baselines and detect regressions.
-
-**Design:**
-
-```dart
-class BenchmarkResult {
-  final String name;
-  final int iterations;
-  final double avgMicros;
-  final int bytesWritten;
-  final DateTime timestamp;
-}
-
-class BenchmarkSuite {
-  final List<BenchmarkResult> results = [];
-
-  void measure(String name, void Function() fn, {int iterations = 1000});
-  void rendererComparison(Surface small, Surface large);
-  void saveResults(String filePath);
-  bool checkRegression(String name, double thresholdPercent);
-}
-```
-
-**Benchmark scenarios:**
-- Sparse update: 1 cell changes in 80×24 grid
-- Row update: 1 full row changes in 80×24 grid
-- Full frame: all 1920 cells change
-- Resize: terminal grows from 80×24 to 120×40
-- Line-level vs cell-level comparison for each scenario
-
-**Metrics:**
-- Average frame time (µs) over N iterations
-- Bytes written per frame
-- Frames per second (FPS) sustainable
-
-**Dart documentation references:**
-- https://api.dart.dev/stable/dart-core/Stopwatch-class.html
-- https://api.dart.dev/stable/dart-core/DateTime-class.html
-- https://api.dart.dev/stable/dart-io/File-class.html
-- https://api.dart.dev/stable/dart-io/File/writeAsString.html
-- https://api.dart.dev/stable/dart-io/File/readAsString.html
-
-**Tests (`test/renderer/benchmark_test.dart`):**
-- Ensure benchmark runs without errors
-- Verify benchmark produces measurable results
-- Verify saved results file is valid JSON
-- Verify regression detection works (above threshold fails)
 
 ---
 
@@ -719,7 +665,7 @@ When `KeyboardProbe` confirms Kitty protocol and terminal supports sync updates,
 | 11 | `line_renderer.dart` update | Hyperlink OSC 8 wrapping | 5 |
 | 12 | `virtual_terminal.dart` | NEW: in-memory ANSI emulator | Nothing |
 | 13 | `widget_tester.dart` | NEW: widget test harness | 12, 7 |
-| 14 | `benchmark.dart` | NEW: performance benchmarks | 7 |
+
 | 15 | Barrel export | Update `t22e.dart` | All tasks |
 | 16 | Test manifest | Update `all_test.dart` | All tasks |
 

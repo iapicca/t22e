@@ -13,7 +13,6 @@ Implement a cell-level renderer that compares individual cells between frames an
 | # | Task | Est. |
 |---|------|------|
 | 5.1.1 | Cell-level diff renderer | L |
-| 5.1.2 | Performance benchmarking | M |
 
 ## Acceptance Criteria
 
@@ -23,5 +22,4 @@ Implement a cell-level renderer that compares individual cells between frames an
 - If identical: skip entirely (no output)
 - Cell renderer handles wide characters (only writes at start cell, skips continuation)
 - Significantly reduces output compared to line-level on sparse updates
-- Benchmark: measure bytes written and time per frame for both renderers
 - Renderer can be selected at runtime based on terminal capability

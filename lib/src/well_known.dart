@@ -481,12 +481,6 @@ final class WellKnown {
   /// Sentinel value for unlimited max length
   static const int textInputNoMaxLength = -1;
 
-  // ── benchmark defaults ──
-
-  static const int benchmarkIterationsDefault = 1000;
-  static const int benchmarkRenderCompareIterations = 500;
-  static const int benchmarkRegressionPercent = 100;
-
   // ── layout / geometry sentinels ──
 
   /// Maximum int for unbounded constraint dimensions

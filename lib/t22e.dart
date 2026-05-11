@@ -31,7 +31,6 @@ export 'src/renderer/frame.dart';
 export 'src/renderer/line_renderer.dart';
 export 'src/renderer/sync_renderer.dart';
 export 'src/renderer/cell_renderer.dart' show CellRenderer;
-export 'src/renderer/benchmark.dart' show BenchmarkSuite, BenchmarkResult;
 
 export 'src/well_known.dart' show WellKnown;
 export 'src/loop/model.dart' show Model;

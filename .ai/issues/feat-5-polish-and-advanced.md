@@ -6,7 +6,7 @@
 
 ## Description
 
-Polish the TUI framework with advanced features: cell-level renderer for flicker-free output on all terminals, Kitty keyboard protocol, mouse support, clipboard integration, hyperlinks, performance benchmarking, and testing utilities.
+Polish the TUI framework with advanced features: cell-level renderer for flicker-free output on all terminals, Kitty keyboard protocol, mouse support, clipboard integration, hyperlinks, and testing utilities.
 
 ## Stories
 
@@ -23,5 +23,4 @@ Polish the TUI framework with advanced features: cell-level renderer for flicker
 - Mouse support enables click, drag, wheel events with SGR encoding
 - Clipboard integration (OSC 52) for copy/paste
 - Hyperlinks rendered with OSC 8 sequences
-- Performance benchmarks establish baseline and regression detection
 - Virtual terminal enables deterministic widget tests without a real terminal

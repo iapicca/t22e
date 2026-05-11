@@ -6,7 +6,7 @@
 
 ## Description
 
-Build testing infrastructure: a virtual terminal that captures output for deterministic testing, widget test utilities, and performance benchmarks.
+Build testing infrastructure: a virtual terminal that captures output for deterministic testing and widget test utilities.
 
 ## Tasks
 
@@ -23,5 +23,3 @@ Build testing infrastructure: a virtual terminal that captures output for determ
 - Widget tests: simulate key events and verify state changes
 - Screenshot testing: compare virtual terminal output to expected output
 - CI integration: all tests run without a real terminal
-- Performance benchmarks: automated timing of renderer, parser, layout operations
-- Regression detection: benchmark thresholds that fail if performance degrades

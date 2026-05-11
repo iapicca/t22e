@@ -31,7 +31,6 @@ import 'widgets/interactive/list_test.dart' as list_view;
 import 'widgets/interactive/text_input_test.dart' as text_input;
 import 'widgets/basic/link_test.dart' as link;
 import 'renderer/cell_renderer_test.dart' as cell_renderer;
-import 'renderer/benchmark_test.dart' as benchmark;
 import 'testing/virtual_terminal_test.dart' as virtual_terminal;
 import 'testing/widget_tester_test.dart' as widget_tester;
 
@@ -69,7 +68,6 @@ void main() {
   text_input.main();
   link.main();
   cell_renderer.main();
-  benchmark.main();
   virtual_terminal.main();
   widget_tester.main();
 }

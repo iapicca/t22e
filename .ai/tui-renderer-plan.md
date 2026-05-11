@@ -520,8 +520,7 @@ your_tui/
 25. Mouse support
 26. Clipboard integration
 27. Hyperlinks
-28. Performance benchmarking
-29. Testing utilities (virtual terminal for tests)
+28. Testing utilities (virtual terminal for tests)
 
 ---
 
