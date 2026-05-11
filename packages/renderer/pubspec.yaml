@@ -1,0 +1,20 @@
+name: renderer
+description: Terminal rendering engine with frame diffing, line and sync renderers.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+  ansi:
+    path: ../ansi
+  core:
+    path: ../core
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

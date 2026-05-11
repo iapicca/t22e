@@ -1,0 +1,22 @@
+name: capability
+description: Terminal capability probing (DA1, color, sync, keyboard).
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+  ansi:
+    path: ../ansi
+  parser:
+    path: ../parser
+  core:
+    path: ../core
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

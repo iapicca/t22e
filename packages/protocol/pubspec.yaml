@@ -1,0 +1,12 @@
+name: protocol
+description: Terminal protocol byte-level constants.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

@@ -1,0 +1,20 @@
+name: lifecycle
+description: Application lifecycle management (signal handler, alt screen, terminal guard).
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+  ansi:
+    path: ../ansi
+  terminal:
+    path: ../terminal
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

@@ -1,0 +1,22 @@
+name: widgets
+description: Terminal widget library with TEA architecture (Model/Msg/Cmd).
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+  core:
+    path: ../core
+  unicode:
+    path: ../unicode
+  parser:
+    path: ../parser
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

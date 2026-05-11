@@ -1,0 +1,16 @@
+name: parser
+description: Terminal input parser with VT500 state machine.
+version: 0.0.1
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6

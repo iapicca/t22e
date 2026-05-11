@@ -1,0 +1,19 @@
+name: core
+description: Core terminal data structures.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.11.6
+
+dependencies:
+  protocol:
+    path: ../protocol
+  unicode:
+    path: ../unicode
+  ansi:
+    path: ../ansi
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
