@@ -3,6 +3,7 @@ import 'geometry.dart';
 import 'style.dart';
 import '../unicode/grapheme.dart' show graphemeClusters;
 import '../unicode/width.dart' show charWidth, stringWidth;
+import '../well_known.dart' show WellKnown;
 import '../ansi/codes.dart' show bold, dim, italic, underline, blink, reverse, strikethrough, overLine, resetAll;
 import '../ansi/term.dart' show hyperlink;
 
@@ -47,7 +48,7 @@ class Surface {
     final cw = ch.runes.isEmpty ? 1 : charWidth(ch.runes.first);
     grid[y][x] = Cell(char: ch, style: style);
 
-    if (cw == 2 && x + 1 < width) {
+    if (cw == WellKnown.wideCharWidth && x + 1 < width) {
       grid[y][x + 1] = const Cell(char: '', wideContinuation: true);
     }
   }
@@ -65,7 +66,7 @@ class Surface {
 
       final sub = _substringByCodeUnits(text, cluster.start, cluster.end);
 
-      if (cluster.columnWidth == 2) {
+      if (cluster.columnWidth == WellKnown.wideCharWidth) {
         if (col + 1 < width) {
           grid[y][col] = Cell(char: sub, style: style);
           grid[y][col + 1] = const Cell(char: '', wideContinuation: true);
@@ -91,7 +92,7 @@ class Surface {
       grid[row] = List<Cell>.of(grid[row]);
       for (var col = rect.left; col < rect.right; col++) {
         grid[row][col] = Cell(char: ch, style: style);
-        if (cw == 2 && col + 1 < rect.right) {
+        if (cw == WellKnown.wideCharWidth && col + 1 < rect.right) {
           grid[row][col + 1] = const Cell(char: '', wideContinuation: true);
           col++;
         }
@@ -168,7 +169,7 @@ class Surface {
         if (cell.wideContinuation) continue;
         if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
           if (lastHyperlink != null && cell.hyperlink == null) {
-            buf.write('\x1b]8;;\x07');
+            buf.write(WellKnown.st);
           }
           buf.write(_styleToAnsi(cell.style));
           lastStyle = cell.style;
@@ -182,7 +183,7 @@ class Surface {
         buf.write(cell.char);
       }
       if (lastHyperlink != null) {
-        buf.write('\x1b]8;;\x07');
+        buf.write(WellKnown.st);
       }
       if (lastStyle != null && !lastStyle.isClear) {
         buf.write(resetAll());

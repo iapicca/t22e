@@ -3,6 +3,7 @@ import '../../loop/msg.dart' show Msg, KeyMsg;
 import '../../loop/cmd.dart' show Cmd;
 import '../../core/layout.dart' show Constraints, Size;
 import '../../core/style.dart' show TextStyle;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show Axis;
 import '../../parser/events.dart' show KeyEvent;
@@ -21,9 +22,9 @@ class Scrollable extends Model<Scrollable> {
     this.scrollY = 0,
     required this.child,
     this.axis = Axis.vertical,
-    this.scrollStep = 3,
-    this.viewportWidth = 80,
-    this.viewportHeight = 24,
+    this.scrollStep = WellKnown.defaultScrollStep,
+    this.viewportWidth = WellKnown.defaultTerminalWidth,
+    this.viewportHeight = WellKnown.defaultTerminalHeight,
   });
 
   @override
@@ -81,8 +82,8 @@ class _ScrollView extends Widget {
     required this.child,
     this.scrollX = 0,
     this.scrollY = 0,
-    this.viewportWidth = 80,
-    this.viewportHeight = 24,
+    this.viewportWidth = WellKnown.defaultTerminalWidth,
+    this.viewportHeight = WellKnown.defaultTerminalHeight,
   });
 
   @override
@@ -99,14 +100,14 @@ class _ScrollView extends Widget {
     child.paint(context.child(-scrollX, -scrollY));
 
     // Draw scrollbar on right edge
-    if (viewportHeight > 2) {
+    if (viewportHeight > WellKnown.scrollbarMinViewportHeight) {
       final sbX = context.offsetX + viewportWidth - 1;
       final sbTop = context.offsetY;
       final sbBottom = context.offsetY + viewportHeight - 1;
 
       // Draw track
       for (var r = sbTop; r <= sbBottom; r++) {
-        context.surface.putChar(sbX, r, '\u2591', TextStyle.empty);
+        context.surface.putChar(sbX, r, WellKnown.charLightShade, TextStyle.empty);
       }
     }
   }

@@ -1,4 +1,5 @@
 import '../core/style.dart' show TextStyle;
+import '../well_known.dart' show WellKnown;
 import '../ansi/term.dart' show hyperlink;
 import 'frame.dart' show Frame;
 
@@ -41,7 +42,7 @@ class CellRenderer {
         if (prev == null || prev.char != curr.char || linkChanged) {
           buf.write('\x1b[${r + 1};${c + 1}H');
           if (prev?.hyperlink != null && curr.hyperlink == null) {
-            buf.write('\x1b]8;;\x07');
+            buf.write(WellKnown.st);
           }
           buf.write(curr.char);
         }
@@ -53,14 +54,14 @@ class CellRenderer {
 
   String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
     final buf = StringBuffer();
-    if (s.bold == true) buf.write('\x1b[1m');
-    if (s.dim == true) buf.write('\x1b[2m');
-    if (s.italic == true) buf.write('\x1b[3m');
-    if (s.underline == true) buf.write('\x1b[4m');
-    if (s.blink == true) buf.write('\x1b[5m');
-    if (s.reverse == true) buf.write('\x1b[7m');
-    if (s.strikethrough == true) buf.write('\x1b[9m');
-    if (s.overline == true) buf.write('\x1b[53m');
+    if (s.bold == true) buf.write('${WellKnown.csi}${WellKnown.sgrBold}m');
+    if (s.dim == true) buf.write('${WellKnown.csi}${WellKnown.sgrFaint}m');
+    if (s.italic == true) buf.write('${WellKnown.csi}${WellKnown.sgrItalic}m');
+    if (s.underline == true) buf.write('${WellKnown.csi}${WellKnown.sgrUnderline}m');
+    if (s.blink == true) buf.write('${WellKnown.csi}${WellKnown.sgrBlink}m');
+    if (s.reverse == true) buf.write('${WellKnown.csi}${WellKnown.sgrReverse}m');
+    if (s.strikethrough == true) buf.write('${WellKnown.csi}${WellKnown.sgrStrikethrough}m');
+    if (s.overline == true) buf.write('${WellKnown.csi}${WellKnown.sgrOverline}m');
     if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
     if (s.background != null) buf.write(s.background!.sgrSequence(background: true));
     if (linkUri != null) buf.write(hyperlink(linkUri, ''));

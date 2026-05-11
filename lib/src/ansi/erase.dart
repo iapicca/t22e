@@ -1,7 +1,9 @@
-String eraseDisplay(int mode) => '\x1b[${mode}J';
-String eraseLine(int mode) => '\x1b[${mode}K';
-String eraseScreen() => '\x1b[2J';
-String eraseSavedLines() => '\x1b[3J';
-String eraseLineToEnd() => '\x1b[0K';
-String eraseLineToStart() => '\x1b[1K';
-String eraseLineAll() => '\x1b[2K';
+import '../well_known.dart' show WellKnown;
+
+String eraseDisplay(int mode) => '${WellKnown.csi}${mode}J';
+String eraseLine(int mode) => '${WellKnown.csi}${mode}K';
+String eraseScreen() => '${WellKnown.csi}${WellKnown.eraseDisplayAll}J';
+String eraseSavedLines() => '${WellKnown.csi}${WellKnown.eraseDisplaySaved}J';
+String eraseLineToEnd() => '${WellKnown.csi}${WellKnown.eraseLineRight}K';
+String eraseLineToStart() => '${WellKnown.csi}${WellKnown.eraseLineLeft}K';
+String eraseLineAll() => '${WellKnown.csi}${WellKnown.eraseLineAll}K';

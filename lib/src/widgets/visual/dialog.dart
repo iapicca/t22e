@@ -1,6 +1,7 @@
 import '../../loop/model.dart' show Model;
 import '../../loop/msg.dart' show Msg, KeyMsg;
 import '../../loop/cmd.dart' show Cmd;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget, PaintingContext;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -128,12 +129,12 @@ class _DialogOverlay extends Widget {
       }
     }
 
-    final dialogW = (w * 0.6).round().clamp(20, w - 4);
-    final dialogH = (h * 0.4).round().clamp(5, h - 4);
+    final dialogW = (w * WellKnown.dialogWidthRatio).round().clamp(WellKnown.dialogMinWidth, w - WellKnown.dialogHMargin);
+    final dialogH = (h * WellKnown.dialogHeightRatio).round().clamp(WellKnown.dialogMinHeight, h - WellKnown.dialogHMargin);
     final dialogX = (w - dialogW) ~/ 2;
     final dialogY = h ~/ 3;
 
-    final contentHeight = dialogH - 4 - (buttons.isNotEmpty ? 3 : 0);
+    final contentHeight = dialogH - WellKnown.dialogHMargin - (buttons.isNotEmpty ? WellKnown.dialogButtonBarHeight : 0);
 
     final buttonBar = _buildButtonBar();
 
@@ -142,8 +143,8 @@ class _DialogOverlay extends Widget {
       title: title.isNotEmpty ? title : null,
       padding: const Insets.all(1),
       child: Column(children: [
-        SizedBox(height: contentHeight.clamp(1, 100), child: content),
-        if (buttons.isNotEmpty) SizedBox(height: 3, child: buttonBar),
+        SizedBox(height: contentHeight.clamp(1, WellKnown.dialogContentClampHigh), child: content),
+        if (buttons.isNotEmpty) SizedBox(height: WellKnown.dialogButtonBarHeight, child: buttonBar),
       ]),
     );
 

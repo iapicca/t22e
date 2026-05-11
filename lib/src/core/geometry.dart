@@ -1,3 +1,5 @@
+import '../well_known.dart' show WellKnown;
+
 class Point {
   final int x;
   final int y;
@@ -76,8 +78,8 @@ class Rect {
   Rect inflate(int dx, int dy) {
     final l = left - dx;
     final t = top - dy;
-    final r = (right + dx).clamp(l, 0x7FFFFFFF);
-    final b = (bottom + dy).clamp(t, 0x7FFFFFFF);
+    final r = (right + dx).clamp(l, WellKnown.unbounded);
+    final b = (bottom + dy).clamp(t, WellKnown.unbounded);
     return Rect(l, t, r - l, b - t);
   }
 

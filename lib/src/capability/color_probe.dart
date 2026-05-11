@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import '../core/color.dart' show ColorProfile;
-import '../loop/well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
 import '../parser/events.dart' show ColorQueryEvent;
 import '../parser/parser.dart' show TerminalParser;
 import 'result.dart' show QueryResult, Supported, Da1Result;
@@ -10,12 +10,12 @@ import 'result.dart' show QueryResult, Supported, Da1Result;
 class ColorProbe {
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
-    if (colorterm == 'truecolor' || colorterm == '24bit') {
+    if (colorterm == WellKnown.envColortermTruecolor || colorterm == WellKnown.envColorterm24bit) {
       return ColorProfile.trueColor;
     }
     final term = Platform.environment['TERM'] ?? '';
-    if (term.endsWith('-256color')) return ColorProfile.indexed256;
-    if (term.endsWith('-truecolor') || term.endsWith('-direct')) {
+    if (term.endsWith(WellKnown.envTermSuffix256Color)) return ColorProfile.indexed256;
+    if (term.endsWith(WellKnown.envTermSuffixTrueColor) || term.endsWith(WellKnown.envTermSuffixDirect)) {
       return ColorProfile.trueColor;
     }
     return ColorProfile.ansi16;
@@ -24,8 +24,8 @@ class ColorProbe {
   ColorProfile detectFromDa1(QueryResult<Da1Result> da1Result) {
     if (da1Result is Supported<Da1Result>) {
       final attrs = da1Result.value.attributes;
-      if (attrs.contains(28)) return ColorProfile.trueColor;
-      if (attrs.contains(22)) return ColorProfile.indexed256;
+      if (attrs.contains(WellKnown.da1AttrTrueColor)) return ColorProfile.trueColor;
+      if (attrs.contains(WellKnown.da1AttrIndexed256)) return ColorProfile.indexed256;
     }
     return ColorProfile.ansi16;
   }
@@ -57,7 +57,7 @@ class ColorProbe {
       }
     });
 
-    stdout.write('\x1b]10;?\x07');
+    stdout.write('${WellKnown.osc}${WellKnown.oscFgQuery};?${WellKnown.bel}');
     await stdout.flush();
 
     final result = await completer.future;

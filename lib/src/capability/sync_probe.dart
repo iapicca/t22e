@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../loop/well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
+import '../ansi/term.dart' show querySyncUpdate;
 import '../parser/events.dart' show QuerySyncUpdateEvent;
 import '../parser/parser.dart' show TerminalParser;
 
@@ -27,7 +28,7 @@ class SyncProbe {
       }
     });
 
-    stdout.write('\x1b[?2026\$p');
+    stdout.write(querySyncUpdate());
     await stdout.flush();
 
     final result = await completer.future;

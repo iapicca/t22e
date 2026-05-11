@@ -1,14 +1,15 @@
 import 'package:test/test.dart';
 import 'package:t22e/src/ansi/codes.dart';
+import 'package:t22e/src/well_known.dart' show WellKnown;
 
 void main() {
   group('ANSI constants', () {
-    test('esc is \\x1b', () => expect(esc, equals('\x1b')));
-    test('csi is \\x1b[', () => expect(csi, equals('\x1b[')));
-    test('osc is \\x1b]', () => expect(osc, equals('\x1b]')));
-    test('dcs is \\x1bP', () => expect(dcs, equals('\x1bP')));
-    test('st is \\x1b\\', () => expect(st, equals('\x1b\\')));
-    test('bel is \\x07', () => expect(bel, equals('\x07')));
+    test('esc is \\x1b', () => expect(WellKnown.esc, equals('\x1b')));
+    test('csi is \\x1b[', () => expect(WellKnown.csi, equals('\x1b[')));
+    test('osc is \\x1b]', () => expect(WellKnown.osc, equals('\x1b]')));
+    test('dcs is \\x1bP', () => expect(WellKnown.dcs, equals('\x1bP')));
+    test('st is \\x1b\\', () => expect(WellKnown.st, equals('\x1b\\')));
+    test('bel is \\x07', () => expect(WellKnown.bel, equals('\x07')));
   });
 
   group('text attributes', () {

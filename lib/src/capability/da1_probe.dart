@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import '../ansi/term.dart' show queryDa1;
-import '../loop/well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
 import '../parser/events.dart' show PrimaryDeviceAttributesEvent;
 import '../parser/parser.dart' show TerminalParser;
 import 'result.dart' show QueryResult, Supported, Unavailable, Da1Result;

@@ -33,7 +33,7 @@ export 'src/renderer/sync_renderer.dart';
 export 'src/renderer/cell_renderer.dart' show CellRenderer;
 export 'src/renderer/benchmark.dart' show BenchmarkSuite, BenchmarkResult;
 
-export 'src/loop/well_known.dart' show WellKnown;
+export 'src/well_known.dart' show WellKnown;
 export 'src/loop/model.dart' show Model;
 export 'src/loop/msg.dart';
 export 'src/loop/cmd.dart';

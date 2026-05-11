@@ -1,6 +1,7 @@
 import '../../loop/model.dart' show Model;
 import '../../loop/msg.dart' show Msg, KeyMsg, CursorBlinkMsg;
 import '../../loop/cmd.dart' show Cmd, TickCmd;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
@@ -22,11 +23,11 @@ class TextInput extends Model<TextInput> {
     this.value = '',
     this.cursorPosition = 0,
     this.selectionStart,
-    this.maxLength = -1,
+    this.maxLength = WellKnown.textInputNoMaxLength,
     this.echoMode = EchoMode.normal,
     this.validator,
     this.cursorVisible = true,
-    this.blinkInterval = const Duration(milliseconds: 500),
+    this.blinkInterval = WellKnown.cursorBlinkInterval,
   });
 
   @override
@@ -110,7 +111,7 @@ class TextInput extends Model<TextInput> {
 
   bool _isPrintable(String char) {
     final cp = char.runes.first;
-    return cp >= 0x20 && cp != 0x7F;
+    return cp >= WellKnown.codepointSpace && cp != WellKnown.codepointDel;
   }
 
   (TextInput, Cmd?) _insertChar(String char) {
@@ -150,7 +151,7 @@ class TextInput extends Model<TextInput> {
   String get _displayValue {
     return switch (echoMode) {
       EchoMode.normal => value,
-      EchoMode.password => '\u2022' * value.length,
+      EchoMode.password => WellKnown.charBullet * value.length,
       EchoMode.noEcho => '',
     };
   }
@@ -184,7 +185,7 @@ class TextInput extends Model<TextInput> {
     final beforeCursor = display.substring(0, cursorPos);
     final afterCursor = display.substring(cursorPos);
 
-    final cursorChar = cursorVisible ? '\u2588' : ' ';
+    final cursorChar = cursorVisible ? WellKnown.charFullBlock : ' ';
 
     return Row(children: [
       Text(beforeCursor),

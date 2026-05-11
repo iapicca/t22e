@@ -1,4 +1,4 @@
-import '../ansi/codes.dart' show csi;
+import '../well_known.dart' show WellKnown;
 
 enum ColorKind { noColor, ansi, indexed, rgb }
 
@@ -148,18 +148,18 @@ class Color {
   }
 
   String sgrSequence({bool background = false}) {
-    final prefix = background ? 48 : 38;
+    final prefix = background ? WellKnown.sgrBgExtended : WellKnown.sgrFgExtended;
     switch (kind) {
       case ColorKind.noColor:
-        return background ? '$csi${49}m' : '$csi${39}m';
+        return background ? '${WellKnown.csi}${WellKnown.sgrBgReset}m' : '${WellKnown.csi}${WellKnown.sgrFgReset}m';
       case ColorKind.ansi:
-        final off = background ? 40 : 30;
-        if (value < 8) return '$csi${off + value}m';
-        return '$csi${off + 60 + value - 8}m';
+        final off = background ? WellKnown.sgrBgAnsiBase : WellKnown.sgrFgAnsiBase;
+        if (value < WellKnown.ansiDarkThreshold) return '${WellKnown.csi}${off + value}m';
+        return '${WellKnown.csi}${off + WellKnown.ansiBrightOffset + value - WellKnown.ansiDarkThreshold}m';
       case ColorKind.indexed:
-        return '$csi$prefix;5;${value}m';
+        return '${WellKnown.csi}$prefix;5;${value}m';
       case ColorKind.rgb:
-        return '$csi$prefix;2;$red;$green;${blue}m';
+        return '${WellKnown.csi}$prefix;2;$red;$green;${blue}m';
     }
   }
 

@@ -1,4 +1,5 @@
 import 'color.dart';
+import '../well_known.dart' show WellKnown;
 
 class TextStyle {
   final Color? foreground;
@@ -127,7 +128,7 @@ class TextStyle {
 
   factory TextStyle.link({String? uri}) {
     return TextStyle(
-      foreground: const Color.rgb(0, 102, 204),
+      foreground: const Color.rgb(WellKnown.linkColorRed, WellKnown.linkColorGreen, WellKnown.linkColorBlue),
       underline: true,
     );
   }

@@ -1,4 +1,4 @@
-import '../loop/well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
 
 enum VtState { ground, escape, escapeIntermediate, csiEntry, csiParam, csiIntermediate, csiIgnore, oscString, dcsEntry, dcsParam, dcsIntermediate, dcsIgnore, dcsPassthrough }
 

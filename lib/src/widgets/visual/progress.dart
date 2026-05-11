@@ -1,6 +1,7 @@
 import '../../loop/model.dart' show Model;
 import '../../loop/msg.dart' show Msg, ProgressTickMsg;
 import '../../loop/cmd.dart' show Cmd, TickCmd;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
@@ -18,10 +19,10 @@ class ProgressBar extends Model<ProgressBar> {
   const ProgressBar({
     this.fraction,
     this.label,
-    this.barWidth = 20,
-    this.fillChar = '\u2588',
-    this.emptyChar = '\u2591',
-    this.animInterval = const Duration(milliseconds: 100),
+    this.barWidth = WellKnown.defaultProgressBarWidth,
+    this.fillChar = WellKnown.charFullBlock,
+    this.emptyChar = WellKnown.charLightShade,
+    this.animInterval = WellKnown.progressAnimInterval,
     this.indeterminateOffset = 0,
   });
 

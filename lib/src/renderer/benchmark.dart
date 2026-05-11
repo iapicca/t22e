@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import '../core/cell.dart';
 import '../core/surface.dart';
+import '../well_known.dart' show WellKnown;
 import 'frame.dart' show Frame, diff;
 import 'line_renderer.dart';
 import 'cell_renderer.dart';
@@ -42,7 +43,7 @@ class BenchmarkResult {
 class BenchmarkSuite {
   final List<BenchmarkResult> results = [];
 
-  void measure(String name, void Function() fn, {int iterations = 1000}) {
+  void measure(String name, void Function() fn, {int iterations = WellKnown.benchmarkIterationsDefault}) {
     final stopwatch = Stopwatch();
     stopwatch.start();
     for (var i = 0; i < iterations; i++) {
@@ -83,7 +84,7 @@ class BenchmarkSuite {
         final renderer = pair.$2;
 
         final stopwatch = Stopwatch();
-        const iterations = 500;
+        const iterations = WellKnown.benchmarkRenderCompareIterations;
         stopwatch.start();
         int totalBytes = 0;
         for (var i = 0; i < iterations; i++) {
@@ -131,7 +132,7 @@ class BenchmarkSuite {
     final historicalAvg = historical.last.avgMicros;
 
     if (historicalAvg <= 0) return false;
-    final change = ((currentAvg - historicalAvg) / historicalAvg) * 100;
+    final change = ((currentAvg - historicalAvg) / historicalAvg) * WellKnown.benchmarkRegressionPercent;
     return change > thresholdPercent;
   }
 }

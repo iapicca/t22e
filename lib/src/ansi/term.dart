@@ -1,31 +1,33 @@
-String enterAltScreen() => '\x1b[?1049h';
-String exitAltScreen() => '\x1b[?1049l';
-String enableNormalMouse() => '\x1b[?1000h';
-String disableMouse() => '\x1b[?1000l\x1b[?1002l\x1b[?1006l';
-String enableButtonEvents() => '\x1b[?1002h';
-String enableSgrMouse() => '\x1b[?1006h';
-String startSync() => '\x1b[?2026h';
-String endSync() => '\x1b[?2026l';
-String enableBracketedPaste() => '\x1b[?2004h';
-String disableBracketedPaste() => '\x1b[?2004l';
-String enableFocusTracking() => '\x1b[?1004h';
-String disableFocusTracking() => '\x1b[?1004l';
-String setTitle(String title) => '\x1b]0;$title\x07';
+import '../well_known.dart' show WellKnown;
+
+String enterAltScreen() => '${WellKnown.csi}?${WellKnown.decModeAltScreen}h';
+String exitAltScreen() => '${WellKnown.csi}?${WellKnown.decModeAltScreen}l';
+String enableNormalMouse() => '${WellKnown.csi}?${WellKnown.decModeMouseNormal}h';
+String disableMouse() => '${WellKnown.csi}?${WellKnown.decModeMouseNormal}l${WellKnown.csi}?${WellKnown.decModeMouseButton}l${WellKnown.csi}?${WellKnown.decModeMouseSgr}l';
+String enableButtonEvents() => '${WellKnown.csi}?${WellKnown.decModeMouseButton}h';
+String enableSgrMouse() => '${WellKnown.csi}?${WellKnown.decModeMouseSgr}h';
+String startSync() => '${WellKnown.csi}?${WellKnown.decModeSync}h';
+String endSync() => '${WellKnown.csi}?${WellKnown.decModeSync}l';
+String enableBracketedPaste() => '${WellKnown.csi}?${WellKnown.decModeBracketedPaste}h';
+String disableBracketedPaste() => '${WellKnown.csi}?${WellKnown.decModeBracketedPaste}l';
+String enableFocusTracking() => '${WellKnown.csi}?${WellKnown.decModeFocus}h';
+String disableFocusTracking() => '${WellKnown.csi}?${WellKnown.decModeFocus}l';
+String setTitle(String title) => '${WellKnown.osc}0;$title${WellKnown.bel}';
 String hyperlink(String uri, String text, {String? id}) {
   final params = id != null ? 'id=$id' : '';
-  return '\x1b]8;$params;$uri\x07$text\x1b]8;;\x07';
+  return '${WellKnown.osc}8;$params;$uri${WellKnown.bel}$text${WellKnown.osc}8;;${WellKnown.bel}';
 }
-String enableKittyKeyboard(int flags) => '\x1b[>${flags}u';
-String disableKittyKeyboard() => '\x1b[<u';
-String queryKittyKeyboard() => '\x1b[?u';
-String queryForegroundColor() => '\x1b]10;?\x07';
-String queryBackgroundColor() => '\x1b]11;?\x07';
-String queryCursorPosition() => '\x1b[6n';
-String queryDa1() => '\x1b[c';
-String querySyncUpdate() => '\x1b[?2026\$p';
-String softReset() => '\x1b[!p';
+String enableKittyKeyboard(int flags) => '${WellKnown.csi}>${flags}u';
+String disableKittyKeyboard() => '${WellKnown.csi}<u';
+String queryKittyKeyboard() => '${WellKnown.csi}?u';
+String queryForegroundColor() => '${WellKnown.osc}10;?${WellKnown.bel}';
+String queryBackgroundColor() => '${WellKnown.osc}11;?${WellKnown.bel}';
+String queryCursorPosition() => '${WellKnown.csi}6n';
+String queryDa1() => '${WellKnown.csi}c';
+String querySyncUpdate() => '${WellKnown.csi}?${WellKnown.decModeSync}\$p';
+String softReset() => '${WellKnown.csi}!p';
 String writeClipboard(String base64Data, {String clipboard = 'c'}) =>
-    '\x1b]52;$clipboard;$base64Data\x07';
+    '${WellKnown.osc}52;$clipboard;$base64Data${WellKnown.bel}';
 String queryClipboard({String clipboard = 'c'}) =>
-    '\x1b]52;$clipboard;?\x07';
-String enableMouse() => '\x1b[?1000h\x1b[?1002h\x1b[?1006h';
+    '${WellKnown.osc}52;$clipboard;?${WellKnown.bel}';
+String enableMouse() => '${WellKnown.csi}?${WellKnown.decModeMouseNormal}h${WellKnown.csi}?${WellKnown.decModeMouseButton}h${WellKnown.csi}?${WellKnown.decModeMouseSgr}h';

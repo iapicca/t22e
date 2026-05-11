@@ -1,4 +1,5 @@
 import '../core/color.dart' show ColorProfile;
+import '../well_known.dart' show WellKnown;
 
 sealed class QueryResult<T> {
   const QueryResult();
@@ -34,7 +35,7 @@ class Capabilities {
     this.colorProfile = ColorProfile.ansi16,
     this.syncSupported = false,
     this.keyboardProtocol = KeyboardProtocol.basic,
-    this.rows = 24,
-    this.cols = 80,
+    this.rows = WellKnown.defaultTerminalHeight,
+    this.cols = WellKnown.defaultTerminalWidth,
   });
 }

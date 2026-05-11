@@ -1,3 +1,4 @@
+import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
@@ -7,30 +8,29 @@ final class CsiParser {
     final intermediates = data.intermediates;
     final fb = data.finalByte;
 
-    // CSI final bytes are ASCII characters
-    if (intermediates.contains(0x3C)) {
+    if (intermediates.contains(WellKnown.csiExtendedIntermediate)) {
       return _parseExtended(params, fb);
     }
 
-    if (intermediates.contains(0x3E) && fb == 0x75) {
+    if (intermediates.contains(WellKnown.csiKittyQueryIntermediate) && fb == WellKnown.csiFinalKittyKey) {
       return _parseKittyKey(params);
     }
 
     return switch (fb) {
-      0x41 => _keyEvent(KeyCode.up, params),
-      0x42 => _keyEvent(KeyCode.down, params),
-      0x43 => _keyEvent(KeyCode.right, params),
-      0x44 => _keyEvent(KeyCode.left, params),
-      0x48 => _keyEvent(KeyCode.home, params),
-      0x46 => _keyEvent(KeyCode.end, params),
-      0x50 => _fKey(1, params),
-      0x51 => _fKey(2, params),
-      0x52 when params.length >= 2 => CursorPositionEvent(params[0], params[1]),
-      0x52 => _fKey(3, params),
-      0x53 => _fKey(4, params),
-      0x7E => _parseTilde(params),
-      0x4D => _parseSgrMouse(params),
-      0x63 when intermediates.contains(0x3E) =>
+      WellKnown.csiFinalUp => _keyEvent(KeyCode.up, params),
+      WellKnown.csiFinalDown => _keyEvent(KeyCode.down, params),
+      WellKnown.csiFinalRight => _keyEvent(KeyCode.right, params),
+      WellKnown.csiFinalLeft => _keyEvent(KeyCode.left, params),
+      WellKnown.csiFinalHome => _keyEvent(KeyCode.home, params),
+      WellKnown.csiFinalEnd => _keyEvent(KeyCode.end, params),
+      WellKnown.csiFinalF1 => _fKey(1, params),
+      WellKnown.csiFinalF2 => _fKey(2, params),
+      WellKnown.csiFinalCursorPos when params.length >= 2 => CursorPositionEvent(params[0], params[1]),
+      WellKnown.csiFinalCursorPos => _fKey(3, params),
+      WellKnown.csiFinalF4 => _fKey(4, params),
+      WellKnown.csiFinalTilde => _parseTilde(params),
+      WellKnown.csiFinalMouse => _parseSgrMouse(params),
+      WellKnown.csiFinalDA when intermediates.contains(WellKnown.csiKittyQueryIntermediate) =>
           PrimaryDeviceAttributesEvent(List.unmodifiable(params.length >= 2 ? params.sublist(1) : params)),
       _ => null,
     };
@@ -63,7 +63,7 @@ final class CsiParser {
   }
 
   Event? _parseExtended(List<int> params, int fb) {
-    if (fb == 0x4D && params.length >= 3) {
+    if (fb == WellKnown.csiFinalMouse && params.length >= 3) {
       return _parseSgrMouseParams(params);
     }
     return null;
@@ -78,7 +78,7 @@ final class CsiParser {
     final mods = _kittyModifiers(modifiers);
     final type = eventType == 2 ? KeyEventType.up : (eventType == 3 ? KeyEventType.repeat : KeyEventType.down);
 
-    if (code >= ' '.codeUnitAt(0) && code <= '~'.codeUnitAt(0)) {
+    if (code >= WellKnown.byteRangePrintableLow && code <= WellKnown.byteRangePrintableHigh) {
       return KeyEvent(keyCode: KeyCode.char, modifiers: mods, type: type, codepoint: code);
     }
 
@@ -107,10 +107,10 @@ final class CsiParser {
 
   KeyModifiers _kittyModifiers(int mod) {
     return KeyModifiers(
-      shift: (mod & 1) != 0,
-      alt: (mod & 2) != 0,
-      ctrl: (mod & 4) != 0,
-      meta: (mod & 8) != 0,
+      shift: (mod & WellKnown.modShift) != 0,
+      alt: (mod & WellKnown.modAlt) != 0,
+      ctrl: (mod & WellKnown.modCtrl) != 0,
+      meta: (mod & WellKnown.modMeta) != 0,
     );
   }
 
@@ -124,19 +124,19 @@ final class CsiParser {
     final x = params[1] - 1;
     final y = params[2] - 1;
 
-    if (cb == 64) return MouseEvent(button: MouseButton.wheelUp, action: MouseAction.press, x: x, y: y);
-    if (cb == 65) return MouseEvent(button: MouseButton.wheelDown, action: MouseAction.press, x: x, y: y);
+    if (cb == WellKnown.mouseWheelUpCode) return MouseEvent(button: MouseButton.wheelUp, action: MouseAction.press, x: x, y: y);
+    if (cb == WellKnown.mouseWheelDownCode) return MouseEvent(button: MouseButton.wheelDown, action: MouseAction.press, x: x, y: y);
 
-    if ((cb & 32) != 0 && (cb & 3) != 3) {
-      final button = _mouseButtonFromCode(cb & 3);
+    if ((cb & WellKnown.mouseDragBit) != 0 && (cb & WellKnown.mouseButtonMask) != 3) {
+      final button = _mouseButtonFromCode(cb & WellKnown.mouseButtonMask);
       return MouseEvent(button: button, action: MouseAction.drag, x: x, y: y);
     }
 
-    if ((cb & 32) != 0) {
+    if ((cb & WellKnown.mouseDragBit) != 0) {
       return MouseEvent(button: MouseButton.none, action: MouseAction.release, x: x, y: y);
     }
 
-    final button = _mouseButtonFromCode(cb & 3);
+    final button = _mouseButtonFromCode(cb & WellKnown.mouseButtonMask);
     return MouseEvent(button: button, action: MouseAction.press, x: x, y: y);
   }
 
@@ -165,10 +165,10 @@ final class CsiParser {
 
   KeyModifiers _modifiersFromParam(int param) {
     return KeyModifiers(
-      shift: (param & 1) != 0,
-      alt: (param & 2) != 0,
-      ctrl: (param & 4) != 0,
-      meta: (param & 8) != 0,
+      shift: (param & WellKnown.modShift) != 0,
+      alt: (param & WellKnown.modAlt) != 0,
+      ctrl: (param & WellKnown.modCtrl) != 0,
+      meta: (param & WellKnown.modMeta) != 0,
     );
   }
 }

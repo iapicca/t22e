@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import '../ansi/term.dart' show enableKittyKeyboard, disableKittyKeyboard;
-import '../loop/well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
 import '../parser/events.dart' show KeyboardEnhancementFlagsEvent;
 import '../parser/parser.dart' show TerminalParser;
 import 'result.dart' show KeyboardProtocol;
@@ -31,7 +31,7 @@ class KeyboardProbe {
       }
     });
 
-    stdout.write(enableKittyKeyboard(1));
+    stdout.write(enableKittyKeyboard(WellKnown.kittyDisambiguate));
     await stdout.flush();
 
     final result = await completer.future;

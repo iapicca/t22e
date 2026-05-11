@@ -1,6 +1,7 @@
 import '../../loop/model.dart' show Model;
 import '../../loop/msg.dart' show Msg, KeyMsg;
 import '../../loop/cmd.dart' show Cmd;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -29,7 +30,7 @@ class ListView extends Model<ListView> {
     this.selectedIndex = 0,
     this.multiSelected = const {},
     this.multiSelect = false,
-    this.viewportHeight = 10,
+    this.viewportHeight = WellKnown.defaultViewportHeight,
   });
 
   @override
@@ -135,8 +136,8 @@ class ListView extends Model<ListView> {
         ? const TextStyle(reverse: true)
         : TextStyle.empty;
     final prefix = multiSelect
-        ? (isMultiSelected ? '[\u2713] ' : '[ ] ')
-        : (isSelected ? '\u25B6 ' : '  ');
+        ? (isMultiSelected ? '[${WellKnown.charCheckMark}] ' : '[ ] ')
+        : (isSelected ? '${WellKnown.charRightTriangle} ' : '  ');
     return Text('$prefix${item.label}', style: style);
   }
 }

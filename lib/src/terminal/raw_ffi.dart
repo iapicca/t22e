@@ -1,13 +1,15 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import '../well_known.dart' show WellKnown;
+
 DynamicLibrary _loadLibc() {
-  if (Platform.isMacOS) return DynamicLibrary.open('libSystem.dylib');
+  if (Platform.isMacOS) return DynamicLibrary.open(WellKnown.libcMacOS);
   if (Platform.isLinux) {
     try {
-      return DynamicLibrary.open('libc.so.6');
+      return DynamicLibrary.open(WellKnown.libcLinux6);
     } catch (_) {
-      return DynamicLibrary.open('libc.so.7');
+      return DynamicLibrary.open(WellKnown.libcLinux7);
     }
   }
   throw UnsupportedError('FFI raw mode is not supported on this platform');
@@ -23,11 +25,6 @@ final int Function(int fd, int opt, Pointer<Uint8> buf) tcSetAttr = _libc
     .lookupFunction<Int32 Function(Int32, Int32, Pointer<Uint8>),
         int Function(int, int, Pointer<Uint8>)>('tcsetattr');
 
-const _echo = 0x00000008;
-const _icanon = 0x00000002;
-const _isig = 0x00000001;
-const _iexten = 0x00008000;
-
 final class RawModeState {
   final Pointer<Uint8> buf;
   final int cIflag;
@@ -40,9 +37,8 @@ final class RawModeState {
 
 RawModeState? enableRawModeFfi() {
   if (Platform.isWindows) return null;
-  const size = 60;
-  final buf = _malloc(size);
-  final result = tcGetAttr(0, buf);
+  final buf = _malloc(WellKnown.termiosStructSize);
+  final result = tcGetAttr(WellKnown.stdinFd, buf);
   if (result != 0) {
     _free(buf);
     return null;
@@ -50,18 +46,18 @@ RawModeState? enableRawModeFfi() {
 
   final saved = RawModeState(
     buf,
-    _read32(buf, 0),
-    _read32(buf, 4),
-    _read32(buf, 8),
-    _read32(buf, 12),
+    _read32(buf, WellKnown.termiosOffsetIFlag),
+    _read32(buf, WellKnown.termiosOffsetOFlag),
+    _read32(buf, WellKnown.termiosOffsetCFlag),
+    _read32(buf, WellKnown.termiosOffsetLFlag),
   );
 
-  final clflag = saved.cLflag & ~(_echo | _icanon | _isig | _iexten);
-  _write32(buf, 12, clflag);
-  _write8(buf, 17, 1);
-  _write8(buf, 18, 0);
+  final clflag = saved.cLflag & ~(WellKnown.termiosEcho | WellKnown.termiosICanon | WellKnown.termiosISig | WellKnown.termiosIExten);
+  _write32(buf, WellKnown.termiosOffsetLFlag, clflag);
+  _write8(buf, WellKnown.termiosOffsetCCMin, WellKnown.termiosVminRaw);
+  _write8(buf, WellKnown.termiosOffsetCCTime, WellKnown.termiosVtimeRaw);
 
-  final setResult = tcSetAttr(0, 0, buf);
+  final setResult = tcSetAttr(WellKnown.stdinFd, WellKnown.tcsaNow, buf);
   if (setResult != 0) {
     _free(buf);
     return null;
@@ -71,11 +67,11 @@ RawModeState? enableRawModeFfi() {
 }
 
 void disableRawModeFfi(RawModeState state) {
-  _write32(state.buf, 0, state.cIflag);
-  _write32(state.buf, 4, state.cOflag);
-  _write32(state.buf, 8, state.cCflag);
-  _write32(state.buf, 12, state.cLflag);
-  tcSetAttr(0, 0, state.buf);
+  _write32(state.buf, WellKnown.termiosOffsetIFlag, state.cIflag);
+  _write32(state.buf, WellKnown.termiosOffsetOFlag, state.cOflag);
+  _write32(state.buf, WellKnown.termiosOffsetCFlag, state.cCflag);
+  _write32(state.buf, WellKnown.termiosOffsetLFlag, state.cLflag);
+  tcSetAttr(WellKnown.stdinFd, WellKnown.tcsaNow, state.buf);
   _free(state.buf);
 }
 
@@ -94,16 +90,16 @@ void _free(Pointer<Uint8> ptr) {
 }
 
 int _read32(Pointer<Uint8> p, int offset) {
-  return p[offset] | (p[offset + 1] << 8) | (p[offset + 2] << 16) | (p[offset + 3] << 24);
+  return p[offset] | (p[offset + 1] << WellKnown.bitShift8) | (p[offset + 2] << WellKnown.bitShift16) | (p[offset + 3] << WellKnown.bitShift24);
 }
 
 void _write32(Pointer<Uint8> p, int offset, int value) {
-  p[offset] = value & 0xFF;
-  p[offset + 1] = (value >> 8) & 0xFF;
-  p[offset + 2] = (value >> 16) & 0xFF;
-  p[offset + 3] = (value >> 24) & 0xFF;
+  p[offset] = value & WellKnown.byteMask;
+  p[offset + 1] = (value >> WellKnown.bitShift8) & WellKnown.byteMask;
+  p[offset + 2] = (value >> WellKnown.bitShift16) & WellKnown.byteMask;
+  p[offset + 3] = (value >> WellKnown.bitShift24) & WellKnown.byteMask;
 }
 
 void _write8(Pointer<Uint8> p, int offset, int value) {
-  p[offset] = value & 0xFF;
+  p[offset] = value & WellKnown.byteMask;
 }

@@ -3,6 +3,7 @@ import '../enums.dart' show BorderStyle;
 import '../../core/geometry.dart' show Insets, Rect;
 import '../../core/layout.dart' show Constraints, Size;
 import '../../core/style.dart' show TextStyle;
+import '../../well_known.dart' show WellKnown;
 import '../../unicode/width.dart' show stringWidth;
 
 class Box extends Widget {
@@ -114,10 +115,10 @@ class Box extends Widget {
 
   String _borderChars() {
     return switch (borderStyle) {
-      BorderStyle.single => '│─┌┐└┘',
-      BorderStyle.double => '║═╔╗╚╝',
-      BorderStyle.rounded => '│─╭╮╰╯',
-      BorderStyle.thick => '┃━┏┓┗┛',
+      BorderStyle.single => WellKnown.borderSingle,
+      BorderStyle.double => WellKnown.borderDouble,
+      BorderStyle.rounded => WellKnown.borderRounded,
+      BorderStyle.thick => WellKnown.borderThick,
     };
   }
 }

@@ -1,3 +1,5 @@
+import '../well_known.dart' show WellKnown;
+
 class Constraints {
   final int minWidth;
   final int maxWidth;
@@ -6,9 +8,9 @@ class Constraints {
 
   const Constraints({
     this.minWidth = 0,
-    this.maxWidth = 0x7FFFFFFF,
+    this.maxWidth = WellKnown.unbounded,
     this.minHeight = 0,
-    this.maxHeight = 0x7FFFFFFF,
+    this.maxHeight = WellKnown.unbounded,
   });
 
   const Constraints.tight(int width, int height)
@@ -20,7 +22,7 @@ class Constraints {
   bool get isTight => minWidth == maxWidth && minHeight == maxHeight;
 
   bool get isUnbounded =>
-      maxWidth == 0x7FFFFFFF || maxHeight == 0x7FFFFFFF;
+      maxWidth == WellKnown.unbounded || maxHeight == WellKnown.unbounded;
 
   Size constrain(Size size) {
     return Size(

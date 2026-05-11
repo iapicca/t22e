@@ -1,6 +1,7 @@
 import '../core/cell.dart';
 import '../core/surface.dart';
 import '../core/style.dart';
+import '../well_known.dart' show WellKnown;
 import '../widgets/widget.dart';
 import '../widgets/renderer.dart';
 import '../renderer/frame.dart';
@@ -16,10 +17,10 @@ class WidgetTester {
   Model? _model;
   Surface Function()? _viewFn;
 
-  WidgetTester({int width = 80, int height = 24})
+  WidgetTester({int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight})
       : virtualTerminal = VirtualTerminal(width: width, height: height);
 
-  void pumpWidget(Widget root, {int width = 80, int height = 24}) {
+  void pumpWidget(Widget root, {int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight}) {
     final surface = WidgetRenderer.render(root, width, height);
     final frame = Frame.fromSurface(surface, includeCells: true);
     final empty = Frame([], [],
@@ -28,7 +29,7 @@ class WidgetTester {
     virtualTerminal.write(output);
   }
 
-  void pumpWidgetWithModel(Model model, {required Surface Function() view, int width = 80, int height = 24}) {
+  void pumpWidgetWithModel(Model model, {required Surface Function() view, int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight}) {
     _model = model;
     _viewFn = view;
     final surface = view();
@@ -43,7 +44,7 @@ class WidgetTester {
     _model = result.$1 as Model;
     final surface = _viewFn!();
     final frame = Frame.fromSurface(surface);
-    virtualTerminal.write('\x1b[2J');
+    virtualTerminal.write('${WellKnown.csi}${WellKnown.eraseDisplayAll}J');
     for (var r = 0; r < frame.styledLines.length; r++) {
       virtualTerminal.write('\x1b[${r + 1};1H${frame.styledLines[r]}');
     }
@@ -56,7 +57,7 @@ class WidgetTester {
     _model = result.$1 as Model;
     final surface = _viewFn!();
     final frame = Frame.fromSurface(surface);
-    virtualTerminal.write('\x1b[2J');
+    virtualTerminal.write('${WellKnown.csi}${WellKnown.eraseDisplayAll}J');
     for (var r = 0; r < frame.styledLines.length; r++) {
       virtualTerminal.write('\x1b[${r + 1};1H${frame.styledLines[r]}');
     }

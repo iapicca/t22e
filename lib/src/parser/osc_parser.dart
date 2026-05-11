@@ -1,3 +1,4 @@
+import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
@@ -14,11 +15,11 @@ final class OscParser {
     final value = content.substring(semicolon + 1);
 
     return switch (pn) {
-      0 || 1 || 2 => InternalEvent('title_changed', {'title': value}),
-      8 => _parseHyperlink(value),
-      10 => _parseColor(value, 10),
-      11 => _parseColor(value, 11),
-       52 => _parseClipboard(value),
+      WellKnown.oscTitle || 1 || 2 => InternalEvent('title_changed', {'title': value}),
+      WellKnown.oscHyperlink => _parseHyperlink(value),
+      WellKnown.oscFgQuery => _parseColor(value, WellKnown.oscFgQuery),
+      WellKnown.oscBgQuery => _parseColor(value, WellKnown.oscBgQuery),
+      WellKnown.oscClipboard => _parseClipboard(value),
       _ => null,
     };
   }

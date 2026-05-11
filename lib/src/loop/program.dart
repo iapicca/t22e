@@ -18,14 +18,14 @@ import '../widgets/renderer.dart' show WidgetRenderer;
 import 'cmd.dart' show Cmd;
 import 'model.dart' show Model;
 import 'msg.dart';
-import 'well_known.dart' show WellKnown;
+import '../well_known.dart' show WellKnown;
 
 class FpsThrottle {
   final Duration _frameDuration;
   DateTime _lastRender = DateTime.now();
 
   FpsThrottle({int fps = WellKnown.defaultFps})
-      : _frameDuration = Duration(microseconds: (1000000 / fps).round());
+      : _frameDuration = Duration(microseconds: (WellKnown.microsecondsPerSecond / fps).round());
 
   bool get shouldRender {
     final now = DateTime.now();
@@ -61,8 +61,8 @@ class Program<M extends Model<M>> {
   Frame? _previousFrame;
   bool _inEscapeSequence = false;
   Timer? _escTimer;
-  int _termWidth = 80;
-  int _termHeight = 24;
+  int _termWidth = WellKnown.defaultTerminalWidth;
+  int _termHeight = WellKnown.defaultTerminalHeight;
 
   Program(this._model, {
     int fps = WellKnown.defaultFps,
@@ -95,7 +95,7 @@ class Program<M extends Model<M>> {
       stdout.write(enableMouse());
     }
     if (_useKittyKeyboard) {
-      stdout.write(enableKittyKeyboard(3));
+      stdout.write(enableKittyKeyboard(WellKnown.kittyAllEvents));
     }
     stdout.flush();
     _guard.arm();

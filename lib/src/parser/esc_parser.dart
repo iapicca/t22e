@@ -1,3 +1,4 @@
+import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
@@ -6,25 +7,25 @@ final class EscParser {
     final intermediates = data.intermediates;
     final fb = data.finalByte;
 
-    if (intermediates.contains(0x4F)) {
+    if (intermediates.contains(WellKnown.ss3Byte)) {
       return switch (fb) {
-        0x50 => KeyEvent(keyCode: KeyCode.f1),
-        0x51 => KeyEvent(keyCode: KeyCode.f2),
-        0x52 => KeyEvent(keyCode: KeyCode.f3),
-        0x53 => KeyEvent(keyCode: KeyCode.f4),
+        WellKnown.escSs3F1 => KeyEvent(keyCode: KeyCode.f1),
+        WellKnown.escSs3F2 => KeyEvent(keyCode: KeyCode.f2),
+        WellKnown.escSs3F3 => KeyEvent(keyCode: KeyCode.f3),
+        WellKnown.escSs3F4 => KeyEvent(keyCode: KeyCode.f4),
         _ => null,
       };
     }
 
-    if (intermediates.contains(0x4F) && fb == 0x52) {
+    if (intermediates.contains(WellKnown.ss3Byte) && fb == WellKnown.escSs3F3) {
       return KeyEvent(keyCode: KeyCode.f3);
     }
 
     return switch (fb) {
-      0x63 => InternalEvent('reset'),
-      0x37 => InternalEvent('screen_save'),
-      0x38 => InternalEvent('screen_restore'),
-      0x4D => InternalEvent('scroll_reverse'),
+      WellKnown.escFinalReset => InternalEvent('reset'),
+      WellKnown.escFinalSaveCursor => InternalEvent('screen_save'),
+      WellKnown.escFinalRestoreCursor => InternalEvent('screen_restore'),
+      WellKnown.escFinalScrollReverse => InternalEvent('scroll_reverse'),
       _ => null,
     };
   }

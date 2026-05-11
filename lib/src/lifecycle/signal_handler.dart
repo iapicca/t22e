@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import '../well_known.dart' show WellKnown;
 import 'terminal_guard.dart' show TerminalGuard;
 
 class SignalHandler {
@@ -21,7 +22,7 @@ class SignalHandler {
 
     _sigtermSub = ProcessSignal.sigterm.watch().listen((_) {
       _guard.restore();
-      exit(0);
+      exit(WellKnown.exitCodeOk);
     });
 
     _sigtstpSub = ProcessSignal.sigtstp.watch().listen((_) {

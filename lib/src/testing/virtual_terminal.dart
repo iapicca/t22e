@@ -1,6 +1,7 @@
 import '../core/cell.dart';
 import '../core/style.dart';
 import '../core/color.dart' show Color;
+import '../well_known.dart' show WellKnown;
 
 class VirtualTerminal {
   int width;
@@ -16,7 +17,7 @@ class VirtualTerminal {
   // ignore: unused_field
   List<List<Cell>>? _normalScreenBuffer;
 
-  VirtualTerminal({this.width = 80, this.height = 24}) {
+  VirtualTerminal({this.width = WellKnown.defaultTerminalWidth, this.height = WellKnown.defaultTerminalHeight}) {
     _resetGrid();
   }
 
@@ -24,33 +25,33 @@ class VirtualTerminal {
     var i = 0;
     while (i < ansi.length) {
       final c = ansi.codeUnitAt(i);
-      if (c == 0x1B && i + 1 < ansi.length) {
+      if (c == WellKnown.escapeByte && i + 1 < ansi.length) {
         final next = ansi.codeUnitAt(i + 1);
-        if (next == 0x5B) {
+        if (next == WellKnown.csiEntryByte) {
           i = _handleCsi(ansi, i + 2);
-        } else if (next == 0x5D) {
+        } else if (next == WellKnown.oscEntryByte) {
           i = _handleOsc(ansi, i + 2);
-        } else if (next == 0x63) {
+        } else if (next == WellKnown.escFinalReset) {
           _resetGrid();
           i += 2;
-        } else if (next == 0x37) {
+        } else if (next == WellKnown.escFinalSaveCursor) {
           _cursorX = _savedCursorX;
           _cursorY = _savedCursorY;
           i += 2;
-        } else if (next == 0x38) {
+        } else if (next == WellKnown.escFinalRestoreCursor) {
           _savedCursorX = _cursorX;
           _savedCursorY = _cursorY;
           i += 2;
         } else {
           i += 2;
         }
-      } else if (c == 0x0A) {
+      } else if (c == WellKnown.lineFeedByte) {
         _newline();
         i++;
-      } else if (c == 0x0D) {
+      } else if (c == WellKnown.carriageReturnByte) {
         _cursorX = 0;
         i++;
-      } else if (c >= 0x20) {
+      } else if (c >= WellKnown.codepointSpace) {
         _putChar(ansi[i]);
         i++;
       } else {
@@ -69,17 +70,17 @@ class VirtualTerminal {
 
     while (i < ansi.length) {
       final c = ansi.codeUnitAt(i);
-      if (c >= 0x30 && c <= 0x39) {
+      if (c >= WellKnown.byteRangeDigitLow && c <= WellKnown.byteRangeDigitHigh) {
         numStr += String.fromCharCode(c);
-      } else if (c == 0x3B) {
+      } else if (c == WellKnown.semicolonByte) {
         params.add(numStr.isEmpty ? 0 : int.parse(numStr));
         numStr = '';
-      } else if (c >= 0x40 && c <= 0x7E) {
+      } else if (c >= WellKnown.byteRangeUpperLow && c <= WellKnown.byteRangeUpperHigh) {
         params.add(numStr.isEmpty ? 0 : int.parse(numStr));
         final fb = c;
         _dispatchCsi(params, fb);
         return i + 1;
-      } else if (c == 0x3F) {
+      } else if (c == WellKnown.decPrivatePrefix) {
         params.add(-1);
         numStr = '';
       } else {
@@ -94,7 +95,7 @@ class VirtualTerminal {
     var i = start;
     while (i < ansi.length) {
       final c = ansi.codeUnitAt(i);
-      if (c == 0x07 || c == 0x9C) return i + 1;
+      if (c == WellKnown.bellByte || c == WellKnown.stringTerminatorByte) return i + 1;
       i++;
     }
     return i;
@@ -102,37 +103,37 @@ class VirtualTerminal {
 
   void _dispatchCsi(List<int> params, int fb) {
     switch (fb) {
-      case 0x48: // CUP
+      case WellKnown.csiFinalCup:
         _cursorY = (params.isNotEmpty ? params[0] : 1) - 1;
         _cursorX = (params.length > 1 ? params[1] : 1) - 1;
         _clampCursor();
-      case 0x41: // CUU
+      case WellKnown.csiFinalUp:
         _cursorY = (_cursorY - (params.isEmpty ? 1 : params[0])).clamp(0, height - 1);
-      case 0x42: // CUD
+      case WellKnown.csiFinalDown:
         _cursorY = (_cursorY + (params.isEmpty ? 1 : params[0])).clamp(0, height - 1);
-      case 0x43: // CUF
+      case WellKnown.csiFinalRight:
         _cursorX = (_cursorX + (params.isEmpty ? 1 : params[0])).clamp(0, width - 1);
-      case 0x44: // CUB
+      case WellKnown.csiFinalLeft:
         _cursorX = (_cursorX - (params.isEmpty ? 1 : params[0])).clamp(0, width - 1);
-      case 0x4A: // ED
-        _eraseDisplay(params.isEmpty ? 0 : params[0]);
-      case 0x4B: // EL
-        _eraseLine(params.isEmpty ? 0 : params[0]);
-      case 0x6D: // SGR
+      case WellKnown.csiFinalEd:
+        _eraseDisplay(params.isEmpty ? WellKnown.eraseDisplayBelow : params[0]);
+      case WellKnown.csiFinalEl:
+        _eraseLine(params.isEmpty ? WellKnown.eraseLineRight : params[0]);
+      case WellKnown.csiFinalSgr:
         _applySgr(params);
-      case 0x68 when params.contains(1049): // DECSET - alt screen
+      case WellKnown.csiFinalDecset when params.contains(WellKnown.decModeAltScreen):
         _altScreen = true;
-      case 0x6C when params.contains(1049): // DECRST - alt screen
+      case WellKnown.csiFinalDecrst when params.contains(WellKnown.decModeAltScreen):
         _altScreen = false;
-      case 0x68 when params[0] == 1049: // alt screen
+      case WellKnown.csiFinalDecset when params[0] == WellKnown.decModeAltScreen:
         _altScreen = true;
-      case 0x6C when params[0] == 1049:
+      case WellKnown.csiFinalDecrst when params[0] == WellKnown.decModeAltScreen:
         _altScreen = false;
     }
   }
 
   void _applySgr(List<int> params) {
-    if (params.isEmpty || params[0] == 0) {
+    if (params.isEmpty || params[0] == WellKnown.sgrReset) {
       _currentStyle = TextStyle.empty;
       return;
     }
@@ -140,79 +141,79 @@ class VirtualTerminal {
     while (i < params.length) {
       final p = params[i];
       switch (p) {
-        case 0:
+        case WellKnown.sgrReset:
           _currentStyle = TextStyle.empty;
-        case 1:
+        case WellKnown.sgrBold:
           _currentStyle = TextStyle(bold: true).merge(_currentStyle);
-        case 2:
+        case WellKnown.sgrFaint:
           _currentStyle = TextStyle(dim: true).merge(_currentStyle);
-        case 3:
+        case WellKnown.sgrItalic:
           _currentStyle = TextStyle(italic: true).merge(_currentStyle);
-        case 4:
+        case WellKnown.sgrUnderline:
           _currentStyle = TextStyle(underline: true).merge(_currentStyle);
-        case 5:
+        case WellKnown.sgrBlink:
           _currentStyle = TextStyle(blink: true).merge(_currentStyle);
-        case 7:
+        case WellKnown.sgrReverse:
           _currentStyle = TextStyle(reverse: true).merge(_currentStyle);
-        case 9:
+        case WellKnown.sgrStrikethrough:
           _currentStyle = TextStyle(strikethrough: true).merge(_currentStyle);
-        case 22:
+        case WellKnown.sgrNoBoldFaint:
           _currentStyle = TextStyle(bold: false, dim: false).merge(_currentStyle);
-        case 23:
+        case WellKnown.sgrNoItalic:
           _currentStyle = TextStyle(italic: false).merge(_currentStyle);
-        case 24:
+        case WellKnown.sgrNoUnderline:
           _currentStyle = TextStyle(underline: false).merge(_currentStyle);
-        case 25:
+        case WellKnown.sgrNoBlink:
           _currentStyle = TextStyle(blink: false).merge(_currentStyle);
-        case 27:
+        case WellKnown.sgrNoReverse:
           _currentStyle = TextStyle(reverse: false).merge(_currentStyle);
-        case 29:
+        case WellKnown.sgrNoStrikethrough:
           _currentStyle = TextStyle(strikethrough: false).merge(_currentStyle);
-        case 30:
-        case 31:
-        case 32:
-        case 33:
-        case 34:
-        case 35:
-        case 36:
-        case 37:
-          _currentStyle = TextStyle(foreground: Color.ansi(p - 30)).merge(_currentStyle);
-        case 38:
+        case WellKnown.sgrFgAnsiBase:
+        case WellKnown.sgrFgAnsiBase + 1:
+        case WellKnown.sgrFgAnsiBase + 2:
+        case WellKnown.sgrFgAnsiBase + 3:
+        case WellKnown.sgrFgAnsiBase + 4:
+        case WellKnown.sgrFgAnsiBase + 5:
+        case WellKnown.sgrFgAnsiBase + 6:
+        case WellKnown.sgrFgAnsiBase + 7:
+          _currentStyle = TextStyle(foreground: Color.ansi(p - WellKnown.sgrFgAnsiBase)).merge(_currentStyle);
+        case WellKnown.sgrFgExtended:
           if (i + 1 < params.length) {
-            if (params[i + 1] == 5 && i + 2 < params.length) {
+            if (params[i + 1] == WellKnown.sgrColor256 && i + 2 < params.length) {
               _currentStyle = TextStyle(foreground: Color.indexed(params[i + 2])).merge(_currentStyle);
               i += 2;
-            } else if (params[i + 1] == 2 && i + 4 < params.length) {
+            } else if (params[i + 1] == WellKnown.sgrColorRgb && i + 4 < params.length) {
               _currentStyle = TextStyle(foreground: Color.rgb(params[i + 2], params[i + 3], params[i + 4])).merge(_currentStyle);
               i += 4;
             }
           }
-        case 39:
+        case WellKnown.sgrFgReset:
           _currentStyle = TextStyle(foreground: null).merge(_currentStyle);
-        case 40:
-        case 41:
-        case 42:
-        case 43:
-        case 44:
-        case 45:
-        case 46:
-        case 47:
-          _currentStyle = TextStyle(background: Color.ansi(p - 40)).merge(_currentStyle);
-        case 48:
+        case WellKnown.sgrBgAnsiBase:
+        case WellKnown.sgrBgAnsiBase + 1:
+        case WellKnown.sgrBgAnsiBase + 2:
+        case WellKnown.sgrBgAnsiBase + 3:
+        case WellKnown.sgrBgAnsiBase + 4:
+        case WellKnown.sgrBgAnsiBase + 5:
+        case WellKnown.sgrBgAnsiBase + 6:
+        case WellKnown.sgrBgAnsiBase + 7:
+          _currentStyle = TextStyle(background: Color.ansi(p - WellKnown.sgrBgAnsiBase)).merge(_currentStyle);
+        case WellKnown.sgrBgExtended:
           if (i + 1 < params.length) {
-            if (params[i + 1] == 5 && i + 2 < params.length) {
+            if (params[i + 1] == WellKnown.sgrColor256 && i + 2 < params.length) {
               _currentStyle = TextStyle(background: Color.indexed(params[i + 2])).merge(_currentStyle);
               i += 2;
-            } else if (params[i + 1] == 2 && i + 4 < params.length) {
+            } else if (params[i + 1] == WellKnown.sgrColorRgb && i + 4 < params.length) {
               _currentStyle = TextStyle(background: Color.rgb(params[i + 2], params[i + 3], params[i + 4])).merge(_currentStyle);
               i += 4;
             }
           }
-        case 49:
+        case WellKnown.sgrBgReset:
           _currentStyle = TextStyle(background: null).merge(_currentStyle);
-        case 53:
+        case WellKnown.sgrOverline:
           _currentStyle = TextStyle(overline: true).merge(_currentStyle);
-        case 55:
+        case WellKnown.sgrNoOverline:
           _currentStyle = TextStyle(overline: false).merge(_currentStyle);
       }
       i++;

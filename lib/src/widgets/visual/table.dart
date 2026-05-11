@@ -1,6 +1,7 @@
 import '../../loop/model.dart' show Model;
 import '../../loop/msg.dart' show Msg;
 import '../../loop/cmd.dart' show Cmd;
+import '../../well_known.dart' show WellKnown;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -58,7 +59,7 @@ class Table extends Model<Table> {
     for (var c = 0; c < columns.length; c++) {
       var label = columns[c];
       if (c == sortColumn) {
-        label += sortAscending ? ' \u25B2' : ' \u25BC';
+        label += sortAscending ? ' ${WellKnown.charUpTriangle}' : ' ${WellKnown.charDownTriangle}';
       }
       headerWidgets.add(Text(label, style: const TextStyle(bold: true)));
     }

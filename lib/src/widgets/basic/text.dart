@@ -2,6 +2,7 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show TextAlign;
 import '../../core/layout.dart' show Constraints, Size;
 import '../../core/style.dart' show TextStyle;
+import '../../well_known.dart' show WellKnown;
 import '../../unicode/width.dart' show stringWidth, charWidth;
 
 class Text extends Widget {
@@ -75,7 +76,7 @@ class Text extends Widget {
           }
           break;
         }
-        if (runeList[i] == 0x20 || runeList[i] == 0x3000) {
+        if (runeList[i] == WellKnown.codepointSpace || runeList[i] == WellKnown.codepointIdeographicSpace) {
           lastBreak = i;
           lastBreakWidth = lineWidth;
         }
@@ -85,7 +86,7 @@ class Text extends Widget {
 
       result.add(String.fromCharCodes(runeList.sublist(lineStart, lineEnd)));
       lineStart = lineEnd;
-      if (lineStart < total && runeList[lineStart] == 0x20) {
+      if (lineStart < total && runeList[lineStart] == WellKnown.codepointSpace) {
         lineStart++;
       }
     }
