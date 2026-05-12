@@ -4,6 +4,7 @@ import '../../core/style.dart' show TextStyle;
 import '../../core/cell.dart' show Cell;
 import '../../unicode/width.dart' show stringWidth;
 
+/// A clickable hyperlink text widget that uses terminal OSC 8 sequences
 class Hyperlink extends Widget {
   final String uri;
   final String text;

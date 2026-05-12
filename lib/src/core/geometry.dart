@@ -1,5 +1,6 @@
 import '../well_known.dart' show WellKnown;
 
+/// A 2D integer point (x=column, y=row)
 class Point {
   final int x;
   final int y;
@@ -23,6 +24,7 @@ class Point {
   String toString() => 'Point($x, $y)';
 }
 
+/// An integer rectangle with position and size (x, y, width, height)
 class Rect {
   final int x;
   final int y;
@@ -99,6 +101,7 @@ class Rect {
   String toString() => 'Rect($x, $y, $width, $height)';
 }
 
+/// Padding or margin insets for a rectangle (left, top, right, bottom)
 class Insets {
   final int left;
   final int top;

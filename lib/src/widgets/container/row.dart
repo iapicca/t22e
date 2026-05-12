@@ -2,6 +2,7 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show MainAxisAlignment, CrossAxisAlignment;
 import '../../core/layout.dart' show Constraints, Size, LayoutItem, splitHorizontal;
 
+/// A widget that lays out its children horizontally in a row
 class Row extends Widget {
   final List<Widget> children;
   final int gap;

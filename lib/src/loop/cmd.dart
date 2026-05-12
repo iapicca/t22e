@@ -3,12 +3,15 @@ import 'dart:io';
 
 import 'msg.dart' show Msg;
 
+/// Base sealed class for side-effect commands (TEA Cmd)
 sealed class Cmd {
   const Cmd();
 
+  /// Executes the side effect and optionally returns a message
   FutureOr<Msg?> execute(void Function(Msg) enqueue);
 }
 
+/// A delayed one-shot command that produces a message after a set time
 final class TickCmd extends Cmd {
   final Duration delay;
   final Msg Function(DateTime) createMsg;
@@ -22,6 +25,7 @@ final class TickCmd extends Cmd {
   }
 }
 
+/// A recurring command that produces a message at regular intervals
 final class EveryCmd extends Cmd {
   final Duration interval;
   final Msg Function(DateTime) createMsg;
@@ -41,6 +45,7 @@ final class EveryCmd extends Cmd {
   }
 }
 
+/// Runs multiple commands concurrently and waits for all to complete
 final class BatchCmd extends Cmd {
   final List<Cmd?> commands;
 
@@ -55,6 +60,7 @@ final class BatchCmd extends Cmd {
   }
 }
 
+/// Runs commands sequentially, one after another
 final class SequenceCmd extends Cmd {
   final List<Cmd> commands;
 
@@ -70,6 +76,7 @@ final class SequenceCmd extends Cmd {
   }
 }
 
+/// Spawns an external process and optionally fires a message on completion
 final class ExecCmd extends Cmd {
   final String exe;
   final List<String> args;
@@ -87,6 +94,7 @@ final class ExecCmd extends Cmd {
   }
 }
 
+/// A no-op command that does nothing
 final class NoCmd extends Cmd {
   const NoCmd();
 
@@ -94,16 +102,21 @@ final class NoCmd extends Cmd {
   FutureOr<Msg?> execute(void Function(Msg) enqueue) => null;
 }
 
+/// Creates a TickCmd: fires createMsg after delay milliseconds
 Cmd tick(Duration delay, Msg Function(DateTime) createMsg) =>
     TickCmd(delay, createMsg);
 
+/// Creates an EveryCmd: fires createMsg at regular intervals
 Cmd every(Duration interval, Msg Function(DateTime) createMsg) =>
     EveryCmd(interval, createMsg);
 
+/// Creates a BatchCmd: runs multiple commands concurrently
 Cmd batch(List<Cmd?> commands) => BatchCmd(commands);
 
+/// Creates a SequenceCmd: runs commands one after another
 Cmd sequence(List<Cmd> commands) => SequenceCmd(commands);
 
+/// Creates an ExecCmd: runs an external process
 Cmd execProcess(
   String exe,
   List<String> args, {
@@ -111,4 +124,5 @@ Cmd execProcess(
 }) =>
     ExecCmd(exe, args, onExit: onExit);
 
+/// Creates a NoCmd: does nothing
 Cmd none() => const NoCmd();

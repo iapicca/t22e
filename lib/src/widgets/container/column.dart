@@ -2,6 +2,7 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show MainAxisAlignment, CrossAxisAlignment;
 import '../../core/layout.dart' show Constraints, Size, LayoutItem, splitVertical;
 
+/// A widget that lays out its children vertically in a column
 class Column extends Widget {
   final List<Widget> children;
   final int gap;

@@ -10,6 +10,7 @@ import '../container/column.dart' show Column;
 import '../enums.dart' show BorderStyle;
 import '../../core/style.dart' show TextStyle;
 
+/// A sortable data table widget with column headers and rows
 class Table extends Model<Table> {
   final List<String> columns;
   final List<List<String>> rows;

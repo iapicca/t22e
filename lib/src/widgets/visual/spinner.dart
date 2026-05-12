@@ -6,6 +6,7 @@ import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
 
+/// An animated braille spinner widget with optional label
 class Spinner extends Model<Spinner> {
   final int frame;
   final List<String> frames;

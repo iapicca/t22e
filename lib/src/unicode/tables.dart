@@ -1,13 +1,19 @@
 import 'dart:typed_data';
 
+// Stage 1 table: maps high byte to stage 2 index
 const int _stage1Len = 0x1100;
+// Stage 2 table: stores packed properties for each codepoint
 const int _stage2Len = 0x10000;
 
+// Lookup table stage 1: high-byte index into stage 2
 final Uint8List _stage1 = Uint8List(_stage1Len);
+// Lookup table stage 2: packed property values
 final Uint8List _stage2 = Uint8List(_stage2Len);
 
+// Flag indicating tables have been populated
 final bool _initialized = _initTables();
 
+/// Packs width, emoji, printable, and private-use flags into a single byte
 int _prop(int width, bool emoji, bool printable, bool privateUse) {
   return (width & 0x03) |
       (emoji ? 0x04 : 0) |
@@ -15,11 +21,16 @@ int _prop(int width, bool emoji, bool printable, bool privateUse) {
       (privateUse ? 0x10 : 0);
 }
 
+// Packed prop: width 0, not printable, not emoji
 const _propN = 0x00; // width 0, not printable
+// Packed prop: width 1, printable, not emoji
 const _prop1 = 0x09; // width 1, printable
+// Packed prop: width 2, printable, not emoji
 const _prop2 = 0x0A; // width 2, printable
+// Packed prop: width 2, printable, emoji
 const _propE = 0x0E; // width 2, printable, emoji
 
+/// Initializes stage1/stage2 tables with Unicode width and property data
 bool _initTables() {
   for (var i = 0; i < _stage1Len; i++) {
     _stage1[i] = i;
@@ -195,6 +206,7 @@ bool _initTables() {
   return true;
 }
 
+/// Sets a codepoint range to the given property value
 void _setRange(int start, int end, int prop) {
   if (start < 0) return;
   for (var cp = start; cp <= end && cp <= 0xFFFF; cp++) {
@@ -207,6 +219,7 @@ void _setRange(int start, int end, int prop) {
   }
 }
 
+/// Looks up packed property byte for the given codepoint
 int _lookup(int codepoint) {
   if (!_initialized) return _prop1;
   if (codepoint < 0 || codepoint > 0x10FFFF) return 0;
@@ -261,15 +274,20 @@ int _lookup(int codepoint) {
   return _stage2[s2idx];
 }
 
+/// Returns the display width (0, 1, or 2) for a codepoint from the lookup table
 int charWidthFromTable(int codepoint) {
   final prop = _lookup(codepoint);
   return prop & 0x03;
 }
 
+/// Whether the codepoint is an emoji according to the lookup table
 bool isEmojiFromTable(int codepoint) => (_lookup(codepoint) & 0x04) != 0;
 
+/// Whether the codepoint is printable according to the lookup table
 bool isPrintableFromTable(int codepoint) => (_lookup(codepoint) & 0x08) != 0;
 
+/// Whether the codepoint is private-use according to the lookup table
 bool isPrivateUseFromTable(int codepoint) => (_lookup(codepoint) & 0x10) != 0;
 
+/// Whether the codepoint has ambiguous width (East Asian width A)
 bool isAmbiguousWidthFromTable(int codepoint) => (_lookup(codepoint) & 0x03) == 3;

@@ -3,6 +3,7 @@ import '../core/style.dart';
 import '../core/color.dart' show Color;
 import '../well_known.dart' show WellKnown;
 
+/// Simulates a real terminal: processes ANSI escape codes and maintains cell grid
 class VirtualTerminal {
   int width;
   int height;
@@ -21,6 +22,7 @@ class VirtualTerminal {
     _resetGrid();
   }
 
+  /// Feeds an ANSI string to the virtual terminal, updating its state and grid
   void write(String ansi) {
     var i = 0;
     while (i < ansi.length) {
@@ -291,6 +293,7 @@ class VirtualTerminal {
     );
   }
 
+  /// Resizes the virtual terminal grid, preserving existing cells where possible
   void resize(int newWidth, int newHeight) {
     final oldGrid = _grid;
     width = newWidth;
@@ -304,6 +307,7 @@ class VirtualTerminal {
     _clampCursor();
   }
 
+  /// Returns the cell at the given row and column
   Cell cellAt(int row, int col) {
     if (row < 0 || row >= height || col < 0 || col >= width) {
       return const Cell();
@@ -311,6 +315,7 @@ class VirtualTerminal {
     return _grid[row][col];
   }
 
+  /// Returns the entire grid as a plain text string with line breaks
   String plainText() {
     return _grid.map((row) {
       return row.map((c) => c.wideContinuation ? '' : c.char).join();

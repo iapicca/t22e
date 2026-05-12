@@ -7,11 +7,16 @@ import '../well_known.dart' show WellKnown;
 import '../ansi/codes.dart' show bold, dim, italic, underline, blink, reverse, strikethrough, overLine, resetAll;
 import '../ansi/term.dart' show hyperlink;
 
+/// A 2D grid of terminal cells that can be drawn to and rendered as ANSI
 class Surface {
+  /// Width in columns
   final int width;
+  /// Height in rows
   final int height;
+  /// 2D grid of cells: grid[row][col]
   final List<List<Cell>> grid;
 
+  /// Creates an empty surface with the given dimensions
   Surface(this.width, this.height)
       : grid = List.generate(
           height,
@@ -19,6 +24,7 @@ class Surface {
           growable: false,
         );
 
+  /// Creates a surface from an existing cell grid
   Surface.fromGrid(this.grid)
       : width = grid.isEmpty ? 0 : grid[0].length,
         height = grid.length;
@@ -37,9 +43,11 @@ class Surface {
           growable: false,
         );
 
+  /// Creates a new surface resized from the source, preserving overlapping cells
   Surface resize(int newWidth, int newHeight) =>
       Surface._resized(this, newWidth, newHeight);
 
+  /// Places a single character at (x, y) with the given style
   void putChar(int x, int y, String ch, TextStyle style) {
     if (x < 0 || x >= width || y < 0 || y >= height) return;
 
@@ -53,6 +61,7 @@ class Surface {
     }
   }
 
+  /// Places text at (x, y), handling grapheme clusters and wide characters
   void putText(int x, int y, String text, TextStyle style) {
     if (x >= width || y >= height || y < 0 || text.isEmpty) return;
 
@@ -82,6 +91,7 @@ class Surface {
     }
   }
 
+  /// Fills a rectangle region with the given character and style
   void fillRect(int x, int y, int w, int h, String ch, TextStyle style) {
     final rect = Rect(x, y, w, h).intersect(Rect(0, 0, width, height));
     if (rect.isEmpty) return;
@@ -100,6 +110,7 @@ class Surface {
     }
   }
 
+  /// Clears a rectangle region, resetting cells to empty defaults
   void clearRect(int x, int y, int w, int h) {
     final rect = Rect(x, y, w, h).intersect(Rect(0, 0, width, height));
     if (rect.isEmpty) return;
@@ -111,6 +122,7 @@ class Surface {
     }
   }
 
+  /// Draws a border around a rectangle with optional custom chars, style, and title
   void drawBorder(Rect r, {String? borderChars, TextStyle? style, String? title}) {
     final rect = r.intersect(Rect(0, 0, width, height));
     if (rect.isEmpty || rect.width < 2 || rect.height < 2) return;
@@ -160,6 +172,7 @@ class Surface {
     }
   }
 
+  /// Converts the surface to ANSI-escaped strings, one per row
   List<String> toAnsiLines() {
     return grid.map((row) {
       final buf = StringBuffer();
@@ -192,6 +205,7 @@ class Surface {
     }).toList(growable: false);
   }
 
+  /// Converts the surface to plain (no escape codes) strings, one per row
   List<String> toPlainLines() {
     return grid.map((row) {
       return row.map((cell) => cell.wideContinuation ? '' : cell.char).join();

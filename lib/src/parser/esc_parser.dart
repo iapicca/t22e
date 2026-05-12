@@ -2,7 +2,9 @@ import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
+/// Interprets parsed ESC sequences into terminal events
 final class EscParser {
+  /// Parses an ESC sequence into an Event, or null if unrecognized
   Event? parse(EscSequenceData data) {
     final intermediates = data.intermediates;
     final fb = data.finalByte;

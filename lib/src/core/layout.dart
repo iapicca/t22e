@@ -1,9 +1,14 @@
 import '../well_known.dart' show WellKnown;
 
+/// Layout constraints: min/max width and height a widget can occupy
 class Constraints {
+  /// Minimum allowed width
   final int minWidth;
+  /// Maximum allowed width
   final int maxWidth;
+  /// Minimum allowed height
   final int minHeight;
+  /// Maximum allowed height
   final int maxHeight;
 
   const Constraints({
@@ -13,17 +18,21 @@ class Constraints {
     this.maxHeight = WellKnown.unbounded,
   });
 
+  /// Tight constraints: forces the widget to be exactly (width, height)
   const Constraints.tight(int width, int height)
       : minWidth = width,
         maxWidth = width,
         minHeight = height,
         maxHeight = height;
 
+  /// Whether min and max are equal (tight fit)
   bool get isTight => minWidth == maxWidth && minHeight == maxHeight;
 
+  /// Whether maxWidth or maxHeight is unbounded
   bool get isUnbounded =>
       maxWidth == WellKnown.unbounded || maxHeight == WellKnown.unbounded;
 
+  /// Clamps a size to these constraints
   Size constrain(Size size) {
     return Size(
       size.width.clamp(minWidth, maxWidth),
@@ -57,6 +66,7 @@ class Constraints {
       'Constraints($minWidth≤w≤$maxWidth, $minHeight≤h≤$maxHeight)';
 }
 
+/// A width × height size, used for widget layout and measurement
 class Size {
   final int width;
   final int height;
@@ -75,6 +85,7 @@ class Size {
   String toString() => 'Size($width, $height)';
 }
 
+/// An item in a flex layout: either fixed size or flexible with a flex factor
 class LayoutItem {
   final int? fixedSize;
   final int flex;
@@ -147,8 +158,10 @@ List<int> _splitSpace(int total, List<LayoutItem> items, int gap) {
   return result;
 }
 
+/// Splits available horizontal space among layout items by flex
 List<int> splitHorizontal(int total, List<LayoutItem> items, int gap) =>
     _splitSpace(total, items, gap);
 
+/// Splits available vertical space among layout items by flex
 List<int> splitVertical(int total, List<LayoutItem> items, int gap) =>
     _splitSpace(total, items, gap);

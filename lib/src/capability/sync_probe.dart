@@ -6,7 +6,9 @@ import '../ansi/term.dart' show querySyncUpdate;
 import '../parser/events.dart' show QuerySyncUpdateEvent;
 import '../parser/parser.dart' show TerminalParser;
 
+/// Probes whether the terminal supports synchronized update (DEC mode 2026)
 class SyncProbe {
+  /// Queries synchronous update support, returning true/false with timeout
   Future<bool> probe({
     Duration timeout = WellKnown.defaultProbeTimeout,
   }) async {

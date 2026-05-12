@@ -20,6 +20,7 @@ import 'model.dart' show Model;
 import 'msg.dart';
 import '../well_known.dart' show WellKnown;
 
+/// Throttles frame rendering to a target FPS to avoid excessive output
 class FpsThrottle {
   final Duration _frameDuration;
   DateTime _lastRender = DateTime.now();
@@ -27,6 +28,7 @@ class FpsThrottle {
   FpsThrottle({int fps = WellKnown.defaultFps})
       : _frameDuration = Duration(microseconds: (WellKnown.microsecondsPerSecond / fps).round());
 
+  /// Whether enough time has elapsed since the last render to allow a new one
   bool get shouldRender {
     final now = DateTime.now();
     if (now.difference(_lastRender) >= _frameDuration) {
@@ -36,32 +38,55 @@ class FpsThrottle {
     return false;
   }
 
+  /// Resets the last render time to now
   void reset() {
     _lastRender = DateTime.now();
   }
 }
 
+/// The Elm Architecture runtime: event loop, rendering, and signal handling
 class Program<M extends Model<M>> {
+  /// Current application model state
   M _model;
+  /// Queue of pending messages to process
   final Queue<Msg> _msgQueue = Queue<Msg>();
+  /// FPS throttle to limit render frequency
   final FpsThrottle _fpsThrottle;
+  /// Raw mode entry/exit manager
   final TerminalRunner _runner = TerminalRunner();
+  /// Ensures terminal state is restored on exit
   late final TerminalGuard _guard;
+  /// Alternate screen buffer manager
   late final AltScreenManager _altScreen;
+  /// Installs POSIX signal handlers
   late final SignalHandler _signalHandler;
+  /// Terminal byte parser
   final TerminalParser _parser = TerminalParser();
+  /// Line-based renderer (with optional sync update wrapping)
   final SyncRenderer _lineRenderer;
+  /// Cell-based renderer for per-cell diffing
   final CellRenderer _cellRenderer;
+  /// Whether to use per-cell diffing instead of line-based
   final bool _useCellRenderer;
+  /// Whether the Kitty keyboard protocol is enabled
   final bool _useKittyKeyboard;
+  /// Whether mouse tracking is enabled
   final bool _useMouse;
+  /// Subscription to stdin byte stream
   StreamSubscription<List<int>>? _stdinSub;
+  /// Whether the event loop is still running
   bool _running = true;
+  /// Whether a re-render is needed
   bool _needsRender = true;
+  /// The previous frame for diffing
   Frame? _previousFrame;
+  /// Whether we're inside an escape sequence (for ESC disambiguation)
   bool _inEscapeSequence = false;
+  /// Timer for ESC-alone disambiguation
   Timer? _escTimer;
+  /// Current terminal width in columns
   int _termWidth = WellKnown.defaultTerminalWidth;
+  /// Current terminal height in rows
   int _termHeight = WellKnown.defaultTerminalHeight;
 
   Program(this._model, {
@@ -84,10 +109,12 @@ class Program<M extends Model<M>> {
     );
   }
 
+  /// Queues a message for processing in the event loop
   void enqueue(Msg msg) {
     _msgQueue.add(msg);
   }
 
+  /// Starts the program: enters raw mode, alt screen, installs signals, begins event loop
   void run() {
     _runner.enterRawMode();
     _altScreen.enter();
@@ -139,6 +166,7 @@ class Program<M extends Model<M>> {
     };
   }
 
+  /// Main event loop: processes messages and renders frames until quit
   void _eventLoop() {
     while (_running) {
       while (_msgQueue.isNotEmpty && _running) {
@@ -159,6 +187,7 @@ class Program<M extends Model<M>> {
     _shutdown();
   }
 
+  /// Processes a single message, dispatching to the model or handling it directly
   void _processMessage(Msg msg) {
     switch (msg) {
       case QuitMsg():
@@ -175,6 +204,7 @@ class Program<M extends Model<M>> {
     }
   }
 
+  /// Dispatches a message to the model's update function and fires any resulting command
   void _dispatchToModel(Msg msg) {
     final result = _model.update(msg);
     _model = result.$1;
@@ -194,6 +224,7 @@ class Program<M extends Model<M>> {
     } catch (_) {}
   }
 
+  /// Renders the current model view to the terminal via diff-based output
   void _renderFrame() {
     final view = _model.view();
     late final Surface surface;
@@ -244,6 +275,7 @@ class Program<M extends Model<M>> {
     }
   }
 
+  /// Shuts down: cancels subscriptions, disables features, restores terminal
   void _shutdown() {
     _stdinSub?.cancel();
     _escTimer?.cancel();

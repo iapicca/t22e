@@ -11,6 +11,7 @@ import '../../core/style.dart' show TextStyle;
 import '../../core/geometry.dart' show Insets;
 import '../../parser/events.dart' show KeyCode, KeyEvent;
 
+/// An item in a list view, with a label and optional icon
 class ListItem {
   final String label;
   final String? icon;
@@ -18,6 +19,7 @@ class ListItem {
   const ListItem(this.label, {this.icon});
 }
 
+/// A keyboard-navigable list view with single/multi selection support
 class ListView extends Model<ListView> {
   final List<ListItem> items;
   final int selectedIndex;
@@ -78,6 +80,7 @@ class ListView extends Model<ListView> {
     return (this, null);
   }
 
+  /// Copy with optional field updates
   ListView copyWith({
     List<ListItem>? items,
     int? selectedIndex,
@@ -120,6 +123,7 @@ class ListView extends Model<ListView> {
     );
   }
 
+  /// Starting index of the visible portion, centered on selectedIndex
   int get _visibleStart {
     if (selectedIndex < 0) return 0;
     final half = viewportHeight ~/ 2;
@@ -131,6 +135,7 @@ class ListView extends Model<ListView> {
     return start;
   }
 
+  /// Builds a single row widget for a list item
   Widget _buildItemRow(ListItem item, bool isSelected, bool isMultiSelected) {
     final style = isSelected
         ? const TextStyle(reverse: true)

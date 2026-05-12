@@ -6,6 +6,7 @@ import '../../core/style.dart' show TextStyle;
 import '../../well_known.dart' show WellKnown;
 import '../../unicode/width.dart' show stringWidth;
 
+/// A container widget with an optional border, title, padding, and child
 class Box extends Widget {
   final Widget? child;
   final BorderStyle borderStyle;
@@ -113,6 +114,7 @@ class Box extends Widget {
     }
   }
 
+  /// Returns the border character set for the current style
   String _borderChars() {
     return switch (borderStyle) {
       BorderStyle.single => WellKnown.borderSingle,

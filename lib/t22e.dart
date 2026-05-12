@@ -1,3 +1,5 @@
+// Terminal UI framework — ANSI codes, widgets, parser, renderer, and TEA runtime
+
 export 'src/ansi/codes.dart';
 export 'src/ansi/color.dart';
 export 'src/ansi/cursor.dart';

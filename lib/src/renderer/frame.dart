@@ -1,13 +1,18 @@
 import '../core/cell.dart';
 import '../core/surface.dart';
 
+/// A rendered frame snapshot: plain lines, ANSI-styled lines, and optional cells
 class Frame {
+  /// Line strings without escape codes (for diffing)
   final List<String> plainLines;
+  /// Line strings with full ANSI styling
   final List<String> styledLines;
+  /// Optional per-cell data for cell-level rendering
   final List<List<Cell>>? cells;
 
   Frame(this.plainLines, this.styledLines, {this.cells});
 
+  /// Creates a frame from a Surface, optionally including cell data
   factory Frame.fromSurface(Surface surface, {bool includeCells = false}) {
     return Frame(
       surface.toPlainLines(),
@@ -19,6 +24,7 @@ class Frame {
   int get height => plainLines.length;
 }
 
+/// Result of diffing two frames: list of row indices that changed
 class DiffResult {
   final List<int> changedRows;
 
@@ -27,6 +33,7 @@ class DiffResult {
   bool get hasChanges => changedRows.isNotEmpty;
 }
 
+/// Computes which rows changed between two frames (by plain and styled content)
 DiffResult diff(Frame previous, Frame current) {
   final changedRows = <int>[];
   final maxRows =

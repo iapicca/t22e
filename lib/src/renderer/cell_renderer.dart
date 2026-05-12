@@ -3,9 +3,11 @@ import '../well_known.dart' show WellKnown;
 import '../ansi/term.dart' show hyperlink;
 import 'frame.dart' show Frame;
 
+/// Renders frames cell-by-cell, producing minimal ANSI for only changed cells
 class CellRenderer {
   const CellRenderer();
 
+  /// Produces ANSI output that updates only the cells that changed since previous
   String render(Frame previous, Frame current) {
     final buf = StringBuffer();
     final prevCells = previous.cells;
@@ -52,6 +54,7 @@ class CellRenderer {
     return buf.toString();
   }
 
+  /// Converts a TextStyle and optional link URI to ANSI escape sequences
   String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
     final buf = StringBuffer();
     if (s.bold == true) buf.write('${WellKnown.csi}${WellKnown.sgrBold}m');

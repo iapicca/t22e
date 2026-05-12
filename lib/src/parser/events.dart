@@ -1,9 +1,11 @@
+/// Base sealed class for all terminal input and response events
 sealed class Event {
   const Event();
 }
 
 // --- key codes ---
 
+/// Enumeration of all supported keyboard key codes
 enum KeyCode {
   none,
   tab,
@@ -48,6 +50,7 @@ enum KeyCode {
   char,
 }
 
+/// Modifier flags (ctrl, shift, alt, meta) for a key event
 final class KeyModifiers {
   final bool ctrl;
   final bool shift;
@@ -73,10 +76,12 @@ final class KeyModifiers {
   int get hashCode => Object.hash(ctrl, shift, alt, meta);
 }
 
+/// Type of key event: down press, up release, or autorepeat
 enum KeyEventType { down, up, repeat }
 
 // --- input events ---
 
+/// A keyboard input event with key code, modifiers, type, and optional codepoint
 final class KeyEvent extends Event {
   final KeyCode keyCode;
   final KeyModifiers modifiers;
@@ -105,10 +110,13 @@ final class KeyEvent extends Event {
   String toString() => 'KeyEvent($keyCode, $modifiers, $type${codepoint != null ? ', U+${codepoint!.toRadixString(16).padLeft(4, '0')}' : ''})';
 }
 
+/// Mouse button identifiers, including wheel events
 enum MouseButton { left, middle, right, none, wheelUp, wheelDown }
 
+/// Type of mouse action: press, release, move, or drag
 enum MouseAction { press, release, move, drag }
 
+/// A mouse input event with button, action, and screen coordinates
 final class MouseEvent extends Event {
   final MouseButton button;
   final MouseAction action;
@@ -137,6 +145,7 @@ final class MouseEvent extends Event {
   String toString() => 'MouseEvent($button, $action, $x, $y)';
 }
 
+/// A bracketed paste event containing the pasted content
 final class PasteEvent extends Event {
   final String content;
 
@@ -155,6 +164,7 @@ final class PasteEvent extends Event {
 
 // --- response events ---
 
+/// Terminal response: current cursor position (1-based)
 final class CursorPositionEvent extends Event {
   final int row;
   final int col;
@@ -172,6 +182,7 @@ final class CursorPositionEvent extends Event {
   String toString() => 'CursorPositionEvent($row, $col)';
 }
 
+/// Terminal response: foreground or background color query result
 final class ColorQueryEvent extends Event {
   final int colorNumber;
   final int? r;
@@ -195,6 +206,7 @@ final class ColorQueryEvent extends Event {
   String toString() => 'ColorQueryEvent(color=$colorNumber, rgb($r,$g,$b))';
 }
 
+/// Terminal response: primary device attributes (DA1)
 final class PrimaryDeviceAttributesEvent extends Event {
   final List<int> params;
 
@@ -212,6 +224,7 @@ final class PrimaryDeviceAttributesEvent extends Event {
   String toString() => 'PrimaryDeviceAttributesEvent($params)';
 }
 
+/// Terminal response: Kitty keyboard enhancement flags
 final class KeyboardEnhancementFlagsEvent extends Event {
   final int flags;
 
@@ -228,6 +241,7 @@ final class KeyboardEnhancementFlagsEvent extends Event {
   String toString() => 'KeyboardEnhancementFlagsEvent($flags)';
 }
 
+/// Terminal response: window resize notification (rows x cols)
 final class WindowResizeEvent extends Event {
   final int rows;
   final int cols;
@@ -251,6 +265,7 @@ final class WindowResizeEvent extends Event {
   String toString() => 'WindowResizeEvent(${rows}x$cols)';
 }
 
+/// Terminal response: focus gained or lost
 final class FocusEvent extends Event {
   final bool focused;
 
@@ -267,6 +282,7 @@ final class FocusEvent extends Event {
   String toString() => 'FocusEvent($focused)';
 }
 
+/// Terminal response: synchronized update support query result
 final class QuerySyncUpdateEvent extends Event {
   final bool supported;
 
@@ -283,6 +299,7 @@ final class QuerySyncUpdateEvent extends Event {
   String toString() => 'QuerySyncUpdateEvent(supported=$supported)';
 }
 
+/// Terminal response: clipboard read result
 final class ClipboardEvent extends Event {
   final String clipboard;
   final String? base64;
@@ -304,6 +321,7 @@ final class ClipboardEvent extends Event {
 
 // --- utility ---
 
+/// An error encountered during parsing or processing
 final class ErrorEvent extends Event {
   final String message;
   final Object? cause;
@@ -314,6 +332,7 @@ final class ErrorEvent extends Event {
   String toString() => 'ErrorEvent($message${cause != null ? ': $cause' : ''})';
 }
 
+/// An internal framework event (e.g. screen save/restore, title change)
 final class InternalEvent extends Event {
   final String kind;
   final Map<String, Object?>? data;

@@ -6,6 +6,7 @@ import 'color_probe.dart' show ColorProbe;
 import 'sync_probe.dart' show SyncProbe;
 import 'keyboard_probe.dart' show KeyboardProbe;
 
+/// Orchestrates all capability probes and assembles a Capabilities result
 class ProbePipeline {
   final Da1Probe da1Probe;
   final ColorProbe colorProbe;
@@ -22,6 +23,7 @@ class ProbePipeline {
         syncProbe = syncProbe ?? SyncProbe(),
         keyboardProbe = keyboardProbe ?? KeyboardProbe();
 
+  /// Runs all probes sequentially and returns the combined capabilities
   Future<Capabilities> run() async {
     final da1 = await da1Probe.probe();
     final color = await colorProbe.probe(da1);

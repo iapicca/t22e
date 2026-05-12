@@ -1,3 +1,8 @@
+I want you to read the whole repositore and create comments for dart code as follow:
+
+- comment every class, variable, function
+- the comment should be very brief (max 80 chars) and focused on the function of said class, variable function
+
 
 
 C) create a package t22e_ui ispired by flutter's dart:ui (https://api.flutter.dev/flutter/dart-ui/) classes and types useful to this project

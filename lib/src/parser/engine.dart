@@ -1,16 +1,20 @@
 import '../well_known.dart' show WellKnown;
 
+/// States of the VT500-compatible state machine
 enum VtState { ground, escape, escapeIntermediate, csiEntry, csiParam, csiIntermediate, csiIgnore, oscString, dcsEntry, dcsParam, dcsIntermediate, dcsIgnore, dcsPassthrough }
 
+/// Base sealed class for parsed sequence data (CSI, ESC, OSC, DCS, or char)
 sealed class SequenceData {
   const SequenceData();
 }
 
+/// A plain printable character byte
 final class CharData extends SequenceData {
   final int codepoint;
   const CharData(this.codepoint);
 }
 
+/// Parsed CSI sequence data: parameters, intermediates, and final byte
 final class CsiSequenceData extends SequenceData {
   final List<int> params;
   final List<int> intermediates;
@@ -18,17 +22,20 @@ final class CsiSequenceData extends SequenceData {
   const CsiSequenceData(this.params, this.intermediates, this.finalByte);
 }
 
+/// Parsed ESC sequence data: intermediates and final byte
 final class EscSequenceData extends SequenceData {
   final List<int> intermediates;
   final int finalByte;
   const EscSequenceData(this.intermediates, this.finalByte);
 }
 
+/// Parsed OSC sequence data: the text content between intro and terminator
 final class OscSequenceData extends SequenceData {
   final String content;
   const OscSequenceData(this.content);
 }
 
+/// Parsed DCS sequence data: params, intermediates, final byte, and payload
 final class DcsSequenceData extends SequenceData {
   final List<int> params;
   final List<int> intermediates;
@@ -37,6 +44,7 @@ final class DcsSequenceData extends SequenceData {
   const DcsSequenceData(this.params, this.intermediates, this.finalByte, [this.data]);
 }
 
+/// Classifies a byte for the VT500 state machine transitions
 /// TODO: Classify bytes into categories for VT500 state machine transitions
 // ignore: unused_element
 int _byteClass(int b) {
@@ -58,18 +66,30 @@ int _byteClass(int b) {
   return 13;
 }
 
+/// VT500-compatible terminal sequence parser state machine
 class Vt500Engine {
+  /// Current state machine state
   VtState _state = VtState.ground;
+  /// Accumulated CSI numeric parameters
   final _params = <int>[];
+  /// Accumulated CSI intermediate bytes
   final _intermediates = <int>[];
+  /// Buffer for OSC string content
   final _oscBuffer = StringBuffer();
+  /// Buffer for DCS data payload
   final _dcsBuffer = StringBuffer();
+  /// Final byte of the DCS sequence
   int _dcsFinalByte = 0;
+  /// DCS numeric parameters
   final _dcsParams = <int>[];
+  /// DCS intermediate bytes
   final _dcsIntermediates = <int>[];
+  /// Whether ESC-ST terminator is expected for OSC
   bool _oscExpectSt = false;
+  /// Whether ESC-ST terminator is expected for DCS
   bool _dcsExpectSt = false;
 
+  /// Feeds a single byte into the state machine, returning parsed data or null
   SequenceData? advance(int b) {
     final byte = b & 0xFF;
 
@@ -476,6 +496,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Feeds a list of bytes, returning all resulting sequence data items
   List<SequenceData> advanceAll(List<int> bytes) {
     final results = <SequenceData>[];
     for (final byte in bytes) {
@@ -485,6 +506,7 @@ class Vt500Engine {
     return results;
   }
 
+  /// Resets the state machine to ground state, clearing all buffers
   void reset() {
     _state = VtState.ground;
     _params.clear();

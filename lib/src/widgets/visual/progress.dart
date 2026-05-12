@@ -7,6 +7,7 @@ import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
 import '../../core/style.dart' show TextStyle;
 
+/// A progress bar widget: determinate (fraction) or indeterminate (animated)
 class ProgressBar extends Model<ProgressBar> {
   final double? fraction;
   final String? label;

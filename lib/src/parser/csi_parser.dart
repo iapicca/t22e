@@ -2,7 +2,9 @@ import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
+/// Interprets parsed CSI sequences into higher-level terminal events
 final class CsiParser {
+  /// Parses a CSI sequence into an Event, or null if unrecognized
   Event? parse(CsiSequenceData data) {
     final params = data.params;
     final intermediates = data.intermediates;
@@ -36,6 +38,7 @@ final class CsiParser {
     };
   }
 
+  /// Parses tilde-encoded key sequences (e.g. ~1=Home)
   Event? _parseTilde(List<int> params) {
     if (params.isEmpty) return null;
     final n = params[0];
@@ -62,6 +65,7 @@ final class CsiParser {
     };
   }
 
+  /// Parses extended CSI sequences (intermediate '<')
   Event? _parseExtended(List<int> params, int fb) {
     if (fb == WellKnown.csiFinalMouse && params.length >= 3) {
       return _parseSgrMouseParams(params);
@@ -69,6 +73,7 @@ final class CsiParser {
     return null;
   }
 
+  /// Parses a Kitty keyboard protocol key event
   Event? _parseKittyKey(List<int> params) {
     if (params.isEmpty) return null;
     final code = params[0];
@@ -105,6 +110,7 @@ final class CsiParser {
     0x1A: KeyCode.delete,
   };
 
+  /// Creates KeyModifiers from Kitty modifier bitmask
   KeyModifiers _kittyModifiers(int mod) {
     return KeyModifiers(
       shift: (mod & WellKnown.modShift) != 0,
@@ -114,11 +120,13 @@ final class CsiParser {
     );
   }
 
+  /// Parses SGR mouse sequence parameters into a MouseEvent
   Event? _parseSgrMouse(List<int> params) {
     if (params.length < 3) return null;
     return _parseSgrMouseParams(params);
   }
 
+  /// Parses SGR mouse parameters (shared by normal and extended paths)
   Event? _parseSgrMouseParams(List<int> params) {
     final cb = params[0];
     final x = params[1] - 1;
@@ -140,6 +148,7 @@ final class CsiParser {
     return MouseEvent(button: button, action: MouseAction.press, x: x, y: y);
   }
 
+  /// Maps a button code (0-2) to the MouseButton enum
   MouseButton _mouseButtonFromCode(int code) {
     return switch (code) {
       0 => MouseButton.left,
@@ -149,11 +158,13 @@ final class CsiParser {
     };
   }
 
+  /// Creates a KeyEvent from a key code and modifier parameter
   KeyEvent _keyEvent(KeyCode code, List<int> params) {
     final mod = params.length > 1 ? params[1] : (params.isNotEmpty ? params[0] : 1);
     return KeyEvent(keyCode: code, modifiers: _modifiersFromParam(mod));
   }
 
+  /// Creates a KeyEvent for function key Fn
   KeyEvent _fKey(int n, List<int> params) {
     final mod = params.length > 1 ? params[1] : 1;
     final code = KeyCode.values.firstWhere(
@@ -163,6 +174,7 @@ final class CsiParser {
     return KeyEvent(keyCode: code, modifiers: _modifiersFromParam(mod));
   }
 
+  /// Extracts KeyModifiers from a modifier parameter value
   KeyModifiers _modifiersFromParam(int param) {
     return KeyModifiers(
       shift: (param & WellKnown.modShift) != 0,

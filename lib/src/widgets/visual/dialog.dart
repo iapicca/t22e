@@ -13,6 +13,7 @@ import '../../core/layout.dart' show Constraints, Size;
 import '../../core/geometry.dart' show Insets;
 import '../../parser/events.dart' show KeyCode, KeyEvent;
 
+/// A button in a dialog's button bar, with label and focus state
 class DialogButton {
   final String label;
   final bool focused;
@@ -20,6 +21,7 @@ class DialogButton {
   const DialogButton(this.label, {this.focused = false});
 }
 
+/// A modal dialog model with title, content, buttons, and keyboard navigation
 class Dialog extends Model<Dialog> {
   final String title;
   final Widget content;
@@ -95,6 +97,7 @@ class Dialog extends Model<Dialog> {
   }
 }
 
+/// Internal overlay widget that dims background and renders the dialog box
 class _DialogOverlay extends Widget {
   final String title;
   final Widget content;
@@ -169,6 +172,7 @@ class _DialogOverlay extends Widget {
   }
 }
 
+/// A widget that constrains the size of its child to the given width/height
 class SizedBox extends Widget {
   final int? width;
   final int? height;

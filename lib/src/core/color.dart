@@ -1,29 +1,38 @@
 import '../well_known.dart' show WellKnown;
 
+/// The color model used: no color, ANSI, indexed 256, or true color RGB
 enum ColorKind { noColor, ansi, indexed, rgb }
 
+/// Supported terminal color profiles
 enum ColorProfile { noColor, ansi16, indexed256, trueColor }
 
+/// A terminal color value that can convert between color models
 class Color {
+  /// The color model kind
   final ColorKind kind;
+  /// The packed color value: index for ansi/indexed, packed RGB for rgb
   final int value;
 
   /// TODO: Private constructor for creating Color instances internally
   // ignore: unused_element
   const Color._(this.kind, this.value);
 
+  /// No color (default terminal color)
   const Color.noColor() : kind = ColorKind.noColor, value = 0;
 
+  /// Standard ANSI color (0–15)
   const Color.ansi(int color)
       : assert(color >= 0 && color <= 15),
         kind = ColorKind.ansi,
         value = color;
 
+  /// 256-color palette index (0–255)
   const Color.indexed(int index)
       : assert(index >= 0 && index <= 255),
         kind = ColorKind.indexed,
         value = index;
 
+  /// True color via red, green, blue components (0–255 each)
   const Color.rgb(int r, int g, int b)
       : assert(r >= 0 && r <= 255),
         assert(g >= 0 && g <= 255),
@@ -31,10 +40,14 @@ class Color {
         kind = ColorKind.rgb,
         value = (r << 16) | (g << 8) | b;
 
+  /// Red component (0–255) for RGB colors
   int get red => (value >> 16) & 0xFF;
+  /// Green component (0–255) for RGB colors
   int get green => (value >> 8) & 0xFF;
+  /// Blue component (0–255) for RGB colors
   int get blue => value & 0xFF;
 
+  /// The color profile this color belongs to
   ColorProfile get profile {
     switch (kind) {
       case ColorKind.noColor:
@@ -48,6 +61,7 @@ class Color {
     }
   }
 
+  /// Converts this color to the target color model (downgrades if needed)
   Color convert(ColorKind target) {
     if (target == kind) return this;
 
@@ -147,6 +161,7 @@ class Color {
     return (2 + rBar / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rBar) / 256) * db * db;
   }
 
+  /// Builds the SGR escape sequence for this color (foreground or background)
   String sgrSequence({bool background = false}) {
     final prefix = background ? WellKnown.sgrBgExtended : WellKnown.sgrFgExtended;
     switch (kind) {

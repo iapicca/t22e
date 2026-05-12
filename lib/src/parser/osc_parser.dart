@@ -2,7 +2,9 @@ import '../well_known.dart' show WellKnown;
 import 'engine.dart';
 import 'events.dart';
 
+/// Interprets parsed OSC sequences into terminal events
 final class OscParser {
+  /// Parses an OSC sequence into an Event, or null if unrecognized
   Event? parse(OscSequenceData data) {
     final content = data.content;
     final semicolon = content.indexOf(';');

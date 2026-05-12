@@ -7,7 +7,9 @@ import '../parser/events.dart' show PrimaryDeviceAttributesEvent;
 import '../parser/parser.dart' show TerminalParser;
 import 'result.dart' show QueryResult, Supported, Unavailable, Da1Result;
 
+/// Probes terminal for device attributes (DA1) to detect model and features
 class Da1Probe {
+  /// Sends DA1 query and waits for the response with timeout
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = WellKnown.defaultProbeTimeout,
   }) async {

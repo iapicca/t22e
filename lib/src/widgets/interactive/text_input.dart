@@ -9,6 +9,7 @@ import '../enums.dart' show EchoMode;
 import '../../core/style.dart' show TextStyle;
 import '../../parser/events.dart' show KeyCode, KeyEvent;
 
+/// A text input field model with cursor, selection, echo modes, and validation
 class TextInput extends Model<TextInput> {
   final String value;
   final int cursorPosition;
@@ -123,6 +124,7 @@ class TextInput extends Model<TextInput> {
     return (copyWith(value: newValue, cursorPosition: newPos, cursorVisible: true), null);
   }
 
+  /// Returns the previous grapheme boundary before the given string position
   int _prevGraphemeBoundary(int pos) {
     if (pos <= 0) return 0;
     final runes = value.runes.toList();
@@ -136,6 +138,7 @@ class TextInput extends Model<TextInput> {
     return strIdx;
   }
 
+  /// Returns the next grapheme boundary after the given string position
   int _nextGraphemeBoundary(int pos) {
     if (pos >= value.length) return value.length;
     final runes = value.runes.toList();
@@ -156,6 +159,7 @@ class TextInput extends Model<TextInput> {
     };
   }
 
+  /// Copy with optional field updates
   TextInput copyWith({
     String? value,
     int? cursorPosition,

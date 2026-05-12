@@ -1,21 +1,35 @@
 import 'color.dart';
 import '../well_known.dart' show WellKnown;
 
+/// Terminal text style attributes: colors, decorations, and layout hints
 class TextStyle {
+  /// Foreground color, or null for default
   final Color? foreground;
+  /// Background color, or null for default
   final Color? background;
 
+  /// Bold text
   final bool? bold;
+  /// Dim/faint text
   final bool? dim;
+  /// Italic text
   final bool? italic;
+  /// Underlined text
   final bool? underline;
+  /// Blinking text
   final bool? blink;
+  /// Reverse video (swap fg/bg)
   final bool? reverse;
+  /// Strikethrough text
   final bool? strikethrough;
+  /// Overlined text
   final bool? overline;
 
+  /// Preferred width in columns, or null for auto
   final int? width;
+  /// Preferred height in rows, or null for auto
   final int? height;
+  /// Whether text should wrap to the next line
   final bool? wordWrap;
 
   const TextStyle({
@@ -34,8 +48,10 @@ class TextStyle {
     this.wordWrap,
   });
 
+  /// An empty style with all attributes null (clear)
   static const empty = TextStyle();
 
+  /// Whether all style attributes are null (no styling)
   bool get isClear =>
       foreground == null &&
       background == null &&
@@ -51,6 +67,7 @@ class TextStyle {
       height == null &&
       wordWrap == null;
 
+  /// Merges another style on top, with other taking precedence for non-null values
   TextStyle merge(TextStyle other) {
     if (other.isClear) return this;
     if (isClear) return other;
@@ -71,6 +88,7 @@ class TextStyle {
     );
   }
 
+  /// Converts colors to match the target color profile
   TextStyle resolveColor(ColorProfile profile) {
     if (foreground == null && background == null) return this;
     final target = _profileToKind(profile);
@@ -107,6 +125,7 @@ class TextStyle {
     }
   }
 
+  /// Inherits from a parent style: parent's null values fall through to child
   TextStyle inherit(TextStyle parent) {
     if (parent.isClear) return this;
     return TextStyle(
@@ -126,6 +145,7 @@ class TextStyle {
     );
   }
 
+  /// Factory: default link style (blue, underlined)
   factory TextStyle.link({String? uri}) {
     return TextStyle(
       foreground: const Color.rgb(WellKnown.linkColorRed, WellKnown.linkColorGreen, WellKnown.linkColorBlue),

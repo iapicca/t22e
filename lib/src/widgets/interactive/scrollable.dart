@@ -8,6 +8,7 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show Axis;
 import '../../parser/events.dart' show KeyEvent;
 
+/// A scrollable viewport model that can scroll a child widget
 class Scrollable extends Model<Scrollable> {
   final int scrollX;
   final int scrollY;
@@ -39,6 +40,7 @@ class Scrollable extends Model<Scrollable> {
     return (this, null);
   }
 
+  /// Copy with optional field updates
   Scrollable copyWith({
     int? scrollX,
     int? scrollY,
@@ -71,6 +73,7 @@ class Scrollable extends Model<Scrollable> {
   }
 }
 
+/// Internal widget that renders a scrolled child with a scrollbar
 class _ScrollView extends Widget {
   final Widget child;
   final int scrollX;

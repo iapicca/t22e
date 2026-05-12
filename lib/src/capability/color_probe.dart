@@ -7,7 +7,9 @@ import '../parser/events.dart' show ColorQueryEvent;
 import '../parser/parser.dart' show TerminalParser;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 
+/// Detects terminal color profile via env vars, DA1 attributes, and OSC query
 class ColorProbe {
+  /// Detects color support from COLORTERM and TERM environment variables
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
     if (colorterm == WellKnown.envColortermTruecolor || colorterm == WellKnown.envColorterm24bit) {
@@ -21,6 +23,7 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
+  /// Detects color support from DA1 attributes (256-color or true-color flags)
   ColorProfile detectFromDa1(QueryResult<Da1Result> da1Result) {
     if (da1Result is Supported<Da1Result>) {
       final attrs = da1Result.value.attributes;
@@ -30,6 +33,7 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
+  /// Queries terminal for true color support via OSC foreground color query
   Future<ColorProfile> probe(
     QueryResult<Da1Result> da1Result, {
     Duration timeout = WellKnown.defaultProbeTimeout,

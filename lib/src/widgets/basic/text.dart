@@ -5,10 +5,15 @@ import '../../core/style.dart' show TextStyle;
 import '../../well_known.dart' show WellKnown;
 import '../../unicode/width.dart' show stringWidth, charWidth;
 
+/// A widget that displays a string of text with optional style, alignment, and wrapping
 class Text extends Widget {
+  /// The text content to display
   final String text;
+  /// Text style attributes
   final TextStyle style;
+  /// Horizontal alignment within the allocated width
   final TextAlign align;
+  /// Whether to wrap text to fit within the max width
   final bool wordWrap;
 
   Text(
@@ -51,6 +56,7 @@ class Text extends Widget {
     return Size(w, h);
   }
 
+  /// Breaks text into lines that fit within maxWidth, splitting at spaces
   static List<String> _wrapText(String txt, int maxWidth) {
     if (maxWidth <= 0 || stringWidth(txt) <= maxWidth) return [txt];
 

@@ -11,6 +11,7 @@ import '../loop/model.dart';
 import '../parser/events.dart' show KeyCode, KeyModifiers, KeyEvent, MouseButton, MouseAction, MouseEvent;
 import 'virtual_terminal.dart';
 
+/// Test harness for rendering widgets and asserting their visual output
 class WidgetTester {
   final VirtualTerminal virtualTerminal;
   final CellRenderer _cellRenderer = const CellRenderer();
@@ -20,6 +21,7 @@ class WidgetTester {
   WidgetTester({int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight})
       : virtualTerminal = VirtualTerminal(width: width, height: height);
 
+  /// Renders a widget tree and writes its ANSI output to the virtual terminal
   void pumpWidget(Widget root, {int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight}) {
     final surface = WidgetRenderer.render(root, width, height);
     final frame = Frame.fromSurface(surface, includeCells: true);
@@ -29,6 +31,7 @@ class WidgetTester {
     virtualTerminal.write(output);
   }
 
+  /// Renders a Model-based widget using its view function
   void pumpWidgetWithModel(Model model, {required Surface Function() view, int width = WellKnown.defaultTerminalWidth, int height = WellKnown.defaultTerminalHeight}) {
     _model = model;
     _viewFn = view;
@@ -37,6 +40,7 @@ class WidgetTester {
     virtualTerminal.write(frame.styledLines.join('\n'));
   }
 
+  /// Simulates a key press on the widget model and re-renders
   void sendKeyEvent(KeyCode key, {KeyModifiers? modifiers, int? codepoint}) {
     if (_model == null || _viewFn == null) return;
     final event = KeyEvent(keyCode: key, modifiers: modifiers ?? const KeyModifiers(), codepoint: codepoint);
@@ -50,6 +54,7 @@ class WidgetTester {
     }
   }
 
+  /// Simulates a mouse event on the widget model and re-renders
   void sendMouseEvent(MouseButton button, MouseAction action, int x, int y) {
     if (_model == null || _viewFn == null) return;
     final event = MouseEvent(button: button, action: action, x: x, y: y);
@@ -63,6 +68,7 @@ class WidgetTester {
     }
   }
 
+  /// Asserts the character and/or style at a specific cell position
   void expectCell(int row, int col, {String? char, TextStyle? style}) {
     final cell = virtualTerminal.cellAt(row, col);
     if (char != null) {
@@ -77,6 +83,7 @@ class WidgetTester {
     }
   }
 
+  /// Asserts the entire virtual terminal plain text matches the expected string
   void expectPlainText(String expected) {
     final actual = virtualTerminal.plainText();
     if (actual != expected) {
@@ -85,6 +92,7 @@ class WidgetTester {
   }
 }
 
+/// Exception thrown when a test assertion fails
 class TestFailure implements Exception {
   final String message;
   const TestFailure(this.message);

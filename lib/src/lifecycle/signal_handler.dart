@@ -4,17 +4,25 @@ import 'dart:io';
 import '../well_known.dart' show WellKnown;
 import 'terminal_guard.dart' show TerminalGuard;
 
+/// Installs POSIX signal handlers for SIGINT, SIGTERM, SIGTSTP, SIGCONT
 class SignalHandler {
+  /// Terminal guard for cleanup on signals
   final TerminalGuard _guard;
+  /// Callback for SIGINT
   final void Function() onInterrupt;
+  /// SIGINT subscription
   StreamSubscription<ProcessSignal>? _sigintSub;
+  /// SIGTERM subscription
   StreamSubscription<ProcessSignal>? _sigtermSub;
+  /// SIGTSTP subscription
   StreamSubscription<ProcessSignal>? _sigtstpSub;
+  /// SIGCONT subscription
   StreamSubscription<ProcessSignal>? _sigcontSub;
 
   SignalHandler({required TerminalGuard guard, required this.onInterrupt})
       : _guard = guard;
 
+  /// Installs all signal handlers
   void install() {
     _sigintSub = ProcessSignal.sigint.watch().listen((_) {
       onInterrupt();
@@ -32,6 +40,7 @@ class SignalHandler {
     _sigcontSub = ProcessSignal.sigcont.watch().listen((_) {});
   }
 
+  /// Cancels all signal subscriptions
   void dispose() {
     _sigintSub?.cancel();
     _sigtermSub?.cancel();
