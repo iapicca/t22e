@@ -1,4 +1,3 @@
-/// Terminal capability probing: color, sync, keyboard, DA1, and pipeline orchestration.
 export 'src/result.dart'
     show
         QueryResult,
