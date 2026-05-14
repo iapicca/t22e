@@ -1,139 +1,151 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
-/// The kind of color representation.
-enum ColorKind { noColor, ansi, indexed, rgb }
+import 'color_profile.dart';
 
-/// The capability level for color support.
-enum ColorProfile { noColor, ansi16, indexed256, trueColor }
+export 'color_profile.dart';
+part 'color.freezed.dart';
 
-/// A terminal color supporting ANSI, indexed 256, and RGB with automatic downgrade.
-class Color {
-  /// The color representation kind.
-  final ColorKind kind;
-  /// The packed color value (meaning depends on [kind]).
-  final int value;
+/// Extension type for validated ANSI 16-color codes (0–15).
+extension type AnsiColor._(int _code) {
+  AnsiColor(int code)
+    : _code = code,
+      assert(
+        code >= 0 && code <= Defaults.ansiColorMax,
+        'ANSI code out of range',
+      );
 
-  // ignore: unused_element
-  const Color._(this.kind, this.value);
+  int get code => _code;
+}
 
-  /// No color / default terminal color.
-  const Color.noColor() : kind = ColorKind.noColor, value = 0;
+/// Extension type for validated indexed 256-color palette entries (0–255).
+extension type IndexedColor._(int _index) {
+  IndexedColor(int index)
+    : _index = index,
+      assert(
+        index >= 0 && index < Defaults.colorProfileIndexedCount,
+        'index out of range',
+      );
 
-  /// Standard ANSI 16-color (0-15).
-  const Color.ansi(int color)
-    : assert(color >= 0 && color <= 15),
-      kind = ColorKind.ansi,
-      value = color;
+  int get index => _index;
+}
 
-  /// Indexed 256-color palette entry (0-255).
-  const Color.indexed(int index)
-    : assert(index >= 0 && index <= 255),
-      kind = ColorKind.indexed,
-      value = index;
+/// A terminal color stored as exact RGB, with conversion getters.
+@freezed
+abstract class Color with _$Color {
+  const Color._();
 
-  /// Truecolor RGB color (0-255 per component).
-  const Color.rgb(int r, int g, int b)
-    : assert(r >= 0 && r <= 255),
-      assert(g >= 0 && g <= 255),
-      assert(b >= 0 && b <= 255),
-      kind = ColorKind.rgb,
-      value = (r << 16) | (g << 8) | b;
+  @Assert('red >= 0 && red <= ${Defaults.rgbComponentMax}')
+  @Assert('green >= 0 && green <= ${Defaults.rgbComponentMax}')
+  @Assert('blue >= 0 && blue <= ${Defaults.rgbComponentMax}')
+  const factory Color({
+    @Default(0) int red,
+    @Default(0) int green,
+    @Default(0) int blue,
+  }) = _Color;
 
-  /// Red component of RGB color.
-  int get red => (value >> 16) & 0xFF;
-  /// Green component of RGB color.
-  int get green => (value >> 8) & 0xFF;
-  /// Blue component of RGB color.
-  int get blue => value & 0xFF;
+  factory Color.fromAnsi(AnsiColor ansi) {
+    final (r, g, b) = _ansiToRgb(ansi.code);
+    return Color(red: r, green: g, blue: b);
+  }
 
-  /// The color profile matching this color's kind.
-  ColorProfile get profile {
-    switch (kind) {
-      case ColorKind.noColor:
-        return ColorProfile.noColor;
-      case ColorKind.ansi:
-        return ColorProfile.ansi16;
-      case ColorKind.indexed:
-        return ColorProfile.indexed256;
-      case ColorKind.rgb:
-        return ColorProfile.trueColor;
+  factory Color.fromIndexed(IndexedColor indexed) {
+    final (r, g, b) = _indexToRgb(indexed.index);
+    return Color(red: r, green: g, blue: b);
+  }
+
+  /// Nearest indexed 256-color palette entry.
+  int get index => _rgbToIndexed(red, green, blue);
+
+  /// Nearest ANSI 16-color match.
+  AnsiColor get ansi => AnsiColor(_indexedToAnsi(index));
+
+  /// Generates the SGR escape sequence for this color.
+  String sgrSequence({
+    bool background = false,
+    ColorProfile profile = ColorProfile.trueColor,
+  }) {
+    switch (profile) {
+      case ColorProfile.noColor:
+        return background
+            ? '${Defaults.csi}${Defaults.sgrBgReset}m'
+            : '${Defaults.csi}${Defaults.sgrFgReset}m';
+      case ColorProfile.ansi16:
+        final code = ansi.code;
+        final off = background
+            ? Defaults.sgrBgAnsiBase
+            : Defaults.sgrFgAnsiBase;
+        if (code < Defaults.ansiDarkThreshold) {
+          return '${Defaults.csi}${off + code}m';
+        }
+        return '${Defaults.csi}'
+            '${off + Defaults.ansiBrightOffset + code - Defaults.ansiDarkThreshold}m';
+      case ColorProfile.indexed256:
+        final prefix = background
+            ? Defaults.sgrBgExtended
+            : Defaults.sgrFgExtended;
+        return '${Defaults.csi}$prefix;${Defaults.sgrColor256};${index}m';
+      case ColorProfile.trueColor:
+        final prefix = background
+            ? Defaults.sgrBgExtended
+            : Defaults.sgrFgExtended;
+        return '${Defaults.csi}$prefix;${Defaults.sgrColorRgb};$red;$green;${blue}m';
     }
   }
 
-  /// Converts this color to the closest match in the given kind.
-  Color convert(ColorKind target) {
-    if (target == kind) return this;
+  // ── internal conversion helpers ──
 
-    switch (target) {
-      case ColorKind.noColor:
-        return const Color.noColor();
-      case ColorKind.ansi:
-        return _toAnsi();
-      case ColorKind.indexed:
-        return _toIndexed();
-      case ColorKind.rgb:
-        return this;
-    }
+  static (int, int, int) _ansiToRgb(int code) {
+    return switch (code) {
+      0 => (0, 0, 0),
+      1 => (153, 0, 0),
+      2 => (0, 153, 0),
+      3 => (153, 153, 0),
+      4 => (0, 0, 153),
+      5 => (153, 0, 153),
+      6 => (0, 153, 153),
+      7 => (153, 153, 153),
+      8 => (68, 68, 68),
+      9 => (255, 0, 0),
+      10 => (0, 255, 0),
+      11 => (255, 255, 0),
+      12 => (0, 0, 255),
+      13 => (255, 0, 255),
+      14 => (0, 255, 255),
+      15 => (255, 255, 255),
+      _ => (0, 0, 0),
+    };
   }
 
-  /// Downgrades this color to ANSI 16 if possible.
-  Color _toAnsi() {
-    switch (kind) {
-      case ColorKind.noColor:
-        return this;
-      case ColorKind.ansi:
-        return this;
-      case ColorKind.indexed:
-        return _indexedToAnsi(value);
-      case ColorKind.rgb:
-        return _toIndexed()._toAnsi();
+  static (int, int, int) _indexToRgb(int index) {
+    if (index < Defaults.indexedColorCubeStart) return _ansiToRgb(index);
+    if (index >= Defaults.indexedColorGrayStart) {
+      final v =
+          (index - Defaults.indexedColorGrayStart) * _grayStep + _grayBase;
+      return (v, v, v);
     }
+    final i = index - Defaults.indexedColorCubeStart;
+    final cubeArea = Defaults.indexedColorCubeSize;
+    final r = (i ~/ (cubeArea * cubeArea)) * _cubeStep;
+    final g = ((i % (cubeArea * cubeArea)) ~/ cubeArea) * _cubeStep;
+    final b = (i % cubeArea) * _cubeStep;
+    return (r, g, b);
   }
 
-  /// Upgrades or downgrades this color to indexed 256.
-  Color _toIndexed() {
-    switch (kind) {
-      case ColorKind.noColor:
-        return this;
-      case ColorKind.ansi:
-        return this;
-      case ColorKind.indexed:
-        return this;
-      case ColorKind.rgb:
-        return _rgbToIndexed(red, green, blue);
-    }
-  }
-
-  /// Maps an indexed 256 color to the nearest ANSI 16.
-  static Color _indexedToAnsi(int index) {
-    if (index < 16) return Color.ansi(index);
-    const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
-    final gray = index - 232;
-    if (gray >= 0 && gray <= 23) {
-      if (gray < 12) return const Color.ansi(8);
-      return const Color.ansi(15);
-    }
-    final cube = index - 16;
-    final cubeR = cube ~/ 36;
-    final cubeG = (cube % 36) ~/ 6;
-    final cubeB = cube % 6;
-    final ansiR = cubeR < 3 ? 0 : 1;
-    final ansiG = cubeG < 3 ? 0 : 1;
-    final ansiB = cubeB < 3 ? 0 : 1;
-    final ansiIdx = ansiR * 4 + ansiG * 2 + ansiB;
-    final bright = (ansiR + ansiG + ansiB) >= 2;
-    return Color.ansi(bright ? 8 + ansiIdx : map[ansiIdx]);
-  }
-
-  /// Finds the nearest indexed 256 color to an RGB value (redmean distance).
-  static Color _rgbToIndexed(int r, int g, int b) {
+  static int _rgbToIndexed(int r, int g, int b) {
     var bestDist = double.infinity;
     var bestIdx = 0;
 
-    for (var i = 16; i < 232; i++) {
-      final cr = ((i - 16) ~/ 36) * 51;
-      final cg = (((i - 16) % 36) ~/ 6) * 51;
-      final cb = ((i - 16) % 6) * 51;
+    final cubeStart = Defaults.indexedColorCubeStart;
+    final cubeSize = Defaults.indexedColorCubeSize;
+    final cubeEnd = cubeStart + cubeSize * cubeSize * cubeSize;
+    final cubeStep = _cubeStep;
+
+    for (var i = cubeStart; i < cubeEnd; i++) {
+      final ci = i - cubeStart;
+      final cr = (ci ~/ (cubeSize * cubeSize)) * cubeStep;
+      final cg = ((ci % (cubeSize * cubeSize)) ~/ cubeSize) * cubeStep;
+      final cb = (ci % cubeSize) * cubeStep;
       final dist = _redmeanDistance(r, g, b, cr, cg, cb);
       if (dist < bestDist) {
         bestDist = dist;
@@ -141,19 +153,43 @@ class Color {
       }
     }
 
-    for (var i = 0; i < 24; i++) {
-      final gray = i * 10 + 8;
+    final grayStart = Defaults.indexedColorGrayStart;
+    final grayCount = Defaults.indexedColorGrayCount;
+    for (var i = 0; i < grayCount; i++) {
+      final gray = i * _grayStep + _grayBase;
       final dist = _redmeanDistance(r, g, b, gray, gray, gray);
       if (dist < bestDist) {
         bestDist = dist;
-        bestIdx = 232 + i;
+        bestIdx = grayStart + i;
       }
     }
 
-    return Color.indexed(bestIdx);
+    return bestIdx;
   }
 
-  /// Redmean color distance approximation (better than Euclidean for RGB).
+  static int _indexedToAnsi(int index) {
+    if (index < Defaults.indexedColorCubeStart) return index;
+    const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
+    final gray = index - Defaults.indexedColorGrayStart;
+    if (gray >= 0 && gray < Defaults.indexedColorGrayCount) {
+      return gray < 12 ? 8 : 15;
+    }
+    final cubeSize = Defaults.indexedColorCubeSize;
+    final cube = index - Defaults.indexedColorCubeStart;
+    final cubeR = cube ~/ (cubeSize * cubeSize);
+    final cubeG = (cube % (cubeSize * cubeSize)) ~/ cubeSize;
+    final cubeB = cube % cubeSize;
+    final ansiR = cubeR < 3 ? 0 : 1;
+    final ansiG = cubeG < 3 ? 0 : 1;
+    final ansiB = cubeB < 3 ? 0 : 1;
+    final ansiIdx = ansiR * 4 + ansiG * 2 + ansiB;
+    final ansi = map[ansiIdx];
+    final maxVal = [cubeR, cubeG, cubeB]
+        .where((v) => v >= 3)
+        .fold(0, (a, b) => a > b ? a : b);
+    return maxVal >= 5 ? ansi + 8 : ansi;
+  }
+
   static double _redmeanDistance(
     int r1,
     int g1,
@@ -171,37 +207,8 @@ class Color {
         (2 + (255 - rBar) / 256) * db * db;
   }
 
-  /// Generates the SGR escape sequence for this color.
-  String sgrSequence({bool background = false}) {
-    final prefix = background ? Defaults.sgrBgExtended : Defaults.sgrFgExtended;
-    switch (kind) {
-      case ColorKind.noColor:
-        return background
-            ? '${Defaults.csi}${Defaults.sgrBgReset}m'
-            : '${Defaults.csi}${Defaults.sgrFgReset}m';
-      case ColorKind.ansi:
-        final off = background
-            ? Defaults.sgrBgAnsiBase
-            : Defaults.sgrFgAnsiBase;
-        if (value < Defaults.ansiDarkThreshold) {
-          return '${Defaults.csi}${off + value}m';
-        }
-        return '${Defaults.csi}${off + Defaults.ansiBrightOffset + value - Defaults.ansiDarkThreshold}m';
-      case ColorKind.indexed:
-        return '${Defaults.csi}$prefix;5;${value}m';
-      case ColorKind.rgb:
-        return '${Defaults.csi}$prefix;2;$red;$green;${blue}m';
-    }
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Color && kind == other.kind && value == other.value);
-
-  @override
-  int get hashCode => Object.hash(kind, value);
-
-  @override
-  String toString() => 'Color($kind, $value)';
+  static const int _cubeStep =
+      Defaults.rgbComponentMax ~/ (Defaults.indexedColorCubeSize - 1);
+  static const int _grayStep = 10;
+  static const int _grayBase = 8;
 }

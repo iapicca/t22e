@@ -5,6 +5,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 class VirtualTerminal {
   /// Current terminal width in columns.
   int width;
+
   /// Current terminal height in rows.
   int height;
   late List<List<Cell>> _grid;
@@ -69,6 +70,7 @@ class VirtualTerminal {
 
   /// Saved cursor X position.
   int _savedCursorX = 0;
+
   /// Saved cursor Y position.
   int _savedCursorY = 0;
 
@@ -211,23 +213,23 @@ class VirtualTerminal {
         case Defaults.sgrFgAnsiBase + 6:
         case Defaults.sgrFgAnsiBase + 7:
           _currentStyle = TextStyle(
-            foreground: Color.ansi(p - Defaults.sgrFgAnsiBase),
+            foreground: Color.fromAnsi(AnsiColor(p - Defaults.sgrFgAnsiBase)),
           ).merge(_currentStyle);
         case Defaults.sgrFgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
               _currentStyle = TextStyle(
-                foreground: Color.indexed(params[i + 2]),
+                foreground: Color.fromIndexed(IndexedColor(params[i + 2])),
               ).merge(_currentStyle);
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&
                 i + 4 < params.length) {
               _currentStyle = TextStyle(
-                foreground: Color.rgb(
-                  params[i + 2],
-                  params[i + 3],
-                  params[i + 4],
+                foreground: Color(
+                  red: params[i + 2],
+                  green: params[i + 3],
+                  blue: params[i + 4],
                 ),
               ).merge(_currentStyle);
               i += 4;
@@ -244,23 +246,23 @@ class VirtualTerminal {
         case Defaults.sgrBgAnsiBase + 6:
         case Defaults.sgrBgAnsiBase + 7:
           _currentStyle = TextStyle(
-            background: Color.ansi(p - Defaults.sgrBgAnsiBase),
+            background: Color.fromAnsi(AnsiColor(p - Defaults.sgrBgAnsiBase)),
           ).merge(_currentStyle);
         case Defaults.sgrBgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
               _currentStyle = TextStyle(
-                background: Color.indexed(params[i + 2]),
+                background: Color.fromIndexed(IndexedColor(params[i + 2])),
               ).merge(_currentStyle);
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&
                 i + 4 < params.length) {
               _currentStyle = TextStyle(
-                background: Color.rgb(
-                  params[i + 2],
-                  params[i + 3],
-                  params[i + 4],
+                background: Color(
+                  red: params[i + 2],
+                  green: params[i + 3],
+                  blue: params[i + 4],
                 ),
               ).merge(_currentStyle);
               i += 4;

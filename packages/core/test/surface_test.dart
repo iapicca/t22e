@@ -175,10 +175,10 @@ void main() {
 
     test('putText applies style to all chars', () {
       final s = Surface(10, 3);
-      const style = TextStyle(foreground: Color.ansi(2));
+      const style = TextStyle(foreground: Color(red: 0, green: 153, blue: 0));
       s.putText(1, 1, 'Hi', style);
-      expect(s.grid[1][1].style.foreground, Color.ansi(2));
-      expect(s.grid[1][2].style.foreground, Color.ansi(2));
+      expect(s.grid[1][1].style.foreground, const Color(red: 0, green: 153, blue: 0));
+      expect(s.grid[1][2].style.foreground, const Color(red: 0, green: 153, blue: 0));
     });
 
     test('fillRect with wide chars marks continuation', () {

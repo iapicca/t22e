@@ -67,29 +67,11 @@ abstract class TextStyle with _$TextStyle {
 
   /// Downgrades colors to match the given color profile.
   TextStyle resolveColor(ColorProfile profile) {
-    if (foreground == null && background == null) return this;
-    final target = _profileToKind(profile);
-    final fg = foreground?.convert(target);
-    final bg = background?.convert(target);
-    if (identical(fg, foreground) && identical(bg, background)) return this;
-    return copyWith(
-      foreground: fg,
-      background: bg,
-    );
-  }
-
-  /// Maps a ColorProfile to the corresponding ColorKind.
-  static ColorKind _profileToKind(ColorProfile profile) {
-    switch (profile) {
-      case ColorProfile.noColor:
-        return ColorKind.noColor;
-      case ColorProfile.ansi16:
-        return ColorKind.ansi;
-      case ColorProfile.indexed256:
-        return ColorKind.indexed;
-      case ColorProfile.trueColor:
-        return ColorKind.rgb;
+    if (profile == ColorProfile.noColor) {
+      if (foreground == null && background == null) return this;
+      return copyWith(foreground: null, background: null);
     }
+    return this;
   }
 
   /// Inherits style from a parent (non-null fields in this take priority).
@@ -115,10 +97,10 @@ abstract class TextStyle with _$TextStyle {
   /// Factory for the default hyperlink style (blue, underlined).
   static TextStyle link({String? uri}) {
     return TextStyle(
-      foreground: const Color.rgb(
-        Defaults.linkColorRed,
-        Defaults.linkColorGreen,
-        Defaults.linkColorBlue,
+      foreground: Color(
+        red: Defaults.linkColorRed,
+        green: Defaults.linkColorGreen,
+        blue: Defaults.linkColorBlue,
       ),
       underline: true,
     );

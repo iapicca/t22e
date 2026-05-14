@@ -2,181 +2,194 @@ import 'package:test/test.dart';
 import 'package:core/core.dart';
 
 void main() {
+  group('AnsiColor', () {
+    test('valid codes', () {
+      expect(() => AnsiColor(0), returnsNormally);
+      expect(() => AnsiColor(15), returnsNormally);
+    });
+
+    test('rejects out of range', () {
+      expect(() => AnsiColor(-1), throwsA(isA<AssertionError>()));
+      expect(() => AnsiColor(16), throwsA(isA<AssertionError>()));
+    });
+  });
+
+  group('IndexedColor', () {
+    test('valid indices', () {
+      expect(() => IndexedColor(0), returnsNormally);
+      expect(() => IndexedColor(255), returnsNormally);
+    });
+
+    test('rejects out of range', () {
+      expect(() => IndexedColor(-1), throwsA(isA<AssertionError>()));
+      expect(() => IndexedColor(256), throwsA(isA<AssertionError>()));
+    });
+  });
+
   group('Color', () {
     group('constructors', () {
-      test('noColor', () {
-        const c = Color.noColor();
-        expect(c.kind, ColorKind.noColor);
-        expect(c.value, 0);
+      test('default to black', () {
+        const c = Color();
+        expect(c.red, 0);
+        expect(c.green, 0);
+        expect(c.blue, 0);
       });
 
-      test('ansi', () {
-        const c = Color.ansi(1);
-        expect(c.kind, ColorKind.ansi);
-        expect(c.value, 1);
-      });
-
-      test('indexed', () {
-        const c = Color.indexed(42);
-        expect(c.kind, ColorKind.indexed);
-        expect(c.value, 42);
-      });
-
-      test('rgb', () {
-        const c = Color.rgb(255, 128, 64);
-        expect(c.kind, ColorKind.rgb);
+      test('direct RGB', () {
+        const c = Color(red: 255, green: 128, blue: 64);
         expect(c.red, 255);
         expect(c.green, 128);
         expect(c.blue, 64);
       });
 
-      test('ansi rejects out of range', () {
-        expect(() => Color.ansi(16), throwsA(isA<AssertionError>()));
+      test('fromAnsi', () {
+        final c = Color.fromAnsi(AnsiColor(1));
+        expect(c.red, 153);
+        expect(c.green, 0);
+        expect(c.blue, 0);
       });
 
-      test('indexed rejects out of range', () {
-        expect(() => Color.indexed(256), throwsA(isA<AssertionError>()));
+      test('fromIndexed', () {
+        final c = Color.fromIndexed(IndexedColor(196));
+        expect(c.red, 255);
+        expect(c.green, 0);
+        expect(c.blue, 0);
       });
 
       test('rgb rejects out of range', () {
-        expect(() => Color.rgb(256, 0, 0), throwsA(isA<AssertionError>()));
+        expect(
+          () => Color(red: 256, green: 0, blue: 0),
+          throwsA(isA<AssertionError>()),
+        );
       });
     });
 
-    group('profile', () {
-      test('noColor profile', () {
-        expect(const Color.noColor().profile, ColorProfile.noColor);
+    group('index getter', () {
+      test('black maps to index 16', () {
+        expect(const Color().index, 16);
       });
 
-      test('ansi profile', () {
-        expect(const Color.ansi(0).profile, ColorProfile.ansi16);
-      });
-
-      test('indexed profile', () {
-        expect(const Color.indexed(0).profile, ColorProfile.indexed256);
-      });
-
-      test('rgb profile', () {
-        expect(const Color.rgb(0, 0, 0).profile, ColorProfile.trueColor);
+      test('red maps to cube', () {
+        final c = Color(red: 255, green: 0, blue: 0);
+        expect(c.index, 196);
       });
     });
 
-    group('conversion - never upgrades', () {
-      test('rgb stays rgb when target is rgb', () {
-        const c = Color.rgb(100, 150, 200);
-        final converted = c.convert(ColorKind.rgb);
-        expect(converted.kind, ColorKind.rgb);
+    group('ansi getter', () {
+      test('black converts to ansi 0', () {
+        expect(const Color().ansi.code, 0);
       });
 
-      test('ansi stays ansi when target is indexed', () {
-        const c = Color.ansi(1);
-        final converted = c.convert(ColorKind.indexed);
-        expect(converted.kind, ColorKind.ansi);
+      test('red converts to ansi 1', () {
+        final c = Color(red: 153, green: 0, blue: 0);
+        expect(c.ansi.code, 1);
       });
 
-      test('indexed stays indexed when target is rgb', () {
-        const c = Color.indexed(42);
-        final converted = c.convert(ColorKind.rgb);
-        expect(converted.kind, ColorKind.indexed);
-      });
-
-      test('noColor stays noColor for any target', () {
-        const c = Color.noColor();
-        expect(c.convert(ColorKind.rgb).kind, ColorKind.noColor);
-        expect(c.convert(ColorKind.ansi).kind, ColorKind.noColor);
-      });
-    });
-
-    group('conversion - downgrade chain', () {
-      test('rgb -> indexed', () {
-        const c = Color.rgb(255, 0, 0);
-        final converted = c.convert(ColorKind.indexed);
-        expect(converted.kind, ColorKind.indexed);
-      });
-
-      test('rgb -> ansi', () {
-        const c = Color.rgb(0, 255, 0);
-        final converted = c.convert(ColorKind.ansi);
-        expect(converted.kind, ColorKind.ansi);
-      });
-
-      test('rgb -> noColor', () {
-        const c = Color.rgb(100, 100, 100);
-        final converted = c.convert(ColorKind.noColor);
-        expect(converted.kind, ColorKind.noColor);
-      });
-
-      test('indexed -> ansi', () {
-        const c = Color.indexed(16);
-        final converted = c.convert(ColorKind.ansi);
-        expect(converted.kind, ColorKind.ansi);
-      });
-
-      test('indexed -> noColor', () {
-        const c = Color.indexed(16);
-        final converted = c.convert(ColorKind.noColor);
-        expect(converted.kind, ColorKind.noColor);
-      });
-
-      test('ansi -> noColor', () {
-        const c = Color.ansi(1);
-        final converted = c.convert(ColorKind.noColor);
-        expect(converted.kind, ColorKind.noColor);
+      test('fromAnsi preserves code', () {
+        for (var i = 0; i < 16; i++) {
+          final c = Color.fromAnsi(AnsiColor(i));
+          expect(c.ansi.code, i);
+        }
       });
     });
 
     group('sgrSequence', () {
       test('noColor foreground', () {
-        expect(const Color.noColor().sgrSequence(), '\x1b[39m');
+        expect(
+          const Color().sgrSequence(profile: ColorProfile.noColor),
+          '\x1b[39m',
+        );
       });
 
       test('noColor background', () {
-        expect(const Color.noColor().sgrSequence(background: true), '\x1b[49m');
+        expect(
+          const Color().sgrSequence(
+            background: true,
+            profile: ColorProfile.noColor,
+          ),
+          '\x1b[49m',
+        );
       });
 
-      test('ansi foreground 0-7', () {
-        expect(const Color.ansi(1).sgrSequence(), '\x1b[31m');
-        expect(const Color.ansi(7).sgrSequence(), '\x1b[37m');
+      test('ansi16 foreground dark', () {
+        final c = Color.fromAnsi(AnsiColor(1));
+        expect(c.sgrSequence(profile: ColorProfile.ansi16), '\x1b[31m');
       });
 
-      test('ansi foreground 8-15 (bright)', () {
-        expect(const Color.ansi(9).sgrSequence(), '\x1b[91m');
-        expect(const Color.ansi(15).sgrSequence(), '\x1b[97m');
+      test('ansi16 foreground bright', () {
+        final c = Color.fromAnsi(AnsiColor(9));
+        expect(c.sgrSequence(profile: ColorProfile.ansi16), '\x1b[91m');
       });
 
-      test('ansi background 0-7', () {
-        expect(const Color.ansi(1).sgrSequence(background: true), '\x1b[41m');
+      test('ansi16 background', () {
+        final c = Color.fromAnsi(AnsiColor(1));
+        expect(
+          c.sgrSequence(background: true, profile: ColorProfile.ansi16),
+          '\x1b[41m',
+        );
       });
 
-      test('ansi background 8-15 (bright)', () {
-        expect(const Color.ansi(9).sgrSequence(background: true), '\x1b[101m');
+      test('ansi16 background bright', () {
+        final c = Color.fromAnsi(AnsiColor(9));
+        expect(
+          c.sgrSequence(background: true, profile: ColorProfile.ansi16),
+          '\x1b[101m',
+        );
       });
 
-      test('indexed foreground', () {
-        expect(const Color.indexed(42).sgrSequence(), '\x1b[38;5;42m');
+      test('indexed256 foreground', () {
+        final c = Color.fromIndexed(IndexedColor(42));
+        expect(
+          c.sgrSequence(profile: ColorProfile.indexed256),
+          '\x1b[38;5;42m',
+        );
       });
 
-      test('indexed background', () {
-        expect(const Color.indexed(42).sgrSequence(background: true), '\x1b[48;5;42m');
+      test('indexed256 background', () {
+        final c = Color.fromIndexed(IndexedColor(42));
+        expect(
+          c.sgrSequence(background: true, profile: ColorProfile.indexed256),
+          '\x1b[48;5;42m',
+        );
       });
 
-      test('rgb foreground', () {
-        expect(const Color.rgb(255, 128, 64).sgrSequence(), '\x1b[38;2;255;128;64m');
+      test('trueColor foreground', () {
+        const c = Color(red: 255, green: 128, blue: 64);
+        expect(
+          c.sgrSequence(profile: ColorProfile.trueColor),
+          '\x1b[38;2;255;128;64m',
+        );
       });
 
-      test('rgb background', () {
-        expect(const Color.rgb(255, 128, 64).sgrSequence(background: true), '\x1b[48;2;255;128;64m');
+      test('trueColor background', () {
+        const c = Color(red: 255, green: 128, blue: 64);
+        expect(
+          c.sgrSequence(background: true, profile: ColorProfile.trueColor),
+          '\x1b[48;2;255;128;64m',
+        );
+      });
+
+      test('defaults to trueColor', () {
+        const c = Color(red: 255, green: 128, blue: 64);
+        expect(c.sgrSequence(), '\x1b[38;2;255;128;64m');
       });
     });
 
     group('equality', () {
-      test('same kind and value are equal', () {
-        expect(const Color.ansi(1) == const Color.ansi(1), isTrue);
-        expect(const Color.rgb(10, 20, 30) == const Color.rgb(10, 20, 30), isTrue);
+      test('same fields are equal', () {
+        expect(
+          const Color(red: 10, green: 20, blue: 30) ==
+              const Color(red: 10, green: 20, blue: 30),
+          isTrue,
+        );
       });
 
-      test('different values are not equal', () {
-        expect(const Color.ansi(1) == const Color.ansi(2), isFalse);
+      test('different fields are not equal', () {
+        expect(
+          const Color(red: 10, green: 20, blue: 30) ==
+              const Color(red: 10, green: 20, blue: 99),
+          isFalse,
+        );
       });
     });
   });

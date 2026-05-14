@@ -258,7 +258,9 @@ class Surface {
     if (s.reverse == true) buf.write(reverse(true));
     if (s.strikethrough == true) buf.write(strikethrough(true));
     if (s.overline == true) buf.write(overLine(true));
-    if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
+    if (s.foreground != null) {
+      buf.write(s.foreground!.sgrSequence());
+    }
     if (s.background != null) {
       buf.write(s.background!.sgrSequence(background: true));
     }
