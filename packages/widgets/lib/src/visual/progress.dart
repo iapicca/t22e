@@ -5,22 +5,27 @@ import 'package:protocol/protocol.dart' show Defaults;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
-import 'package:core/core.dart' show TextStyle;
 
 /// A progress bar with determinate (fraction) and indeterminate (animated) modes.
 class ProgressBar extends Model<ProgressBar> {
   /// Completion fraction (0.0 to 1.0), or null for indeterminate.
   final double? fraction;
+
   /// Optional label text.
   final String? label;
+
   /// Width of the bar in cells.
   final int barWidth;
+
   /// Character used for filled segments.
   final String fillChar;
+
   /// Character used for empty segments.
   final String emptyChar;
+
   /// Animation interval for indeterminate mode.
   final Duration animInterval;
+
   /// Current scroll offset for indeterminate animation.
   final int indeterminateOffset;
 
