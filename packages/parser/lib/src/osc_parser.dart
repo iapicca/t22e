@@ -5,8 +5,8 @@ import 'events.dart';
 /// Parses OSC sequences (title, hyperlink, color queries, clipboard).
 final class OscParser {
   /// Dispatches an OSC sequence by parameter number.
-  Event? parse(OscSequenceData data) {
-    final content = data.content;
+  Event? parse(SequenceData data) {
+    final content = (data as OscSequenceData).content;
     final semicolon = content.indexOf(';');
     if (semicolon == -1) return null;
 

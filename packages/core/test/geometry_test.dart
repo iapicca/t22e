@@ -24,8 +24,8 @@ void main() {
     });
 
     test('withX and withY', () {
-      expect(Point(1, 2).withX(5), Point(5, 2));
-      expect(Point(1, 2).withY(5), Point(1, 5));
+      expect(Point(1, 2).copyWith(x: 5), Point(5, 2));
+      expect(Point(1, 2).copyWith(y: 5), Point(1, 5));
     });
   });
 
@@ -69,13 +69,13 @@ void main() {
 
     test('inset shrinks', () {
       final r = Rect(0, 0, 10, 10);
-      final i = r.inset(const Insets.all(2));
+      final i = r.inset(Insets.all(2));
       expect(i, Rect(2, 2, 6, 6));
     });
 
     test('inset with large values clamps to zero', () {
       final r = Rect(0, 0, 5, 5);
-      final i = r.inset(const Insets.all(10));
+      final i = r.inset(Insets.all(10));
       expect(i.isEmpty, isTrue);
     });
 
@@ -99,7 +99,7 @@ void main() {
 
   group('Insets', () {
     test('all constructor', () {
-      const i = Insets.all(3);
+      final i = Insets.all(3);
       expect(i.left, 3);
       expect(i.top, 3);
       expect(i.right, 3);
@@ -107,7 +107,7 @@ void main() {
     });
 
     test('symmetric constructor', () {
-      const i = Insets.symmetric(horizontal: 5, vertical: 10);
+      final i = Insets.symmetric(horizontal: 5, vertical: 10);
       expect(i.left, 5);
       expect(i.right, 5);
       expect(i.top, 10);
@@ -115,7 +115,7 @@ void main() {
     });
 
     test('only constructor', () {
-      const i = Insets.only(left: 1, top: 2, right: 3, bottom: 4);
+      final i = Insets.only(left: 1, top: 2, right: 3, bottom: 4);
       expect(i.left, 1);
       expect(i.top, 2);
       expect(i.right, 3);
@@ -123,21 +123,21 @@ void main() {
     });
 
     test('horizontal and vertical totals', () {
-      const i = Insets.all(3);
+      final i = Insets.all(3);
       expect(i.horizontal, 6);
       expect(i.vertical, 6);
     });
 
     test('add combines insets', () {
-      const a = Insets.all(2);
-      const b = Insets.all(3);
+      final a = Insets.all(2);
+      final b = Insets.all(3);
       final s = a.add(b);
-      expect(s, const Insets.all(5));
+      expect(s, Insets.all(5));
     });
 
     test('equality and hashCode', () {
-      expect(const Insets.all(2) == const Insets.all(2), isTrue);
-      expect(const Insets.all(2) == const Insets.all(3), isFalse);
+      expect(Insets.all(2) == Insets.all(2), isTrue);
+      expect(Insets.all(2) == Insets.all(3), isFalse);
     });
   });
 }

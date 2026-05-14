@@ -24,9 +24,16 @@ dev_dependencies:
 
 melos:
   scripts:
+    build:
+      description: Run build_runner code generation in all packages.
+      exec: dart run build_runner build
     analyze:
-      description: Run static analysis on all packages.
-      exec: dart analyze
+      description: Run code generation then static analysis on all packages.
+      run: |
+        melos build
+        melos exec -- dart analyze
     test:
-      description: Run tests in all workspace packages.
-      exec: dart test
+      description: Run code generation then tests in all workspace packages.
+      run: |
+        melos build
+        melos exec -- dart test

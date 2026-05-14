@@ -5,9 +5,10 @@ import 'events.dart';
 /// Parses ESC sequences (SS3 function keys, reset, save/restore screen).
 final class EscParser {
   /// Dispatches an ESC sequence to the appropriate handler.
-  Event? parse(EscSequenceData data) {
-    final intermediates = data.intermediates;
-    final fb = data.finalByte;
+  Event? parse(SequenceData data) {
+    final d = data as EscSequenceData;
+    final intermediates = d.intermediates;
+    final fb = d.finalByte;
 
     if (intermediates.contains(Defaults.ss3Byte)) {
       return switch (fb) {

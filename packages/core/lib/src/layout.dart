@@ -1,29 +1,28 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
+part 'layout.freezed.dart';
+
 /// Layout constraints: min/max width and height bounds.
-class Constraints {
-  /// Minimum allowed width.
-  final int minWidth;
-  /// Maximum allowed width.
-  final int maxWidth;
-  /// Minimum allowed height.
-  final int minHeight;
-  /// Maximum allowed height.
-  final int maxHeight;
+@freezed
+abstract class Constraints with _$Constraints {
+  const Constraints._();
 
-  const Constraints({
-    this.minWidth = 0,
-    this.maxWidth = Defaults.unbounded,
-    this.minHeight = 0,
-    this.maxHeight = Defaults.unbounded,
-  });
+  const factory Constraints({
+    @Default(0) int minWidth,
+    @Default(Defaults.unbounded) int maxWidth,
+    @Default(0) int minHeight,
+    @Default(Defaults.unbounded) int maxHeight,
+  }) = _Constraints;
 
-  /// Tight constraints forcing an exact size.
-  const Constraints.tight(int width, int height)
-    : minWidth = width,
-      maxWidth = width,
-      minHeight = height,
-      maxHeight = height;
+  factory Constraints.tight(int width, int height) {
+    return Constraints(
+      minWidth: width,
+      maxWidth: width,
+      minHeight: height,
+      maxHeight: height,
+    );
+  }
 
   /// True if width and height are both tightly constrained.
   bool get isTight => minWidth == maxWidth && minHeight == maxHeight;
@@ -49,70 +48,26 @@ class Constraints {
       maxHeight: (maxHeight * factor).round(),
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Constraints &&
-          minWidth == other.minWidth &&
-          maxWidth == other.maxWidth &&
-          minHeight == other.minHeight &&
-          maxHeight == other.maxHeight);
-
-  @override
-  int get hashCode => Object.hash(minWidth, maxWidth, minHeight, maxHeight);
-
-  @override
-  String toString() =>
-      'Constraints($minWidth≤w≤$maxWidth, $minHeight≤h≤$maxHeight)';
 }
 
 /// A simple width × height size.
-class Size {
-  /// Width in columns.
-  final int width;
-  /// Height in rows.
-  final int height;
-
-  const Size(this.width, this.height);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Size && width == other.width && height == other.height);
-
-  @override
-  int get hashCode => Object.hash(width, height);
-
-  @override
-  String toString() => 'Size($width, $height)';
+@freezed
+abstract class Size with _$Size {
+  const factory Size(int width, int height) = _Size;
 }
 
 /// Describes a flex item with optional fixed size and flex factor.
-class LayoutItem {
-  /// Fixed size (pixels/columns), or null for flexible.
-  final int? fixedSize;
-  /// Flex factor when distributing remaining space.
-  final int flex;
+@freezed
+abstract class LayoutItem with _$LayoutItem {
+  const LayoutItem._();
 
-  const LayoutItem({this.fixedSize, this.flex = 1});
+  const factory LayoutItem({
+    int? fixedSize,
+    @Default(1) int flex,
+  }) = _LayoutItem;
 
   /// True if this item stretches to fill available space.
   bool get isFlexible => fixedSize == null;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is LayoutItem &&
-          fixedSize == other.fixedSize &&
-          flex == other.flex);
-
-  @override
-  int get hashCode => Object.hash(fixedSize, flex);
-
-  @override
-  String toString() =>
-      isFlexible ? 'LayoutItem(flex:$flex)' : 'LayoutItem(fixed:$fixedSize)';
 }
 
 /// Distributes available space among items using a flexbox-like algorithm.

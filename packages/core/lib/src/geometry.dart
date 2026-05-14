@@ -1,57 +1,31 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
-/// A 2D point (x=column, y=row) on the terminal grid.
-class Point {
-  /// Column (0-based).
-  final int x;
-  /// Row (0-based).
-  final int y;
+part 'geometry.freezed.dart';
 
-  const Point(this.x, this.y);
+/// A 2D point (x=column, y=row) on the terminal grid.
+@freezed
+abstract class Point with _$Point {
+  const Point._();
+
+  const factory Point(int x, int y) = _Point;
 
   /// Adds two points component-wise.
   Point operator +(Point other) => Point(x + other.x, y + other.y);
   /// Subtracts two points component-wise.
   Point operator -(Point other) => Point(x - other.x, y - other.y);
-
-  /// Returns a copy with x replaced.
-  Point withX(int x) => Point(x, y);
-  /// Returns a copy with y replaced.
-  Point withY(int y) => Point(x, y);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Point && x == other.x && y == other.y);
-
-  @override
-  int get hashCode => Object.hash(x, y);
-
-  @override
-  String toString() => 'Point($x, $y)';
 }
 
 /// An axis-aligned rectangle.
-class Rect {
-  /// Left edge column.
-  final int x;
-  /// Top edge row.
-  final int y;
-  /// Width in columns.
-  final int width;
-  /// Height in rows.
-  final int height;
+@freezed
+abstract class Rect with _$Rect {
+  const Rect._();
 
-  const Rect(this.x, this.y, this.width, this.height)
-    : assert(width >= 0),
-      assert(height >= 0);
+  @Assert('width >= 0', 'width must be non-negative')
+  @Assert('height >= 0', 'height must be non-negative')
+  const factory Rect(int x, int y, int width, int height) = _Rect;
 
-  /// Creates a Rect from left, top, width, height.
-  const Rect.fromLTWH(int left, int top, int w, int h)
-    : x = left,
-      y = top,
-      width = w,
-      height = h;
+  factory Rect.fromLTWH(int left, int top, int w, int h) => Rect(left, top, w, h);
 
   /// Left edge column.
   int get left => x;
@@ -106,56 +80,28 @@ class Rect {
     final b = (bottom + dy).clamp(t, Defaults.unbounded);
     return Rect(l, t, r - l, b - t);
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Rect &&
-          x == other.x &&
-          y == other.y &&
-          width == other.width &&
-          height == other.height);
-
-  @override
-  int get hashCode => Object.hash(x, y, width, height);
-
-  @override
-  String toString() => 'Rect($x, $y, $width, $height)';
 }
 
 /// Offsets for each edge (used for padding and margins).
-class Insets {
-  /// Left inset.
-  final int left;
-  /// Top inset.
-  final int top;
-  /// Right inset.
-  final int right;
-  /// Bottom inset.
-  final int bottom;
+@freezed
+abstract class Insets with _$Insets {
+  const Insets._();
 
-  const Insets(this.left, this.top, this.right, this.bottom);
+  const factory Insets(int left, int top, int right, int bottom) = _Insets;
 
   /// Same inset on all four sides.
-  const Insets.all(int value)
-    : left = value,
-      top = value,
-      right = value,
-      bottom = value;
+  factory Insets.all(int value) => Insets(value, value, value, value);
 
   /// Symmetric inset: horizontal and vertical separately.
-  const Insets.symmetric({int horizontal = 0, int vertical = 0})
-    : left = horizontal,
-      right = horizontal,
-      top = vertical,
-      bottom = vertical;
+  factory Insets.symmetric({int horizontal = 0, int vertical = 0}) =>
+      Insets(horizontal, vertical, horizontal, vertical);
 
   /// Specify individual sides.
-  const Insets.only({int left = 0, int top = 0, int right = 0, int bottom = 0})
-    : this(left, top, right, bottom);
+  factory Insets.only({int left = 0, int top = 0, int right = 0, int bottom = 0}) =>
+      Insets(left, top, right, bottom);
 
   /// Creates from left, top, right, bottom values.
-  const Insets.fromLTRB(int l, int t, int r, int b) : this(l, t, r, b);
+  factory Insets.fromLTRB(int l, int t, int r, int b) => Insets(l, t, r, b);
 
   /// Total horizontal inset (left + right).
   int get horizontal => left + right;
@@ -169,19 +115,4 @@ class Insets {
     right + other.right,
     bottom + other.bottom,
   );
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Insets &&
-          left == other.left &&
-          top == other.top &&
-          right == other.right &&
-          bottom == other.bottom);
-
-  @override
-  int get hashCode => Object.hash(left, top, right, bottom);
-
-  @override
-  String toString() => 'Insets($left, $top, $right, $bottom)';
 }

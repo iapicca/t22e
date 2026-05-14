@@ -1,8 +1,11 @@
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'platform_service.dart';
+
+part 'raw_ffi.freezed.dart';
 
 /// Platform-specific libc library handle.
 final DynamicLibrary _libc = PlatformService().library;
@@ -22,25 +25,15 @@ final int Function(int fd, int opt, Pointer<Uint8> buf) tcSetAttr = _libc
     >('tcsetattr');
 
 /// Holds the saved termios state for restoring raw mode.
-final class RawModeState {
-  /// Raw byte buffer containing the termios struct.
-  final Pointer<Uint8> buf;
-  /// Saved input flags (c_iflag).
-  final int cIflag;
-  /// Saved output flags (c_oflag).
-  final int cOflag;
-  /// Saved control flags (c_cflag).
-  final int cCflag;
-  /// Saved local flags (c_lflag).
-  final int cLflag;
-
-  const RawModeState(
-    this.buf,
-    this.cIflag,
-    this.cOflag,
-    this.cCflag,
-    this.cLflag,
-  );
+@freezed
+abstract class RawModeState with _$RawModeState {
+  const factory RawModeState(
+    Pointer<Uint8> buf,
+    int cIflag,
+    int cOflag,
+    int cCflag,
+    int cLflag,
+  ) = _RawModeState;
 }
 
 /// Enables raw mode via FFI (tcgetattr/tcsetattr).

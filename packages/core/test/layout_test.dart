@@ -10,7 +10,7 @@ void main() {
     });
 
     test('tight constraints have min == max', () {
-      const c = Constraints.tight(10, 20);
+      final c = Constraints.tight(10, 20);
       expect(c.isTight, isTrue);
       expect(c.minWidth, 10);
       expect(c.maxWidth, 10);

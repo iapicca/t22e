@@ -5,10 +5,11 @@ import 'events.dart';
 /// Parses CSI sequences into key, mouse, and response events.
 final class CsiParser {
   /// Dispatches a CSI sequence to the appropriate handler by final byte.
-  Event? parse(CsiSequenceData data) {
-    final params = data.params;
-    final intermediates = data.intermediates;
-    final fb = data.finalByte;
+  Event? parse(SequenceData data) {
+    final d = data as CsiSequenceData;
+    final params = d.params;
+    final intermediates = d.intermediates;
+    final fb = d.finalByte;
 
     if (intermediates.contains(Defaults.csiExtendedIntermediate)) {
       return _parseExtended(params, fb);

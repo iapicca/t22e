@@ -1,4 +1,7 @@
 /// Event types emitted by the terminal parser: key, mouse, clipboard, and responses.
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'events.freezed.dart';
 sealed class Event {
   const Event();
 }
@@ -49,33 +52,14 @@ enum KeyCode {
 }
 
 /// Keyboard modifier flags for key events.
-final class KeyModifiers {
-  /// Ctrl key held.
-  final bool ctrl;
-  /// Shift key held.
-  final bool shift;
-  /// Alt key held.
-  final bool alt;
-  /// Meta/Super key held.
-  final bool meta;
-
-  const KeyModifiers({
-    this.ctrl = false,
-    this.shift = false,
-    this.alt = false,
-    this.meta = false,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      other is KeyModifiers &&
-      ctrl == other.ctrl &&
-      shift == other.shift &&
-      alt == other.alt &&
-      meta == other.meta;
-
-  @override
-  int get hashCode => Object.hash(ctrl, shift, alt, meta);
+@freezed
+abstract class KeyModifiers with _$KeyModifiers {
+  const factory KeyModifiers({
+    @Default(false) bool ctrl,
+    @Default(false) bool shift,
+    @Default(false) bool alt,
+    @Default(false) bool meta,
+  }) = _KeyModifiers;
 }
 
 /// Key event type: press, release, or repeat.

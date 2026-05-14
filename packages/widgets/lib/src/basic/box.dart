@@ -24,7 +24,7 @@ class Box extends Widget {
   Box({
     this.child,
     this.borderStyle = BorderStyle.single,
-    this.padding = const Insets.all(0),
+    this.padding = const Insets(0, 0, 0, 0),
     this.title,
     this.titleStyle,
     this.borderTextStyle,

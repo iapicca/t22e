@@ -1,4 +1,7 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
+
+part 'engine.freezed.dart';
 
 /// States for the VT500 state machine.
 enum VtState {
@@ -17,50 +20,25 @@ enum VtState {
   dcsPassthrough,
 }
 
-/// Base class for parsed sequence data from the byte engine.
-sealed class SequenceData {
-  const SequenceData();
-}
-
-/// A single printable character byte.
-final class CharData extends SequenceData {
-  final int codepoint;
-  const CharData(this.codepoint);
-}
-
-/// Parsed CSI sequence with params, intermediates, and final byte.
-final class CsiSequenceData extends SequenceData {
-  final List<int> params;
-  final List<int> intermediates;
-  final int finalByte;
-  const CsiSequenceData(this.params, this.intermediates, this.finalByte);
-}
-
-/// Parsed ESC sequence with intermediates and final byte.
-final class EscSequenceData extends SequenceData {
-  final List<int> intermediates;
-  final int finalByte;
-  const EscSequenceData(this.intermediates, this.finalByte);
-}
-
-/// Parsed OSC sequence with content string.
-final class OscSequenceData extends SequenceData {
-  final String content;
-  const OscSequenceData(this.content);
-}
-
-/// Parsed DCS sequence with optional data payload.
-final class DcsSequenceData extends SequenceData {
-  final List<int> params;
-  final List<int> intermediates;
-  final int finalByte;
-  final String? data;
-  const DcsSequenceData(
-    this.params,
-    this.intermediates,
-    this.finalByte, [
-    this.data,
-  ]);
+@freezed
+sealed class SequenceData with _$SequenceData {
+  const factory SequenceData.char(int codepoint) = CharData;
+  const factory SequenceData.csi({
+    required List<int> params,
+    required List<int> intermediates,
+    required int finalByte,
+  }) = CsiSequenceData;
+  const factory SequenceData.esc({
+    required List<int> intermediates,
+    required int finalByte,
+  }) = EscSequenceData;
+  const factory SequenceData.osc(String content) = OscSequenceData;
+  const factory SequenceData.dcs({
+    required List<int> params,
+    required List<int> intermediates,
+    required int finalByte,
+    String? data,
+  }) = DcsSequenceData;
 }
 
 /// VT500-compatible byte-level state machine engine.
@@ -148,7 +126,7 @@ class Vt500Engine {
     }
     if (byte >= Defaults.byteRangePrintableLow &&
         byte <= Defaults.byteRangePrintableHigh) {
-      return CharData(byte);
+      return SequenceData.char(byte);
     }
     if (byte >= Defaults.byteRangeC1Low && byte <= Defaults.byteRangeC1High) {
       return null;
@@ -195,7 +173,10 @@ class Vt500Engine {
     if (byte >= Defaults.byteRangeParamLow &&
         byte <= Defaults.byteRangeUpperHigh) {
       _state = VtState.ground;
-      final data = EscSequenceData(List.unmodifiable(_intermediates), byte);
+      final data = SequenceData.esc(
+        intermediates: List.unmodifiable(_intermediates),
+        finalByte: byte,
+      );
       _intermediates.clear();
       return data;
     }
@@ -223,7 +204,10 @@ class Vt500Engine {
     if (byte >= Defaults.byteRangeParamLow &&
         byte <= Defaults.byteRangeUpperHigh) {
       _state = VtState.ground;
-      final data = EscSequenceData(List.unmodifiable(_intermediates), byte);
+      final data = SequenceData.esc(
+        intermediates: List.unmodifiable(_intermediates),
+        finalByte: byte,
+      );
       _intermediates.clear();
       return data;
     }
@@ -262,10 +246,10 @@ class Vt500Engine {
     if (byte >= Defaults.byteRangeUpperLow &&
         byte <= Defaults.byteRangeUpperHigh) {
       _state = VtState.ground;
-      final data = CsiSequenceData(
-        List.unmodifiable(_params),
-        List.unmodifiable(_intermediates),
-        byte,
+      final data = SequenceData.csi(
+        params: List.unmodifiable(_params),
+        intermediates: List.unmodifiable(_intermediates),
+        finalByte: byte,
       );
       _params.clear();
       _intermediates.clear();
@@ -315,10 +299,10 @@ class Vt500Engine {
     if (byte >= Defaults.byteRangeUpperLow &&
         byte <= Defaults.byteRangeUpperHigh) {
       _state = VtState.ground;
-      final data = CsiSequenceData(
-        List.unmodifiable(_params),
-        List.unmodifiable(_intermediates),
-        byte,
+      final data = SequenceData.csi(
+        params: List.unmodifiable(_params),
+        intermediates: List.unmodifiable(_intermediates),
+        finalByte: byte,
       );
       _params.clear();
       _intermediates.clear();
@@ -346,10 +330,10 @@ class Vt500Engine {
     if (byte >= Defaults.byteRangeUpperLow &&
         byte <= Defaults.byteRangeUpperHigh) {
       _state = VtState.ground;
-      final data = CsiSequenceData(
-        List.unmodifiable(_params),
-        List.unmodifiable(_intermediates),
-        byte,
+      final data = SequenceData.csi(
+        params: List.unmodifiable(_params),
+        intermediates: List.unmodifiable(_intermediates),
+        finalByte: byte,
       );
       _params.clear();
       _intermediates.clear();
@@ -389,7 +373,7 @@ class Vt500Engine {
         _state = VtState.ground;
         final content = _oscBuffer.toString();
         _oscBuffer.clear();
-        return OscSequenceData(content);
+        return SequenceData.osc(content);
       }
       _oscBuffer.writeCharCode(Defaults.escapeByte);
       if (byte >= Defaults.byteRangePrintableLow && byte <= 0x7F) {
@@ -405,13 +389,13 @@ class Vt500Engine {
       _state = VtState.ground;
       final content = _oscBuffer.toString();
       _oscBuffer.clear();
-      return OscSequenceData(content);
+      return SequenceData.osc(content);
     }
     if (byte == Defaults.stringTerminatorByte) {
       _state = VtState.ground;
       final content = _oscBuffer.toString();
       _oscBuffer.clear();
-      return OscSequenceData(content);
+      return SequenceData.osc(content);
     }
     if (byte >= Defaults.byteRangePrintableLow && byte <= 0x7F) {
       _oscBuffer.writeCharCode(byte);
@@ -513,11 +497,11 @@ class Vt500Engine {
         final data = _dcsBuffer.toString();
         _dcsBuffer.clear();
         if (data.isEmpty) return null;
-        return DcsSequenceData(
-          List.unmodifiable(_dcsParams),
-          List.unmodifiable(_dcsIntermediates),
-          _dcsFinalByte,
-          data,
+        return SequenceData.dcs(
+          params: List.unmodifiable(_dcsParams),
+          intermediates: List.unmodifiable(_dcsIntermediates),
+          finalByte: _dcsFinalByte,
+          data: data,
         );
       }
       return null;
@@ -527,11 +511,11 @@ class Vt500Engine {
       final data = _dcsBuffer.toString();
       _dcsBuffer.clear();
       if (data.isEmpty) return null;
-      return DcsSequenceData(
-        List.unmodifiable(_dcsParams),
-        List.unmodifiable(_dcsIntermediates),
-        _dcsFinalByte,
-        data,
+      return SequenceData.dcs(
+        params: List.unmodifiable(_dcsParams),
+        intermediates: List.unmodifiable(_dcsIntermediates),
+        finalByte: _dcsFinalByte,
+        data: data,
       );
     }
     if (byte == Defaults.escapeByte) {

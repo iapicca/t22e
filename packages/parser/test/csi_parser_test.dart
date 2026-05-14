@@ -8,8 +8,8 @@ void main() {
     parser = CsiParser();
   });
 
-  CsiSequenceData csi(int finalByte, [List<int> params = const [], List<int> intermediates = const []]) {
-    return CsiSequenceData(params, intermediates, finalByte);
+  SequenceData csi(int finalByte, [List<int> params = const [], List<int> intermediates = const []]) {
+    return SequenceData.csi(params: params, intermediates: intermediates, finalByte: finalByte);
   }
 
   group('arrow keys', () {

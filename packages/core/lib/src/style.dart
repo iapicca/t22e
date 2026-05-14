@@ -1,52 +1,29 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'color.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
+part 'style.freezed.dart';
+
 /// Text styling with SGR attributes (bold, italic, underline, etc.) and colors.
-class TextStyle {
-  /// Foreground color (null = inherit).
-  final Color? foreground;
-  /// Background color (null = inherit).
-  final Color? background;
+@freezed
+abstract class TextStyle with _$TextStyle {
+  const TextStyle._();
 
-  /// Bold.
-  final bool? bold;
-  /// Dim/faint.
-  final bool? dim;
-  /// Italic.
-  final bool? italic;
-  /// Underline.
-  final bool? underline;
-  /// Blink.
-  final bool? blink;
-  /// Reverse video.
-  final bool? reverse;
-  /// Strikethrough.
-  final bool? strikethrough;
-  /// Overline.
-  final bool? overline;
-
-  /// Forced width hint.
-  final int? width;
-  /// Forced height hint.
-  final int? height;
-  /// Word wrap flag for layout.
-  final bool? wordWrap;
-
-  const TextStyle({
-    this.foreground,
-    this.background,
-    this.bold,
-    this.dim,
-    this.italic,
-    this.underline,
-    this.blink,
-    this.reverse,
-    this.strikethrough,
-    this.overline,
-    this.width,
-    this.height,
-    this.wordWrap,
-  });
+  const factory TextStyle({
+    Color? foreground,
+    Color? background,
+    bool? bold,
+    bool? dim,
+    bool? italic,
+    bool? underline,
+    bool? blink,
+    bool? reverse,
+    bool? strikethrough,
+    bool? overline,
+    int? width,
+    int? height,
+    bool? wordWrap,
+  }) = _TextStyle;
 
   /// An empty text style with all fields null.
   static const empty = TextStyle();
@@ -71,7 +48,7 @@ class TextStyle {
   TextStyle merge(TextStyle other) {
     if (other.isClear) return this;
     if (isClear) return other;
-    return TextStyle(
+    return copyWith(
       foreground: other.foreground ?? foreground,
       background: other.background ?? background,
       bold: other.bold ?? bold,
@@ -95,20 +72,9 @@ class TextStyle {
     final fg = foreground?.convert(target);
     final bg = background?.convert(target);
     if (identical(fg, foreground) && identical(bg, background)) return this;
-    return TextStyle(
+    return copyWith(
       foreground: fg,
       background: bg,
-      bold: bold,
-      dim: dim,
-      italic: italic,
-      underline: underline,
-      blink: blink,
-      reverse: reverse,
-      strikethrough: strikethrough,
-      overline: overline,
-      width: width,
-      height: height,
-      wordWrap: wordWrap,
     );
   }
 
@@ -129,7 +95,7 @@ class TextStyle {
   /// Inherits style from a parent (non-null fields in this take priority).
   TextStyle inherit(TextStyle parent) {
     if (parent.isClear) return this;
-    return TextStyle(
+    return copyWith(
       foreground: foreground ?? parent.foreground,
       background: background ?? parent.background,
       bold: bold ?? parent.bold,
@@ -147,7 +113,7 @@ class TextStyle {
   }
 
   /// Factory for the default hyperlink style (blue, underlined).
-  factory TextStyle.link({String? uri}) {
+  static TextStyle link({String? uri}) {
     return TextStyle(
       foreground: const Color.rgb(
         Defaults.linkColorRed,
@@ -158,57 +124,5 @@ class TextStyle {
     );
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is TextStyle &&
-          foreground == other.foreground &&
-          background == other.background &&
-          bold == other.bold &&
-          dim == other.dim &&
-          italic == other.italic &&
-          underline == other.underline &&
-          blink == other.blink &&
-          reverse == other.reverse &&
-          strikethrough == other.strikethrough &&
-          overline == other.overline &&
-          width == other.width &&
-          height == other.height &&
-          wordWrap == other.wordWrap);
-
-  @override
-  int get hashCode => Object.hash(
-    foreground,
-    background,
-    bold,
-    dim,
-    italic,
-    underline,
-    blink,
-    reverse,
-    strikethrough,
-    overline,
-    width,
-    height,
-    wordWrap,
-  );
-
-  @override
-  String toString() => 'TextStyle(${_describe()})';
-
   /// Produces a human-readable description of the active attributes.
-  String _describe() {
-    final parts = <String>[];
-    if (foreground != null) parts.add('fg:$foreground');
-    if (background != null) parts.add('bg:$background');
-    if (bold == true) parts.add('bold');
-    if (italic == true) parts.add('italic');
-    if (underline == true) parts.add('underline');
-    if (dim == true) parts.add('dim');
-    if (blink == true) parts.add('blink');
-    if (reverse == true) parts.add('reverse');
-    if (strikethrough == true) parts.add('strikethrough');
-    if (overline == true) parts.add('overline');
-    return parts.isEmpty ? 'clear' : parts.join(' ');
-  }
 }

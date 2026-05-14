@@ -9,13 +9,13 @@ void main() {
   });
 
   test('kitty graphics protocol', () {
-    final event = parser.parse(DcsSequenceData([], [0x2B], 0x70, 'some data'));
+    final event = parser.parse(SequenceData.dcs(params: [], intermediates: [0x2B], finalByte: 0x70, data: 'some data'));
     expect(event, isA<InternalEvent>());
     expect((event as InternalEvent).kind, equals('kitty_graphics'));
   });
 
   test('unknown DCS returns null', () {
-    final event = parser.parse(DcsSequenceData([], [], 0x50));
+    final event = parser.parse(SequenceData.dcs(params: [], intermediates: [], finalByte: 0x50));
     expect(event, isNull);
   });
 }

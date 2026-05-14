@@ -1,56 +1,35 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart' show ColorProfile;
 import 'package:protocol/protocol.dart' show Defaults;
 
-/// Sealed base class for probe results (Supported or Unavailable).
-sealed class QueryResult<T> {
-  const QueryResult();
-}
+part 'result.freezed.dart';
 
-/// A successful probe result with a value.
-final class Supported<T> extends QueryResult<T> {
-  /// The probe result value.
-  final T value;
-  const Supported(this.value);
-}
-
-/// An unsuccessful probe result (e.g. timed out).
-final class Unavailable<T> extends QueryResult<T> {
-  const Unavailable();
+@Freezed(genericArgumentFactories: true)
+sealed class QueryResult<T> with _$QueryResult<T> {
+  const factory QueryResult.supported(T value) = Supported<T>;
+  const factory QueryResult.unavailable() = Unavailable<T>;
 }
 
 /// Parsed DA1 response: terminal ID and attribute list.
-class Da1Result {
-  /// Terminal model ID.
-  final int terminalId;
-  /// Additional DA1 attributes.
-  final List<int> attributes;
-  const Da1Result(this.terminalId, this.attributes);
+@freezed
+abstract class Da1Result with _$Da1Result {
+  const factory Da1Result(int terminalId, List<int> attributes) = _Da1Result;
 }
 
 /// Supported keyboard protocol types.
 enum KeyboardProtocol { basic, kitty }
 
 /// Complete terminal capability information gathered by the pipeline.
-class Capabilities {
-  /// DA1 device attributes result.
-  final QueryResult<Da1Result> da1;
-  /// Detected color profile.
-  final ColorProfile colorProfile;
-  /// Whether synchronized updates (DECSET 2026) are supported.
-  final bool syncSupported;
-  /// Detected keyboard protocol.
-  final KeyboardProtocol keyboardProtocol;
-  /// Terminal height in rows.
-  final int rows;
-  /// Terminal width in columns.
-  final int cols;
+@freezed
+abstract class Capabilities with _$Capabilities {
+  const Capabilities._();
 
-  const Capabilities({
-    this.da1 = const Unavailable(),
-    this.colorProfile = ColorProfile.ansi16,
-    this.syncSupported = false,
-    this.keyboardProtocol = KeyboardProtocol.basic,
-    this.rows = Defaults.defaultTerminalHeight,
-    this.cols = Defaults.defaultTerminalWidth,
-  });
+  const factory Capabilities({
+    @Default(Unavailable<Da1Result>()) QueryResult<Da1Result> da1,
+    @Default(ColorProfile.ansi16) ColorProfile colorProfile,
+    @Default(false) bool syncSupported,
+    @Default(KeyboardProtocol.basic) KeyboardProtocol keyboardProtocol,
+    @Default(Defaults.defaultTerminalHeight) int rows,
+    @Default(Defaults.defaultTerminalWidth) int cols,
+  }) = _Capabilities;
 }

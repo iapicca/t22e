@@ -5,7 +5,7 @@ import 'package:ansi/ansi.dart' show queryDa1;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
-import 'result.dart' show QueryResult, Supported, Unavailable, Da1Result;
+import 'result.dart' show QueryResult, Da1Result;
 
 /// Probes the terminal's primary device attributes (DA1).
 class Da1Probe {
@@ -17,7 +17,7 @@ class Da1Probe {
     final completer = Completer<QueryResult<Da1Result>>();
     final timer = Timer(timeout, () {
       if (!completer.isCompleted) {
-        completer.complete(const Unavailable());
+        completer.complete(const QueryResult.unavailable());
       }
     });
 
@@ -32,7 +32,7 @@ class Da1Probe {
               ? event.params[Defaults.da1TerminalIdDefault]
               : 0;
           completer.complete(
-            Supported(Da1Result(id, event.params.skip(1).toList())),
+            QueryResult.supported(Da1Result(id, event.params.skip(1).toList())),
           );
         }
       }

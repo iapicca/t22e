@@ -7,7 +7,7 @@ void main() {
     test('layout adds border to child size', () {
       final box = Box(
         child: Text('Hi'),
-        padding: const Insets.all(0),
+        padding: Insets.all(0),
       );
       final size = box.layout(Constraints(maxWidth: 80, maxHeight: 24));
       expect(size.width, greaterThanOrEqualTo(4));
@@ -17,7 +17,7 @@ void main() {
     test('layout adds border and padding', () {
       final box = Box(
         child: Text('Hi'),
-        padding: const Insets.all(2),
+        padding: Insets.all(2),
       );
       final size = box.layout(Constraints(maxWidth: 80, maxHeight: 24));
       expect(size.width, greaterThanOrEqualTo(8));
@@ -27,7 +27,7 @@ void main() {
       final surface = Surface(20, 10);
       final box = Box(
         child: Text('Hi'),
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -42,7 +42,7 @@ void main() {
       final box = Box(
         child: Text('Hello Wide World'),
         title: 'Title',
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 30, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -54,7 +54,7 @@ void main() {
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.double,
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -67,7 +67,7 @@ void main() {
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.rounded,
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -80,7 +80,7 @@ void main() {
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.thick,
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -92,7 +92,7 @@ void main() {
       final surface = Surface(20, 10);
       final box = Box(
         child: Text('Hi'),
-        padding: const Insets.all(1),
+        padding: Insets.all(1),
       );
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));

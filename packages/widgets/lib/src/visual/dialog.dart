@@ -165,7 +165,7 @@ class _DialogOverlay extends Widget {
     final dialogBox = Box(
       borderStyle: BorderStyle.double,
       title: title.isNotEmpty ? title : null,
-      padding: const Insets.all(1),
+      padding: const Insets(1, 1, 1, 1),
       child: Column(
         children: [
           SizedBox(

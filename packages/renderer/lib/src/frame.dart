@@ -1,15 +1,14 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart';
 
-/// A rendered frame containing plain lines, styled ANSI lines, and optional cell grid.
-class Frame {
-  /// Lines as plain text (no escape sequences).
-  final List<String> plainLines;
-  /// Lines with ANSI escape sequences.
-  final List<String> styledLines;
-  /// Optional row-major cell grid for per-cell diffing.
-  final List<List<Cell>>? cells;
+part 'frame.freezed.dart';
 
-  Frame(this.plainLines, this.styledLines, {this.cells});
+/// A rendered frame containing plain lines, styled ANSI lines, and optional cell grid.
+@freezed
+abstract class Frame with _$Frame {
+  const Frame._();
+
+  factory Frame(List<String> plainLines, List<String> styledLines, {List<List<Cell>>? cells}) = _Frame;
 
   /// Creates a Frame from a Surface, optionally including the cell grid.
   factory Frame.fromSurface(Surface surface, {bool includeCells = false}) {
@@ -25,11 +24,11 @@ class Frame {
 }
 
 /// The result of diffing two frames: a list of changed row indices.
-class DiffResult {
-  /// Indices of rows that differ between previous and current frames.
-  final List<int> changedRows;
+@freezed
+abstract class DiffResult with _$DiffResult {
+  const DiffResult._();
 
-  const DiffResult(this.changedRows);
+  const factory DiffResult(List<int> changedRows) = _DiffResult;
 
   /// True if at least one row changed.
   bool get hasChanges => changedRows.isNotEmpty;

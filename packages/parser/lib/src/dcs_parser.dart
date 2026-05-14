@@ -5,14 +5,15 @@ import 'events.dart';
 /// Parses DCS sequences (Kitty graphics protocol).
 final class DcsParser {
   /// Dispatches a DCS sequence based on final byte and intermediates.
-  Event? parse(DcsSequenceData data) {
-    if (data.finalByte == Defaults.dcsKittyGraphicsP &&
-        data.intermediates.contains(Defaults.dcsKittyIntermediate)) {
+  Event? parse(SequenceData data) {
+    final d = data as DcsSequenceData;
+    if (d.finalByte == Defaults.dcsKittyGraphicsP &&
+        d.intermediates.contains(Defaults.dcsKittyIntermediate)) {
       return InternalEvent('kitty_graphics');
     }
 
-    if (data.finalByte == Defaults.dcsKittyGraphicsQ &&
-        data.intermediates.contains(Defaults.dcsKittyIntermediate)) {
+    if (d.finalByte == Defaults.dcsKittyGraphicsQ &&
+        d.intermediates.contains(Defaults.dcsKittyIntermediate)) {
       return InternalEvent('kitty_graphics');
     }
 

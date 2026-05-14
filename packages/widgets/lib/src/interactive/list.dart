@@ -132,7 +132,7 @@ class ListView extends Model<ListView> {
 
     return Box(
       borderStyle: BorderStyle.single,
-      padding: const Insets.all(1),
+      padding: const Insets(1, 1, 1, 1),
       child: Column(children: itemWidgets),
     );
   }

@@ -1,63 +1,24 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'style.dart';
 
+part 'cell.freezed.dart';
+
 /// A single character cell on the terminal grid, with style and wide-char info.
-class Cell {
-  /// The character string (or empty for wide continuation cells).
-  final String char;
-  /// The text style applied to this cell.
-  final TextStyle style;
-  /// True if this cell is the second column of a 2-wide character.
-  final bool wideContinuation;
-  /// Optional OSC 8 hyperlink URI.
-  final String? hyperlink;
+@freezed
+abstract class Cell with _$Cell {
+  const Cell._();
 
-  const Cell({
-    this.char = ' ',
-    this.style = TextStyle.empty,
-    this.wideContinuation = false,
-    this.hyperlink,
-  });
-
-  /// Creates a copy with overridden fields.
-  Cell copyWith({
-    String? char,
-    TextStyle? style,
-    bool? wideContinuation,
+  const factory Cell({
+    @Default(' ') String char,
+    @Default(TextStyle.empty) TextStyle style,
+    @Default(false) bool wideContinuation,
     String? hyperlink,
-  }) {
-    return Cell(
-      char: char ?? this.char,
-      style: style ?? this.style,
-      wideContinuation: wideContinuation ?? this.wideContinuation,
-      hyperlink: hyperlink ?? this.hyperlink,
-    );
-  }
+  }) = _Cell;
 
   /// Returns a new cell with the given style merged on top.
   Cell mergeStyle(TextStyle override) {
     final merged = style.merge(override);
     if (identical(merged, style)) return this;
-    return Cell(
-      char: char,
-      style: merged,
-      wideContinuation: wideContinuation,
-      hyperlink: hyperlink,
-    );
+    return copyWith(style: merged);
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Cell &&
-          char == other.char &&
-          style == other.style &&
-          wideContinuation == other.wideContinuation &&
-          hyperlink == other.hyperlink);
-
-  @override
-  int get hashCode => Object.hash(char, style, wideContinuation, hyperlink);
-
-  @override
-  String toString() =>
-      'Cell($char, ${wideContinuation ? "cont" : "lead"}${hyperlink != null ? ', link=$hyperlink' : ''})';
 }
