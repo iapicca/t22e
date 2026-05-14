@@ -6,12 +6,18 @@ import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
 
+/// A braille-based animated spinner widget with optional label.
 class Spinner extends Model<Spinner> {
+  /// Current animation frame index.
   final int frame;
+  /// The set of braille pattern frames to cycle through.
   final List<String> frames;
+  /// Animation interval.
   final Duration interval;
+  /// Optional label text.
   final String? label;
 
+  /// Default spinner frames (braille patterns).
   static const List<String> defaultFrames = Defaults.spinnerFrames;
 
   const Spinner({
@@ -32,6 +38,7 @@ class Spinner extends Model<Spinner> {
     return (this, null);
   }
 
+  /// Returns a copy with overridden fields.
   Spinner copyWith({
     int? frame,
     List<String>? frames,

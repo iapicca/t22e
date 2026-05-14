@@ -4,25 +4,34 @@ import 'dart:io';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'platform_service.dart';
 
+/// Platform-specific libc library handle.
 final DynamicLibrary _libc = PlatformService().library;
 
+/// tcgetattr: reads terminal attributes for the given file descriptor.
 final int Function(int fd, Pointer<Uint8> buf) tcGetAttr = _libc
     .lookupFunction<
       Int32 Function(Int32, Pointer<Uint8>),
       int Function(int, Pointer<Uint8>)
     >('tcgetattr');
 
+/// tcsetattr: writes terminal attributes for the given file descriptor.
 final int Function(int fd, int opt, Pointer<Uint8> buf) tcSetAttr = _libc
     .lookupFunction<
       Int32 Function(Int32, Int32, Pointer<Uint8>),
       int Function(int, int, Pointer<Uint8>)
     >('tcsetattr');
 
+/// Holds the saved termios state for restoring raw mode.
 final class RawModeState {
+  /// Raw byte buffer containing the termios struct.
   final Pointer<Uint8> buf;
+  /// Saved input flags (c_iflag).
   final int cIflag;
+  /// Saved output flags (c_oflag).
   final int cOflag;
+  /// Saved control flags (c_cflag).
   final int cCflag;
+  /// Saved local flags (c_lflag).
   final int cLflag;
 
   const RawModeState(
@@ -34,6 +43,7 @@ final class RawModeState {
   );
 }
 
+/// Enables raw mode via FFI (tcgetattr/tcsetattr).
 RawModeState? enableRawModeFfi() {
   if (Platform.isWindows) return null;
   final buf = _malloc(Defaults.termiosStructSize);
@@ -70,6 +80,7 @@ RawModeState? enableRawModeFfi() {
   return saved;
 }
 
+/// Restores the terminal to its saved state and frees the buffer.
 void disableRawModeFfi(RawModeState state) {
   _write32(state.buf, Defaults.termiosOffsetIFlag, state.cIflag);
   _write32(state.buf, Defaults.termiosOffsetOFlag, state.cOflag);
@@ -79,6 +90,7 @@ void disableRawModeFfi(RawModeState state) {
   _free(state.buf);
 }
 
+/// Allocates heap memory via libc malloc.
 Pointer<Uint8> _malloc(int size) {
   final fn = _libc
       .lookupFunction<
@@ -88,6 +100,7 @@ Pointer<Uint8> _malloc(int size) {
   return fn(size).cast();
 }
 
+/// Frees heap memory via libc free.
 void _free(Pointer<Uint8> ptr) {
   final fn = _libc
       .lookupFunction<
@@ -97,6 +110,7 @@ void _free(Pointer<Uint8> ptr) {
   fn(ptr.cast());
 }
 
+/// Reads a 32-bit integer from a byte buffer at the given offset.
 int _read32(Pointer<Uint8> p, int offset) {
   return p[offset] |
       (p[offset + 1] << Defaults.bitShift8) |
@@ -104,6 +118,7 @@ int _read32(Pointer<Uint8> p, int offset) {
       (p[offset + 3] << Defaults.bitShift24);
 }
 
+/// Writes a 32-bit integer to a byte buffer at the given offset.
 void _write32(Pointer<Uint8> p, int offset, int value) {
   p[offset] = value & Defaults.byteMask;
   p[offset + 1] = (value >> Defaults.bitShift8) & Defaults.byteMask;
@@ -111,6 +126,7 @@ void _write32(Pointer<Uint8> p, int offset, int value) {
   p[offset + 3] = (value >> Defaults.bitShift24) & Defaults.byteMask;
 }
 
+/// Writes an 8-bit value to a byte buffer at the given offset.
 void _write8(Pointer<Uint8> p, int offset, int value) {
   p[offset] = value & Defaults.byteMask;
 }

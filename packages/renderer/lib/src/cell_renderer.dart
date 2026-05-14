@@ -3,9 +3,11 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show hyperlink;
 import 'frame.dart' show Frame;
 
+/// Per-cell diff renderer that only outputs changed cells for minimal terminal output.
 class CellRenderer {
   const CellRenderer();
 
+  /// Produces ANSI output by diffing individual cells between frames.
   String render(Frame previous, Frame current) {
     final buf = StringBuffer();
     final prevCells = previous.cells;
@@ -56,6 +58,7 @@ class CellRenderer {
     return buf.toString();
   }
 
+  /// Converts a TextStyle and optional hyperlink URI to SGR escape sequences.
   String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
     final buf = StringBuffer();
     if (s.bold == true) buf.write('${Defaults.csi}${Defaults.sgrBold}m');

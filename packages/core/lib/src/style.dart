@@ -1,21 +1,35 @@
 import 'color.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
+/// Text styling with SGR attributes (bold, italic, underline, etc.) and colors.
 class TextStyle {
+  /// Foreground color (null = inherit).
   final Color? foreground;
+  /// Background color (null = inherit).
   final Color? background;
 
+  /// Bold.
   final bool? bold;
+  /// Dim/faint.
   final bool? dim;
+  /// Italic.
   final bool? italic;
+  /// Underline.
   final bool? underline;
+  /// Blink.
   final bool? blink;
+  /// Reverse video.
   final bool? reverse;
+  /// Strikethrough.
   final bool? strikethrough;
+  /// Overline.
   final bool? overline;
 
+  /// Forced width hint.
   final int? width;
+  /// Forced height hint.
   final int? height;
+  /// Word wrap flag for layout.
   final bool? wordWrap;
 
   const TextStyle({
@@ -34,8 +48,10 @@ class TextStyle {
     this.wordWrap,
   });
 
+  /// An empty text style with all fields null.
   static const empty = TextStyle();
 
+  /// True if no attributes are set (all fields are null).
   bool get isClear =>
       foreground == null &&
       background == null &&
@@ -51,6 +67,7 @@ class TextStyle {
       height == null &&
       wordWrap == null;
 
+  /// Merges another style on top (non-null fields override).
   TextStyle merge(TextStyle other) {
     if (other.isClear) return this;
     if (isClear) return other;
@@ -71,6 +88,7 @@ class TextStyle {
     );
   }
 
+  /// Downgrades colors to match the given color profile.
   TextStyle resolveColor(ColorProfile profile) {
     if (foreground == null && background == null) return this;
     final target = _profileToKind(profile);
@@ -94,6 +112,7 @@ class TextStyle {
     );
   }
 
+  /// Maps a ColorProfile to the corresponding ColorKind.
   static ColorKind _profileToKind(ColorProfile profile) {
     switch (profile) {
       case ColorProfile.noColor:
@@ -107,6 +126,7 @@ class TextStyle {
     }
   }
 
+  /// Inherits style from a parent (non-null fields in this take priority).
   TextStyle inherit(TextStyle parent) {
     if (parent.isClear) return this;
     return TextStyle(
@@ -126,6 +146,7 @@ class TextStyle {
     );
   }
 
+  /// Factory for the default hyperlink style (blue, underlined).
   factory TextStyle.link({String? uri}) {
     return TextStyle(
       foreground: const Color.rgb(
@@ -175,6 +196,7 @@ class TextStyle {
   @override
   String toString() => 'TextStyle(${_describe()})';
 
+  /// Produces a human-readable description of the active attributes.
   String _describe() {
     final parts = <String>[];
     if (foreground != null) parts.add('fg:$foreground');

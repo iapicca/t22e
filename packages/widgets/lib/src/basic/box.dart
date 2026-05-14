@@ -6,12 +6,19 @@ import 'package:core/core.dart' show TextStyle;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:unicode/unicode.dart' show stringWidth;
 
+/// A bordered container widget with optional title, padding, and child.
 class Box extends Widget {
+  /// Optional child widget inside the border.
   final Widget? child;
+  /// The border line style.
   final BorderStyle borderStyle;
+  /// Internal padding applied inside the border.
   final Insets padding;
+  /// Optional title text on the top border.
   final String? title;
+  /// Style for the title text.
   final TextStyle? titleStyle;
+  /// Style for border characters and content text.
   final TextStyle? borderTextStyle;
 
   Box({
@@ -87,6 +94,7 @@ class Box extends Widget {
     }
   }
 
+  /// Draws the border characters on the surface.
   void _drawBorder(PaintingContext context, Rect rect) {
     final chars = _borderChars();
     final s = borderTextStyle ?? TextStyle.empty;
@@ -124,6 +132,7 @@ class Box extends Widget {
     }
   }
 
+  /// Returns the border character set for the current style.
   String _borderChars() {
     return switch (borderStyle) {
       BorderStyle.single => Defaults.borderSingle,

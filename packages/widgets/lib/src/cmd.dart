@@ -3,12 +3,15 @@ import 'dart:io';
 
 import 'msg.dart' show Msg;
 
+/// Base sealed class for side-effect commands in the MVU runtime.
 sealed class Cmd {
   const Cmd();
 
+  /// Executes the command, optionally returning a message to enqueue.
   FutureOr<Msg?> execute(void Function(Msg) enqueue);
 }
 
+/// Schedules a one-shot delayed message.
 final class TickCmd extends Cmd {
   final Duration delay;
   final Msg Function(DateTime) createMsg;
@@ -22,6 +25,7 @@ final class TickCmd extends Cmd {
   }
 }
 
+/// Starts a periodic timer that enqueues messages at a fixed interval.
 final class EveryCmd extends Cmd {
   final Duration interval;
   final Msg Function(DateTime) createMsg;
@@ -41,6 +45,7 @@ final class EveryCmd extends Cmd {
   }
 }
 
+/// Runs multiple commands concurrently, discarding their messages.
 final class BatchCmd extends Cmd {
   final List<Cmd?> commands;
 
@@ -57,6 +62,7 @@ final class BatchCmd extends Cmd {
   }
 }
 
+/// Runs commands sequentially, enqueueing any returned messages.
 final class SequenceCmd extends Cmd {
   final List<Cmd> commands;
 
@@ -72,6 +78,7 @@ final class SequenceCmd extends Cmd {
   }
 }
 
+/// Runs an external process and enqueues a message with the exit code.
 final class ExecCmd extends Cmd {
   final String exe;
   final List<String> args;
@@ -89,6 +96,7 @@ final class ExecCmd extends Cmd {
   }
 }
 
+/// A no-op command.
 final class NoCmd extends Cmd {
   const NoCmd();
 
@@ -96,20 +104,26 @@ final class NoCmd extends Cmd {
   FutureOr<Msg?> execute(void Function(Msg) enqueue) => null;
 }
 
+/// Factory: one-shot delayed message.
 Cmd tick(Duration delay, Msg Function(DateTime) createMsg) =>
     TickCmd(delay, createMsg);
 
+/// Factory: periodic message emitter.
 Cmd every(Duration interval, Msg Function(DateTime) createMsg) =>
     EveryCmd(interval, createMsg);
 
+/// Factory: concurrent batch of commands.
 Cmd batch(List<Cmd?> commands) => BatchCmd(commands);
 
+/// Factory: sequential chain of commands.
 Cmd sequence(List<Cmd> commands) => SequenceCmd(commands);
 
+/// Factory: run an external process.
 Cmd execProcess(
   String exe,
   List<String> args, {
   Msg Function(int exitCode)? onExit,
 }) => ExecCmd(exe, args, onExit: onExit);
 
+/// Factory: no-op command.
 Cmd none() => const NoCmd();

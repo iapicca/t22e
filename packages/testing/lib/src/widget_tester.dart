@@ -7,7 +7,9 @@ import 'package:parser/terminal_parser.dart'
     show KeyCode, KeyModifiers, KeyEvent, MouseButton, MouseAction, MouseEvent;
 import 'virtual_terminal.dart';
 
+/// Drives widgets with simulated input and checks virtual terminal output.
 class WidgetTester {
+  /// The virtual terminal backing store.
   final VirtualTerminal virtualTerminal;
   final CellRenderer _cellRenderer = const CellRenderer();
   Model? _model;
@@ -18,6 +20,7 @@ class WidgetTester {
     int height = Defaults.defaultTerminalHeight,
   }) : virtualTerminal = VirtualTerminal(width: width, height: height);
 
+  /// Renders a widget into the virtual terminal.
   void pumpWidget(
     Widget root, {
     int width = Defaults.defaultTerminalWidth,
@@ -34,6 +37,7 @@ class WidgetTester {
     virtualTerminal.write(output);
   }
 
+  /// Pumps a widget bound to a Model, updating the virtual terminal on each call.
   void pumpWidgetWithModel(
     Model model, {
     required Surface Function() view,
@@ -47,6 +51,7 @@ class WidgetTester {
     virtualTerminal.write(frame.styledLines.join('\n'));
   }
 
+  /// Simulates a key event and re-renders the current model.
   void sendKeyEvent(KeyCode key, {KeyModifiers? modifiers, int? codepoint}) {
     if (_model == null || _viewFn == null) return;
     final event = KeyEvent(
@@ -64,6 +69,7 @@ class WidgetTester {
     }
   }
 
+  /// Simulates a mouse event and re-renders the current model.
   void sendMouseEvent(MouseButton button, MouseAction action, int x, int y) {
     if (_model == null || _viewFn == null) return;
     final event = MouseEvent(button: button, action: action, x: x, y: y);
@@ -77,6 +83,7 @@ class WidgetTester {
     }
   }
 
+  /// Asserts the character and/or style at a specific grid position.
   void expectCell(int row, int col, {String? char, TextStyle? style}) {
     final cell = virtualTerminal.cellAt(row, col);
     if (char != null) {
@@ -93,6 +100,7 @@ class WidgetTester {
     }
   }
 
+  /// Asserts the full plain text content of the virtual terminal.
   void expectPlainText(String expected) {
     final actual = virtualTerminal.plainText();
     if (actual != expected) {
@@ -101,7 +109,9 @@ class WidgetTester {
   }
 }
 
+/// Exception thrown by [WidgetTester] assertions.
 class TestFailure implements Exception {
+  /// The failure message.
   final String message;
   const TestFailure(this.message);
 

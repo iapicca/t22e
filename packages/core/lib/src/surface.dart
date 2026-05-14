@@ -17,11 +17,16 @@ import 'package:ansi/ansi.dart'
         resetAll;
 import 'package:ansi/ansi.dart' show hyperlink;
 
+/// A grid-based terminal surface for painting text and borders.
 class Surface {
+  /// Total width in columns.
   final int width;
+  /// Total height in rows.
   final int height;
+  /// Row-major grid of Cell objects.
   final List<List<Cell>> grid;
 
+  /// Creates a blank surface of the given dimensions.
   Surface(this.width, this.height)
     : grid = List.generate(
         height,
@@ -29,10 +34,12 @@ class Surface {
         growable: false,
       );
 
+  /// Creates a surface from an existing grid.
   Surface.fromGrid(this.grid)
     : width = grid.isEmpty ? 0 : grid[0].length,
       height = grid.length;
 
+  /// Creates a resized copy, preserving overlapping region.
   Surface._resized(Surface source, int newWidth, int newHeight)
     : width = newWidth,
       height = newHeight,
@@ -48,9 +55,11 @@ class Surface {
         growable: false,
       );
 
+  /// Returns a new surface with the given dimensions.
   Surface resize(int newWidth, int newHeight) =>
       Surface._resized(this, newWidth, newHeight);
 
+  /// Writes a single character at the given position with style.
   void putChar(int x, int y, String ch, TextStyle style) {
     if (x < 0 || x >= width || y < 0 || y >= height) return;
 
@@ -64,6 +73,7 @@ class Surface {
     }
   }
 
+  /// Writes text at the given position, respecting grapheme clusters.
   void putText(int x, int y, String text, TextStyle style) {
     if (x >= width || y >= height || y < 0 || text.isEmpty) return;
 
@@ -93,6 +103,7 @@ class Surface {
     }
   }
 
+  /// Fills a rectangular region with a repeating character.
   void fillRect(int x, int y, int w, int h, String ch, TextStyle style) {
     final rect = Rect(x, y, w, h).intersect(Rect(0, 0, width, height));
     if (rect.isEmpty) return;
@@ -111,6 +122,7 @@ class Surface {
     }
   }
 
+  /// Clears a rectangular region to default blank cells.
   void clearRect(int x, int y, int w, int h) {
     final rect = Rect(x, y, w, h).intersect(Rect(0, 0, width, height));
     if (rect.isEmpty) return;
@@ -122,6 +134,7 @@ class Surface {
     }
   }
 
+  /// Draws a styled border with optional title on the top edge.
   void drawBorder(
     Rect r, {
     String? borderChars,
@@ -188,6 +201,7 @@ class Surface {
     }
   }
 
+  /// Exports the surface as ANSI-escaped lines ready for terminal output.
   List<String> toAnsiLines() {
     return grid
         .map((row) {
@@ -222,6 +236,7 @@ class Surface {
         .toList(growable: false);
   }
 
+  /// Exports the surface as plain text lines (no escape sequences).
   List<String> toPlainLines() {
     return grid
         .map((row) {
@@ -232,6 +247,7 @@ class Surface {
         .toList(growable: false);
   }
 
+  /// Converts a TextStyle to ANSI SGR escape sequences.
   static String _styleToAnsi(TextStyle s) {
     final buf = StringBuffer();
     if (s.bold == true) buf.write(bold(true));
@@ -248,10 +264,12 @@ class Surface {
     return buf.toString();
   }
 
+  /// Extracts a substring by rune index range (not code unit range).
   static String _substringByCodeUnits(String text, int start, int end) {
     final runes = text.runes.toList();
     return String.fromCharCodes(runes.sublist(start, end));
   }
 
+  /// Re-wraps a string through rune conversion for safety.
   static String _s(String ch) => String.fromCharCodes(ch.runes);
 }

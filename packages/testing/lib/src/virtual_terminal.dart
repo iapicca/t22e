@@ -1,8 +1,11 @@
 import 'package:core/core.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
+/// Simulates a terminal grid in memory, interpreting ANSI escape sequences.
 class VirtualTerminal {
+  /// Current terminal width in columns.
   int width;
+  /// Current terminal height in rows.
   int height;
   late List<List<Cell>> _grid;
   int _cursorX = 0;
@@ -24,6 +27,7 @@ class VirtualTerminal {
     _resetGrid();
   }
 
+  /// Writes an ANSI-escaped string into the virtual terminal grid.
   void write(String ansi) {
     var i = 0;
     while (i < ansi.length) {
@@ -63,9 +67,12 @@ class VirtualTerminal {
     }
   }
 
+  /// Saved cursor X position.
   int _savedCursorX = 0;
+  /// Saved cursor Y position.
   int _savedCursorY = 0;
 
+  /// Parses a CSI sequence starting at [start] index in the string.
   int _handleCsi(String ansi, int start) {
     final params = <int>[];
     var i = start;
@@ -95,6 +102,7 @@ class VirtualTerminal {
     return i;
   }
 
+  /// Skips over an OSC sequence (BEL or ST terminated).
   int _handleOsc(String ansi, int start) {
     var i = start;
     while (i < ansi.length) {
@@ -106,6 +114,7 @@ class VirtualTerminal {
     return i;
   }
 
+  /// Dispatches a parsed CSI sequence by final byte.
   void _dispatchCsi(List<int> params, int fb) {
     switch (fb) {
       case Defaults.csiFinalCup:
@@ -151,6 +160,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Applies SGR parameters to the current text style.
   void _applySgr(List<int> params) {
     if (params.isEmpty || params[0] == Defaults.sgrReset) {
       _currentStyle = TextStyle.empty;
@@ -266,6 +276,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Erases a region of the display by mode.
   void _eraseDisplay(int mode) {
     switch (mode) {
       case 0:
@@ -278,6 +289,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Erases part of the current line by mode.
   void _eraseLine(int mode) {
     switch (mode) {
       case 0:
@@ -289,6 +301,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Clears a rectangular region of cells.
   void _clearRegion(int r1, int c1, int r2, int c2) {
     for (var r = r1; r <= r2 && r < height; r++) {
       for (var c = c1; c <= c2 && c < width; c++) {
@@ -297,6 +310,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Places a character at the current cursor position.
   void _putChar(String ch) {
     if (_cursorX >= width || _cursorY >= height) return;
     _grid[_cursorY] = List<Cell>.of(_grid[_cursorY]);
@@ -308,6 +322,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Moves to the next line, scrolling if at the bottom.
   void _newline() {
     _cursorY++;
     _cursorX = 0;
@@ -317,6 +332,7 @@ class VirtualTerminal {
     }
   }
 
+  /// Scrolls the grid up by one row.
   void _scrollUp() {
     for (var r = 0; r < height - 1; r++) {
       _grid[r] = List<Cell>.of(_grid[r + 1]);
@@ -324,11 +340,13 @@ class VirtualTerminal {
     _grid[height - 1] = List.filled(width, const Cell(), growable: false);
   }
 
+  /// Clamps cursor position to grid bounds.
   void _clampCursor() {
     _cursorX = _cursorX.clamp(0, width - 1);
     _cursorY = _cursorY.clamp(0, height - 1);
   }
 
+  /// Resets the grid to all blank cells.
   void _resetGrid() {
     _grid = List.generate(
       height,
@@ -337,6 +355,7 @@ class VirtualTerminal {
     );
   }
 
+  /// Resizes the virtual terminal, preserving overlapping content.
   void resize(int newWidth, int newHeight) {
     final oldGrid = _grid;
     width = newWidth;
@@ -350,6 +369,7 @@ class VirtualTerminal {
     _clampCursor();
   }
 
+  /// Returns the cell at the given row/col, or a blank cell if out of bounds.
   Cell cellAt(int row, int col) {
     if (row < 0 || row >= height || col < 0 || col >= width) {
       return const Cell();
@@ -357,6 +377,7 @@ class VirtualTerminal {
     return _grid[row][col];
   }
 
+  /// Returns the entire grid content as plain text.
   String plainText() {
     return _grid
         .map((row) {

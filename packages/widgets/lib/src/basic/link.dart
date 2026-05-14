@@ -4,12 +4,17 @@ import 'package:core/core.dart' show TextStyle;
 import 'package:core/core.dart' show Cell;
 import 'package:unicode/unicode.dart' show stringWidth;
 
+/// A clickable hyperlink widget using OSC 8 terminal links.
 class Hyperlink extends Widget {
+  /// The target URI.
   final String uri;
+  /// The display text.
   final String text;
+  /// Optional text style override.
   final TextStyle? style;
   int _width = 0;
 
+  /// Creates a hyperlink with optional custom style.
   Hyperlink(this.uri, this.text, {this.style});
 
   @override
@@ -48,6 +53,7 @@ class Hyperlink extends Widget {
     }
   }
 
+  /// Splits text into per-rune chunks for individual cell painting.
   static List<String> _graphemeClusters(String text) {
     return text.runes.map((r) => String.fromCharCode(r)).toList();
   }

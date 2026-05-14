@@ -1,9 +1,9 @@
+/// Event types emitted by the terminal parser: key, mouse, clipboard, and responses.
 sealed class Event {
   const Event();
 }
 
-// --- key codes ---
-
+/// Identifies logical keys (arrows, function keys, home, end, etc.).
 enum KeyCode {
   none,
   tab,
@@ -48,10 +48,15 @@ enum KeyCode {
   char,
 }
 
+/// Keyboard modifier flags for key events.
 final class KeyModifiers {
+  /// Ctrl key held.
   final bool ctrl;
+  /// Shift key held.
   final bool shift;
+  /// Alt key held.
   final bool alt;
+  /// Meta/Super key held.
   final bool meta;
 
   const KeyModifiers({
@@ -73,14 +78,18 @@ final class KeyModifiers {
   int get hashCode => Object.hash(ctrl, shift, alt, meta);
 }
 
+/// Key event type: press, release, or repeat.
 enum KeyEventType { down, up, repeat }
 
-// --- input events ---
-
+/// A keyboard input event.
 final class KeyEvent extends Event {
+  /// Which logical key was pressed.
   final KeyCode keyCode;
+  /// Modifier keys held at the time.
   final KeyModifiers modifiers;
+  /// Event type (down/up/repeat).
   final KeyEventType type;
+  /// Unicode codepoint for char events, null otherwise.
   final int? codepoint;
 
   const KeyEvent({
@@ -106,14 +115,21 @@ final class KeyEvent extends Event {
       'KeyEvent($keyCode, $modifiers, $type${codepoint != null ? ', U+${codepoint!.toRadixString(16).padLeft(4, '0')}' : ''})';
 }
 
+/// Mouse button identifiers.
 enum MouseButton { left, middle, right, none, wheelUp, wheelDown }
 
+/// Mouse action type.
 enum MouseAction { press, release, move, drag }
 
+/// A mouse input event.
 final class MouseEvent extends Event {
+  /// Which mouse button was involved.
   final MouseButton button;
+  /// Press, release, move, or drag.
   final MouseAction action;
+  /// Column position (0-based).
   final int x;
+  /// Row position (0-based).
   final int y;
 
   const MouseEvent({
@@ -138,7 +154,9 @@ final class MouseEvent extends Event {
   String toString() => 'MouseEvent($button, $action, $x, $y)';
 }
 
+/// A bracketed paste event.
 final class PasteEvent extends Event {
+  /// The pasted text content.
   final String content;
 
   const PasteEvent(this.content);
@@ -154,10 +172,11 @@ final class PasteEvent extends Event {
   String toString() => 'PasteEvent(${content.length} chars)';
 }
 
-// --- response events ---
-
+/// Terminal response: cursor position report.
 final class CursorPositionEvent extends Event {
+  /// Row (1-based).
   final int row;
+  /// Column (1-based).
   final int col;
 
   const CursorPositionEvent(this.row, this.col);
@@ -173,10 +192,15 @@ final class CursorPositionEvent extends Event {
   String toString() => 'CursorPositionEvent($row, $col)';
 }
 
+/// Terminal response: color query with optional RGB values.
 final class ColorQueryEvent extends Event {
+  /// OSC color number (10=fg, 11=bg).
   final int colorNumber;
+  /// Red component, or null if not available.
   final int? r;
+  /// Green component, or null if not available.
   final int? g;
+  /// Blue component, or null if not available.
   final int? b;
 
   const ColorQueryEvent(this.colorNumber, [this.r, this.g, this.b]);
@@ -196,7 +220,9 @@ final class ColorQueryEvent extends Event {
   String toString() => 'ColorQueryEvent(color=$colorNumber, rgb($r,$g,$b))';
 }
 
+/// Terminal response: primary device attributes (DA1).
 final class PrimaryDeviceAttributesEvent extends Event {
+  /// The DA1 parameter list.
   final List<int> params;
 
   const PrimaryDeviceAttributesEvent(this.params);
@@ -213,7 +239,9 @@ final class PrimaryDeviceAttributesEvent extends Event {
   String toString() => 'PrimaryDeviceAttributesEvent($params)';
 }
 
+/// Terminal response: Kitty keyboard protocol flags.
 final class KeyboardEnhancementFlagsEvent extends Event {
+  /// The flags value reported by the terminal.
   final int flags;
 
   const KeyboardEnhancementFlagsEvent(this.flags);
@@ -229,10 +257,15 @@ final class KeyboardEnhancementFlagsEvent extends Event {
   String toString() => 'KeyboardEnhancementFlagsEvent($flags)';
 }
 
+/// SIGWINCH / window resize event.
 final class WindowResizeEvent extends Event {
+  /// New terminal rows.
   final int rows;
+  /// New terminal columns.
   final int cols;
+  /// Width in pixels (optional).
   final int? widthPixels;
+  /// Height in pixels (optional).
   final int? heightPixels;
 
   const WindowResizeEvent(
@@ -257,7 +290,9 @@ final class WindowResizeEvent extends Event {
   String toString() => 'WindowResizeEvent(${rows}x$cols)';
 }
 
+/// Focus gained/lost event.
 final class FocusEvent extends Event {
+  /// True if the terminal gained focus.
   final bool focused;
 
   const FocusEvent(this.focused);
@@ -273,7 +308,9 @@ final class FocusEvent extends Event {
   String toString() => 'FocusEvent($focused)';
 }
 
+/// Terminal response: synchronized update capability.
 final class QuerySyncUpdateEvent extends Event {
+  /// True if the terminal supports sync updates.
   final bool supported;
 
   const QuerySyncUpdateEvent(this.supported);
@@ -289,8 +326,11 @@ final class QuerySyncUpdateEvent extends Event {
   String toString() => 'QuerySyncUpdateEvent(supported=$supported)';
 }
 
+/// Clipboard read/write event.
 final class ClipboardEvent extends Event {
+  /// Clipboard selection name (e.g. 'c' for system).
   final String clipboard;
+  /// Base64-encoded clipboard data, or null for a query.
   final String? base64;
 
   const ClipboardEvent(this.clipboard, [this.base64]);
@@ -309,10 +349,11 @@ final class ClipboardEvent extends Event {
       'ClipboardEvent($clipboard, ${base64 != null ? '${base64!.length} bytes' : 'query'})';
 }
 
-// --- utility ---
-
+/// Error event for malformed or unhandled sequences.
 final class ErrorEvent extends Event {
+  /// Human-readable error message.
   final String message;
+  /// Optional underlying cause.
   final Object? cause;
 
   const ErrorEvent(this.message, [this.cause]);
@@ -321,8 +362,11 @@ final class ErrorEvent extends Event {
   String toString() => 'ErrorEvent($message${cause != null ? ': $cause' : ''})';
 }
 
+/// Internal event for plumbing between parser layers.
 final class InternalEvent extends Event {
+  /// Event kind string.
   final String kind;
+  /// Optional key-value data payload.
   final Map<String, Object?>? data;
 
   const InternalEvent(this.kind, [this.data]);
@@ -331,6 +375,7 @@ final class InternalEvent extends Event {
   String toString() => 'InternalEvent($kind${data != null ? ', $data' : ''})';
 }
 
+/// Compares two integer lists for equality.
 bool _listEquals(List<int> a, List<int> b) {
   if (a.length != b.length) return false;
   for (var i = 0; i < a.length; i++) {

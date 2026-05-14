@@ -2,7 +2,9 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
+/// Parses ESC sequences (SS3 function keys, reset, save/restore screen).
 final class EscParser {
+  /// Dispatches an ESC sequence to the appropriate handler.
   Event? parse(EscSequenceData data) {
     final intermediates = data.intermediates;
     final fb = data.finalByte;

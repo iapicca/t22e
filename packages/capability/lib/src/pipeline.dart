@@ -6,10 +6,15 @@ import 'color_probe.dart' show ColorProbe;
 import 'sync_probe.dart' show SyncProbe;
 import 'keyboard_probe.dart' show KeyboardProbe;
 
+/// Orchestrates all capability probes and returns a complete Capabilities result.
 class ProbePipeline {
+  /// DA1 (device attributes) probe.
   final Da1Probe da1Probe;
+  /// Color support probe.
   final ColorProbe colorProbe;
+  /// Sync update support probe.
   final SyncProbe syncProbe;
+  /// Keyboard protocol probe.
   final KeyboardProbe keyboardProbe;
 
   ProbePipeline({
@@ -22,6 +27,7 @@ class ProbePipeline {
        syncProbe = syncProbe ?? SyncProbe(),
        keyboardProbe = keyboardProbe ?? KeyboardProbe();
 
+  /// Runs all probes sequentially and aggregates results.
   Future<Capabilities> run() async {
     final da1 = await da1Probe.probe();
     final color = await colorProbe.probe(da1);

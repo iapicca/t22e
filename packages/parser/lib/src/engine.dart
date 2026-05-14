@@ -1,5 +1,6 @@
 import 'package:protocol/protocol.dart' show Defaults;
 
+/// States for the VT500 state machine.
 enum VtState {
   ground,
   escape,
@@ -16,15 +17,18 @@ enum VtState {
   dcsPassthrough,
 }
 
+/// Base class for parsed sequence data from the byte engine.
 sealed class SequenceData {
   const SequenceData();
 }
 
+/// A single printable character byte.
 final class CharData extends SequenceData {
   final int codepoint;
   const CharData(this.codepoint);
 }
 
+/// Parsed CSI sequence with params, intermediates, and final byte.
 final class CsiSequenceData extends SequenceData {
   final List<int> params;
   final List<int> intermediates;
@@ -32,17 +36,20 @@ final class CsiSequenceData extends SequenceData {
   const CsiSequenceData(this.params, this.intermediates, this.finalByte);
 }
 
+/// Parsed ESC sequence with intermediates and final byte.
 final class EscSequenceData extends SequenceData {
   final List<int> intermediates;
   final int finalByte;
   const EscSequenceData(this.intermediates, this.finalByte);
 }
 
+/// Parsed OSC sequence with content string.
 final class OscSequenceData extends SequenceData {
   final String content;
   const OscSequenceData(this.content);
 }
 
+/// Parsed DCS sequence with optional data payload.
 final class DcsSequenceData extends SequenceData {
   final List<int> params;
   final List<int> intermediates;
@@ -56,7 +63,7 @@ final class DcsSequenceData extends SequenceData {
   ]);
 }
 
-
+/// VT500-compatible byte-level state machine engine.
 class Vt500Engine {
   VtState _state = VtState.ground;
   final _params = <int>[];
@@ -69,6 +76,7 @@ class Vt500Engine {
   bool _oscExpectSt = false;
   bool _dcsExpectSt = false;
 
+  /// Feeds a single byte to the state machine, returning parsed data or null.
   SequenceData? advance(int b) {
     final byte = b & 0xFF;
 
@@ -114,6 +122,7 @@ class Vt500Engine {
     }
   }
 
+  /// Processes a byte in the ground state.
   SequenceData? _onGround(int byte) {
     if (byte == Defaults.escapeByte) {
       _state = VtState.escape;
@@ -152,6 +161,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte in the ESC state.
   SequenceData? _onEscape(int byte) {
     if (byte == Defaults.csiEntryByte) {
       _state = VtState.csiEntry;
@@ -203,6 +213,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during an ESC intermediate sequence.
   SequenceData? _onEscapeIntermediate(int byte) {
     if (byte >= Defaults.byteRangeGraphicLow &&
         byte <= Defaults.byteRangeGraphicHigh) {
@@ -226,6 +237,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte at CSI entry.
   SequenceData? _onCsiEntry(int byte) {
     if (byte >= Defaults.byteRangeParamLow &&
         byte <= Defaults.byteRangeParamHigh) {
@@ -276,6 +288,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during CSI parameter accumulation.
   SequenceData? _onCsiParam(int byte) {
     if (byte >= Defaults.byteRangeDigitLow &&
         byte <= Defaults.byteRangeDigitHigh) {
@@ -323,6 +336,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during CSI intermediate.
   SequenceData? _onCsiIntermediate(int byte) {
     if (byte >= Defaults.byteRangeGraphicLow &&
         byte <= Defaults.byteRangeGraphicHigh) {
@@ -353,6 +367,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during CSI ignore (malformed sequence).
   SequenceData? _onCsiIgnore(int byte) {
     if (byte >= Defaults.byteRangeUpperLow &&
         byte <= Defaults.byteRangeUpperHigh) {
@@ -366,6 +381,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during an OSC string sequence.
   SequenceData? _onOscString(int byte) {
     if (_oscExpectSt) {
       _oscExpectSt = false;
@@ -404,6 +420,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte at DCS entry.
   SequenceData? _onDcsEntry(int byte) {
     if (byte >= Defaults.byteRangeParamLow &&
         byte <= Defaults.byteRangeParamHigh) {
@@ -430,6 +447,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during DCS parameter accumulation.
   SequenceData? _onDcsParam(int byte) {
     if (byte >= Defaults.byteRangeDigitLow &&
         byte <= Defaults.byteRangeDigitHigh) {
@@ -457,6 +475,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during DCS intermediate.
   SequenceData? _onDcsIntermediate(int byte) {
     if (byte >= Defaults.byteRangeGraphicLow &&
         byte <= Defaults.byteRangeGraphicHigh) {
@@ -473,6 +492,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during DCS ignore.
   SequenceData? _onDcsIgnore(int byte) {
     if (byte == Defaults.bellByte || byte == Defaults.stringTerminatorByte) {
       _state = VtState.ground;
@@ -484,6 +504,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Processes a byte during DCS passthrough (data accumulation).
   SequenceData? _onDcsPassthrough(int byte) {
     if (_dcsExpectSt) {
       _dcsExpectSt = false;
@@ -521,6 +542,7 @@ class Vt500Engine {
     return null;
   }
 
+  /// Feeds a list of bytes and collects all parsed sequence data.
   List<SequenceData> advanceAll(List<int> bytes) {
     final results = <SequenceData>[];
     for (final byte in bytes) {
@@ -530,6 +552,7 @@ class Vt500Engine {
     return results;
   }
 
+  /// Resets the engine to its initial state.
   void reset() {
     _state = VtState.ground;
     _params.clear();

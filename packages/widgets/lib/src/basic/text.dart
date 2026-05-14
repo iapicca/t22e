@@ -5,12 +5,18 @@ import 'package:core/core.dart' show TextStyle;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:unicode/unicode.dart' show stringWidth, charWidth;
 
+/// A text display widget with alignment and optional word wrapping.
 class Text extends Widget {
+  /// The text content to display.
   final String text;
+  /// Text style (colors, attributes).
   final TextStyle style;
+  /// Horizontal text alignment.
   final TextAlign align;
+  /// Whether to wrap text at the available width.
   final bool wordWrap;
 
+  /// Creates a Text widget with optional styling and alignment.
   Text(
     this.text, {
     this.style = TextStyle.empty,
@@ -56,6 +62,7 @@ class Text extends Widget {
     return Size(w, h);
   }
 
+  /// Breaks text into lines that fit within maxWidth columns.
   static List<String> _wrapText(String txt, int maxWidth) {
     if (maxWidth <= 0 || stringWidth(txt) <= maxWidth) return [txt];
 

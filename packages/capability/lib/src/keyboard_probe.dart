@@ -7,7 +7,9 @@ import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
 import 'result.dart' show KeyboardProtocol;
 
+/// Probes whether the terminal supports the Kitty keyboard protocol.
 class KeyboardProbe {
+  /// Enables Kitty keyboard flags and checks for a response.
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {

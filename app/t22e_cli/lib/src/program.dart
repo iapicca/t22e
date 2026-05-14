@@ -30,6 +30,7 @@ import 'package:widgets/widgets.dart'
         ClearScreenMsg;
 import 'package:protocol/protocol.dart' show Defaults;
 
+/// Rate-limits rendering to a target FPS.
 class FpsThrottle {
   final Duration _frameDuration;
   DateTime _lastRender = DateTime.now();
@@ -39,6 +40,7 @@ class FpsThrottle {
         microseconds: (Defaults.microsecondsPerSecond / fps).round(),
       );
 
+  /// Returns true if enough time has passed since the last render.
   bool get shouldRender {
     final now = DateTime.now();
     if (now.difference(_lastRender) >= _frameDuration) {
@@ -48,11 +50,13 @@ class FpsThrottle {
     return false;
   }
 
+  /// Resets the throttle timer.
   void reset() {
     _lastRender = DateTime.now();
   }
 }
 
+/// Elm-architecture TUI program: manages terminal lifecycle, event loop, and rendering.
 class Program<M extends Model<M>> {
   M _model;
   final Queue<Msg> _msgQueue = Queue<Msg>();
@@ -76,6 +80,7 @@ class Program<M extends Model<M>> {
   int _termWidth = Defaults.defaultTerminalWidth;
   int _termHeight = Defaults.defaultTerminalHeight;
 
+  /// Creates a new program with the initial model and configuration options.
   Program(
     this._model, {
     int fps = Defaults.defaultFps,
@@ -97,10 +102,13 @@ class Program<M extends Model<M>> {
     );
   }
 
+  /// Adds a message to the queue for processing.
   void enqueue(Msg msg) {
     _msgQueue.add(msg);
   }
 
+  /// Starts the program: enters raw mode, alt screen, installs signal handlers,
+  /// begins listening to stdin, and runs the event loop.
   void run() {
     _runner.enterRawMode();
     _altScreen.enter();
@@ -119,6 +127,7 @@ class Program<M extends Model<M>> {
     _eventLoop();
   }
 
+  /// Handles raw stdin bytes, detecting standalone ESC presses and parsing events.
   void _onStdinData(List<int> bytes) {
     for (final byte in bytes) {
       if (byte == Defaults.escapeByte) {
@@ -143,6 +152,7 @@ class Program<M extends Model<M>> {
     }
   }
 
+  /// Converts a parser Event to an Msg for the model.
   Msg? _eventToMsg(Event event) {
     return switch (event) {
       KeyEvent e => KeyMsg(e),
@@ -152,6 +162,7 @@ class Program<M extends Model<M>> {
     };
   }
 
+  /// Main event loop: processes messages and renders at the target FPS.
   void _eventLoop() {
     while (_running) {
       while (_msgQueue.isNotEmpty && _running) {
@@ -172,6 +183,7 @@ class Program<M extends Model<M>> {
     _shutdown();
   }
 
+  /// Routes a message to the appropriate handler.
   void _processMessage(Msg msg) {
     switch (msg) {
       case QuitMsg():
@@ -188,6 +200,7 @@ class Program<M extends Model<M>> {
     }
   }
 
+  /// Passes a message to the model and fires any returned command.
   void _dispatchToModel(Msg msg) {
     final result = _model.update(msg);
     _model = result.$1;
@@ -196,10 +209,12 @@ class Program<M extends Model<M>> {
     _needsRender = true;
   }
 
+  /// Fires a command asynchronously without awaiting.
   void _fire(Cmd cmd) {
     unawaited(_executeCmd(cmd));
   }
 
+  /// Executes a command and enqueues any returned message.
   Future<void> _executeCmd(Cmd cmd) async {
     try {
       final msg = await cmd.execute(enqueue);
@@ -207,6 +222,7 @@ class Program<M extends Model<M>> {
     } catch (_) {}
   }
 
+  /// Renders the current view to the terminal using line or cell diff renderer.
   void _renderFrame() {
     final view = _model.view();
     late final Surface surface;
@@ -257,6 +273,7 @@ class Program<M extends Model<M>> {
     }
   }
 
+  /// Shuts down the program: cancels subscriptions, disables protocols, restores terminal.
   void _shutdown() {
     _stdinSub?.cancel();
     _escTimer?.cancel();

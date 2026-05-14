@@ -8,13 +8,21 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show Axis;
 import 'package:parser/terminal_parser.dart' show KeyEvent;
 
+/// A scrollable viewport wrapping a child widget with scroll position.
 class Scrollable extends Model<Scrollable> {
+  /// Horizontal scroll offset.
   final int scrollX;
+  /// Vertical scroll offset.
   final int scrollY;
+  /// The child widget to scroll.
   final Widget child;
+  /// Scroll axis direction.
   final Axis axis;
+  /// Lines to scroll per step.
   final int scrollStep;
+  /// Width of the viewport in columns.
   final int viewportWidth;
+  /// Height of the viewport in rows.
   final int viewportHeight;
 
   const Scrollable({
@@ -39,6 +47,7 @@ class Scrollable extends Model<Scrollable> {
     return (this, null);
   }
 
+  /// Returns a copy with overridden fields.
   Scrollable copyWith({
     int? scrollX,
     int? scrollY,
@@ -71,6 +80,7 @@ class Scrollable extends Model<Scrollable> {
   }
 }
 
+/// Internal widget that paints the child at a scroll offset with a scrollbar.
 class _ScrollView extends Widget {
   final Widget child;
   final int scrollX;

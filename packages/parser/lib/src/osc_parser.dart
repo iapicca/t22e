@@ -2,7 +2,9 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
+/// Parses OSC sequences (title, hyperlink, color queries, clipboard).
 final class OscParser {
+  /// Dispatches an OSC sequence by parameter number.
   Event? parse(OscSequenceData data) {
     final content = data.content;
     final semicolon = content.indexOf(';');
@@ -26,6 +28,7 @@ final class OscParser {
     };
   }
 
+  /// Parses an OSC 8 hyperlink value (params;uri).
   InternalEvent? _parseHyperlink(String value) {
     final firstSemicolon = value.indexOf(';');
     if (firstSemicolon == -1) return null;
@@ -33,6 +36,7 @@ final class OscParser {
     return InternalEvent('hyperlink', {'uri': uri});
   }
 
+  /// Parses an OSC 52 clipboard value.
   ClipboardEvent? _parseClipboard(String value) {
     final semicolon = value.indexOf(';');
     if (semicolon == -1) return null;
@@ -41,6 +45,7 @@ final class OscParser {
     return ClipboardEvent(clipboard, base64.isEmpty ? null : base64);
   }
 
+  /// Parses an OSC 10/11 color query response (rgb:RR/GG/BB).
   ColorQueryEvent? _parseColor(String value, int colorNumber) {
     if (!value.startsWith('rgb:')) return null;
 

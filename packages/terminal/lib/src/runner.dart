@@ -3,12 +3,15 @@ import 'dart:io';
 import 'raw_io.dart' as io;
 import 'raw_ffi.dart' as ffi;
 
+/// Manages raw mode lifecycle with FFI-first, IO-fallback strategy.
 class TerminalRunner {
   bool _isRawMode = false;
   ffi.RawModeState? _ffiState;
 
+  /// Whether raw mode is currently active.
   bool get isRawMode => _isRawMode;
 
+  /// Enters raw mode: tries FFI, falls back to dart:io.
   void enterRawMode() {
     if (_isRawMode) return;
     if (!Platform.isWindows) {
@@ -25,6 +28,7 @@ class TerminalRunner {
     } catch (_) {}
   }
 
+  /// Exits raw mode, restoring original terminal settings.
   void exitRawMode() {
     if (!_isRawMode) return;
     if (_ffiState != null) {
@@ -39,6 +43,7 @@ class TerminalRunner {
     _isRawMode = false;
   }
 
+  /// Runs [body] with raw mode active, restoring on exit.
   void runWithRawMode<T>(T Function() body) {
     enterRawMode();
     try {

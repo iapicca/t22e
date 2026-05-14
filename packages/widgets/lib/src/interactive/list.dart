@@ -11,18 +11,27 @@ import 'package:core/core.dart' show TextStyle;
 import 'package:core/core.dart' show Insets;
 import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 
+/// A single list item with a label and optional icon.
 class ListItem {
+  /// Display text for the item.
   final String label;
+  /// Optional icon string.
   final String? icon;
 
   const ListItem(this.label, {this.icon});
 }
 
+/// A scrollable, keyboard-navigable list widget with optional multi-select.
 class ListView extends Model<ListView> {
+  /// The list items to display.
   final List<ListItem> items;
+  /// Index of the currently selected item.
   final int selectedIndex;
+  /// Indices of multi-selected items (for checkboxes).
   final Set<int> multiSelected;
+  /// Enable multi-select mode.
   final bool multiSelect;
+  /// Number of visible rows in the viewport.
   final int viewportHeight;
 
   const ListView({
@@ -41,6 +50,7 @@ class ListView extends Model<ListView> {
     return (this, null);
   }
 
+  /// Handles keyboard navigation and selection.
   (ListView, Cmd?) _handleKey(KeyEvent event) {
     final keyCode = event.keyCode;
     if (keyCode == KeyCode.up && selectedIndex > 0) {
@@ -84,6 +94,7 @@ class ListView extends Model<ListView> {
     return (this, null);
   }
 
+  /// Returns a copy with overridden fields.
   ListView copyWith({
     List<ListItem>? items,
     int? selectedIndex,
@@ -126,6 +137,7 @@ class ListView extends Model<ListView> {
     );
   }
 
+  /// Computes the starting visible index centering around the selection.
   int get _visibleStart {
     if (selectedIndex < 0) return 0;
     final half = viewportHeight ~/ 2;
@@ -137,6 +149,7 @@ class ListView extends Model<ListView> {
     return start;
   }
 
+  /// Builds a single item row with selection/multi-select indicators.
   Widget _buildItemRow(ListItem item, bool isSelected, bool isMultiSelected) {
     final style = isSelected ? const TextStyle(reverse: true) : TextStyle.empty;
     final prefix = multiSelect

@@ -7,7 +7,9 @@ import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
 import 'result.dart' show QueryResult, Supported, Unavailable, Da1Result;
 
+/// Probes the terminal's primary device attributes (DA1).
 class Da1Probe {
+  /// Sends a DA1 query and parses the response.
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {

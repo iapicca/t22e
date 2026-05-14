@@ -6,7 +6,9 @@ import 'package:ansi/ansi.dart' show querySyncUpdate;
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
 
+/// Probes whether the terminal supports DEC synchronized updates (DECSET 2026).
 class SyncProbe {
+  /// Queries sync update support and returns true/false.
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
     final parser = TerminalParser();
     final completer = Completer<bool>();

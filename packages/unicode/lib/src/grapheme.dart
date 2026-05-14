@@ -1,7 +1,9 @@
 import 'width.dart';
 
+/// Describes a grapheme cluster: rune range [start, end) and column width.
 typedef GraphemeCluster = ({int start, int end, int columnWidth});
 
+/// Returns the grapheme break property for a codepoint.
 int _graphemeBreakProperty(int codepoint) {
   if (codepoint == 0x200D) {
     return 1;
@@ -56,6 +58,7 @@ int _graphemeBreakProperty(int codepoint) {
   return 0;
 }
 
+/// Segments text into grapheme clusters with their column widths.
 List<GraphemeCluster> graphemeClusters(String text) {
   final clusters = <GraphemeCluster>[];
   if (text.isEmpty) return clusters;
@@ -95,11 +98,13 @@ List<GraphemeCluster> graphemeClusters(String text) {
   return clusters;
 }
 
+/// Computes the total column width of a string respecting grapheme clusters.
 int stringWidthGrapheme(String text) {
   final clusters = graphemeClusters(text);
   return clusters.fold(0, (sum, c) => sum + c.columnWidth);
 }
 
+/// Truncates a string to a maximum display width in columns.
 String truncate(String text, int maxWidth) {
   final clusters = graphemeClusters(text);
   var w = 0;

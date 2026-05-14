@@ -1,9 +1,14 @@
 import 'package:protocol/protocol.dart' show Defaults;
 
+/// Layout constraints: min/max width and height bounds.
 class Constraints {
+  /// Minimum allowed width.
   final int minWidth;
+  /// Maximum allowed width.
   final int maxWidth;
+  /// Minimum allowed height.
   final int minHeight;
+  /// Maximum allowed height.
   final int maxHeight;
 
   const Constraints({
@@ -13,17 +18,21 @@ class Constraints {
     this.maxHeight = Defaults.unbounded,
   });
 
+  /// Tight constraints forcing an exact size.
   const Constraints.tight(int width, int height)
     : minWidth = width,
       maxWidth = width,
       minHeight = height,
       maxHeight = height;
 
+  /// True if width and height are both tightly constrained.
   bool get isTight => minWidth == maxWidth && minHeight == maxHeight;
 
+  /// True if either maxWidth or maxHeight is unbounded.
   bool get isUnbounded =>
       maxWidth == Defaults.unbounded || maxHeight == Defaults.unbounded;
 
+  /// Clamps a size to fit within these constraints.
   Size constrain(Size size) {
     return Size(
       size.width.clamp(minWidth, maxWidth),
@@ -31,6 +40,7 @@ class Constraints {
     );
   }
 
+  /// Scales all constraints by a factor.
   Constraints multiply(double factor) {
     return Constraints(
       minWidth: (minWidth * factor).round(),
@@ -57,8 +67,11 @@ class Constraints {
       'Constraints($minWidth≤w≤$maxWidth, $minHeight≤h≤$maxHeight)';
 }
 
+/// A simple width × height size.
 class Size {
+  /// Width in columns.
   final int width;
+  /// Height in rows.
   final int height;
 
   const Size(this.width, this.height);
@@ -75,12 +88,16 @@ class Size {
   String toString() => 'Size($width, $height)';
 }
 
+/// Describes a flex item with optional fixed size and flex factor.
 class LayoutItem {
+  /// Fixed size (pixels/columns), or null for flexible.
   final int? fixedSize;
+  /// Flex factor when distributing remaining space.
   final int flex;
 
   const LayoutItem({this.fixedSize, this.flex = 1});
 
+  /// True if this item stretches to fill available space.
   bool get isFlexible => fixedSize == null;
 
   @override
@@ -98,6 +115,7 @@ class LayoutItem {
       isFlexible ? 'LayoutItem(flex:$flex)' : 'LayoutItem(fixed:$fixedSize)';
 }
 
+/// Distributes available space among items using a flexbox-like algorithm.
 List<int> _splitSpace(int total, List<LayoutItem> items, int gap) {
   if (items.isEmpty) return [];
   if (items.length == 1) {
@@ -151,8 +169,10 @@ List<int> _splitSpace(int total, List<LayoutItem> items, int gap) {
   return result;
 }
 
+/// Distributes available horizontal space using flexbox rules.
 List<int> splitHorizontal(int total, List<LayoutItem> items, int gap) =>
     _splitSpace(total, items, gap);
 
+/// Distributes available vertical space using flexbox rules.
 List<int> splitVertical(int total, List<LayoutItem> items, int gap) =>
     _splitSpace(total, items, gap);

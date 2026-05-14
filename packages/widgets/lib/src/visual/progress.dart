@@ -7,13 +7,21 @@ import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
 import 'package:core/core.dart' show TextStyle;
 
+/// A progress bar with determinate (fraction) and indeterminate (animated) modes.
 class ProgressBar extends Model<ProgressBar> {
+  /// Completion fraction (0.0 to 1.0), or null for indeterminate.
   final double? fraction;
+  /// Optional label text.
   final String? label;
+  /// Width of the bar in cells.
   final int barWidth;
+  /// Character used for filled segments.
   final String fillChar;
+  /// Character used for empty segments.
   final String emptyChar;
+  /// Animation interval for indeterminate mode.
   final Duration animInterval;
+  /// Current scroll offset for indeterminate animation.
   final int indeterminateOffset;
 
   const ProgressBar({
@@ -37,6 +45,7 @@ class ProgressBar extends Model<ProgressBar> {
     return (this, null);
   }
 
+  /// Returns a copy with overridden fields.
   ProgressBar copyWith({
     double? fraction,
     String? label,
@@ -59,24 +68,34 @@ class ProgressBar extends Model<ProgressBar> {
 
   @override
   Widget view() {
-    final filled = fraction != null
-        ? (barWidth * fraction!).round().clamp(0, barWidth)
-        : indeterminateOffset % barWidth;
+    final barString = fraction != null
+        ? _determinateBar(fraction!)
+        : _indeterminateBar(indeterminateOffset);
 
-    final bar = StringBuffer();
-    for (var i = 0; i < barWidth; i++) {
-      bar.write(i < filled ? fillChar : emptyChar);
-    }
-
-    final children = <Widget>[];
+    final children = <Widget>[Text(barString)];
     if (label != null) {
-      children.add(Text('$label ', style: const TextStyle(bold: true)));
+      children.add(Text(' $label'));
     }
-    children.add(Text(bar.toString()));
-    if (fraction != null) {
-      children.add(Text(' ${(fraction! * 100).round()}%'));
-    }
-
     return Row(children: children);
+  }
+
+  /// Builds a determinate bar string based on fraction.
+  String _determinateBar(double frac) {
+    final filled = (frac.clamp(0.0, 1.0) * barWidth).round();
+    return fillChar * filled + emptyChar * (barWidth - filled);
+  }
+
+  /// Builds an indeterminate scrolling bar.
+  String _indeterminateBar(int offset) {
+    final pos = offset % (barWidth + 3);
+    final buf = StringBuffer();
+    for (var i = 0; i < barWidth; i++) {
+      if (i >= pos && i < pos + 3) {
+        buf.write(fillChar);
+      } else {
+        buf.write(emptyChar);
+      }
+    }
+    return buf.toString();
   }
 }

@@ -1,3 +1,4 @@
+/// Widget library: Model-View-Update framework with layout, interaction, and visual widgets.
 export 'src/model.dart' show Model;
 export 'src/msg.dart';
 export 'src/cmd.dart';

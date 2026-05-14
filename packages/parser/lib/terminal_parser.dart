@@ -1,3 +1,4 @@
+/// VT500-compatible terminal parser: byte-level state machine and event generation.
 export 'src/events.dart';
 export 'src/engine.dart'
     show

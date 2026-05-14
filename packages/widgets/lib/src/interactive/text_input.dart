@@ -9,14 +9,23 @@ import '../enums.dart' show EchoMode;
 import 'package:core/core.dart' show TextStyle;
 import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 
+/// An interactive text input widget with cursor, echo modes, and grapheme-aware editing.
 class TextInput extends Model<TextInput> {
+  /// Current text value.
   final String value;
+  /// Cursor position (code unit index).
   final int cursorPosition;
+  /// Selection start, or null if no selection.
   final int? selectionStart;
+  /// Maximum allowed length (-1 = unlimited).
   final int maxLength;
+  /// Echo mode (normal, password bullets, no echo).
   final EchoMode echoMode;
+  /// Optional validation function.
   final String? Function(String)? validator;
+  /// Whether the cursor is currently visible (for blinking).
   final bool cursorVisible;
+  /// Blink interval duration.
   final Duration blinkInterval;
 
   const TextInput({
@@ -44,6 +53,7 @@ class TextInput extends Model<TextInput> {
     return (this, null);
   }
 
+  /// Dispatches key events for cursor movement, editing, and character input.
   (TextInput, Cmd?) _handleKey(KeyEvent event) {
     final keyCode = event.keyCode;
     final shift = event.modifiers.shift;
@@ -123,11 +133,13 @@ class TextInput extends Model<TextInput> {
     }
   }
 
+  /// True if the character is a printable codepoint.
   bool _isPrintable(String char) {
     final cp = char.runes.first;
     return cp >= Defaults.codepointSpace && cp != Defaults.codepointDel;
   }
 
+  /// Inserts a character at the cursor position.
   (TextInput, Cmd?) _insertChar(String char) {
     if (maxLength > 0 && value.length >= maxLength) return (this, null);
     final newValue =
@@ -141,6 +153,7 @@ class TextInput extends Model<TextInput> {
     );
   }
 
+  /// Moves back one grapheme cluster boundary.
   int _prevGraphemeBoundary(int pos) {
     if (pos <= 0) return 0;
     final runes = value.runes.toList();
@@ -154,6 +167,7 @@ class TextInput extends Model<TextInput> {
     return strIdx;
   }
 
+  /// Moves forward one grapheme cluster boundary.
   int _nextGraphemeBoundary(int pos) {
     if (pos >= value.length) return value.length;
     final runes = value.runes.toList();
@@ -166,6 +180,7 @@ class TextInput extends Model<TextInput> {
     return value.length;
   }
 
+  /// Returns the value transformed by the echo mode.
   String get _displayValue {
     return switch (echoMode) {
       EchoMode.normal => value,
@@ -174,6 +189,7 @@ class TextInput extends Model<TextInput> {
     };
   }
 
+  /// Returns a copy with overridden fields.
   TextInput copyWith({
     String? value,
     int? cursorPosition,

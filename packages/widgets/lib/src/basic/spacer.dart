@@ -1,7 +1,9 @@
 import '../widget.dart' show Widget, PaintingContext;
 import 'package:core/core.dart' show Constraints, Size;
 
+/// Expands to fill available space with a given flex factor.
 class Spacer extends Widget {
+  /// Flex factor for proportional space distribution.
   final int flex;
 
   const Spacer({this.flex = 1});

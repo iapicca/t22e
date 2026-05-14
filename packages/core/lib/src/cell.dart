@@ -1,9 +1,14 @@
 import 'style.dart';
 
+/// A single character cell on the terminal grid, with style and wide-char info.
 class Cell {
+  /// The character string (or empty for wide continuation cells).
   final String char;
+  /// The text style applied to this cell.
   final TextStyle style;
+  /// True if this cell is the second column of a 2-wide character.
   final bool wideContinuation;
+  /// Optional OSC 8 hyperlink URI.
   final String? hyperlink;
 
   const Cell({
@@ -13,6 +18,7 @@ class Cell {
     this.hyperlink,
   });
 
+  /// Creates a copy with overridden fields.
   Cell copyWith({
     String? char,
     TextStyle? style,
@@ -27,6 +33,7 @@ class Cell {
     );
   }
 
+  /// Returns a new cell with the given style merged on top.
   Cell mergeStyle(TextStyle override) {
     final merged = style.merge(override);
     if (identical(merged, style)) return this;

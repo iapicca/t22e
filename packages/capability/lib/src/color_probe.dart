@@ -7,7 +7,9 @@ import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 
+/// Detects terminal color support via environment, DA1, and active probing.
 class ColorProbe {
+  /// Detects color profile from COLORTERM and TERM environment variables.
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
     if (colorterm == Defaults.envColortermTruecolor ||
@@ -24,6 +26,7 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
+  /// Detects color profile from DA1 device attributes.
   ColorProfile detectFromDa1(QueryResult<Da1Result> da1Result) {
     if (da1Result is Supported<Da1Result>) {
       final attrs = da1Result.value.attributes;
@@ -35,6 +38,7 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
+  /// Actively probes color support by querying the terminal's foreground color.
   Future<ColorProfile> probe(
     QueryResult<Da1Result> da1Result, {
     Duration timeout = Defaults.defaultProbeTimeout,

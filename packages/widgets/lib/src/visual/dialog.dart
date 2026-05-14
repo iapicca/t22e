@@ -13,18 +13,27 @@ import 'package:core/core.dart' show Constraints, Size;
 import 'package:core/core.dart' show Insets;
 import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 
+/// A button in a dialog.
 class DialogButton {
+  /// Button label text.
   final String label;
+  /// Whether this button has focus.
   final bool focused;
 
   const DialogButton(this.label, {this.focused = false});
 }
 
+/// A modal dialog overlay with title, content, and buttons.
 class Dialog extends Model<Dialog> {
+  /// Dialog title text.
   final String title;
+  /// Content widget inside the dialog.
   final Widget content;
+  /// Action buttons at the bottom.
   final List<DialogButton> buttons;
+  /// Whether pressing Escape closes the dialog.
   final bool dismissible;
+  /// Index of the currently focused button.
   final int focusedButton;
 
   const Dialog({
@@ -43,6 +52,7 @@ class Dialog extends Model<Dialog> {
     return (this, null);
   }
 
+  /// Handles Escape (dismiss) and Tab/Shift-Tab (button focus cycling).
   (Dialog, Cmd?) _handleKey(KeyEvent event) {
     final keyCode = event.keyCode;
     switch (keyCode) {
@@ -68,6 +78,7 @@ class Dialog extends Model<Dialog> {
     }
   }
 
+  /// Returns a copy with overridden fields.
   Dialog copyWith({
     String? title,
     Widget? content,
@@ -95,6 +106,7 @@ class Dialog extends Model<Dialog> {
   }
 }
 
+/// Internal widget that dims the background and paints the dialog.
 class _DialogOverlay extends Widget {
   final String title;
   final Widget content;
@@ -171,6 +183,7 @@ class _DialogOverlay extends Widget {
     dialogBox.paint(context.child(dialogX, dialogY));
   }
 
+  /// Builds the button bar with focus highlights.
   Widget _buildButtonBar() {
     final children = <Widget>[];
     for (var i = 0; i < buttons.length; i++) {
@@ -192,9 +205,13 @@ class _DialogOverlay extends Widget {
   }
 }
 
+/// Constrains a child to a specific size.
 class SizedBox extends Widget {
+  /// Forced width, or null to let child choose.
   final int? width;
+  /// Forced height, or null to let child choose.
   final int? height;
+  /// The child widget.
   final Widget child;
 
   SizedBox({this.width, this.height, required this.child});

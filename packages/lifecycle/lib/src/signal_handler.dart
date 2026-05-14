@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'terminal_guard.dart' show TerminalGuard;
 
+/// Handles POSIX signals (SIGINT, SIGTERM, SIGTSTP, SIGCONT) for graceful shutdown.
 class SignalHandler {
   final TerminalGuard _guard;
+  /// Callback invoked on SIGINT (Ctrl+C).
   final void Function() onInterrupt;
   StreamSubscription<ProcessSignal>? _sigintSub;
   StreamSubscription<ProcessSignal>? _sigtermSub;
@@ -15,6 +17,7 @@ class SignalHandler {
   SignalHandler({required TerminalGuard guard, required this.onInterrupt})
     : _guard = guard;
 
+  /// Installs signal listeners for all handled signals.
   void install() {
     _sigintSub = ProcessSignal.sigint.watch().listen((_) {
       onInterrupt();
@@ -32,6 +35,7 @@ class SignalHandler {
     _sigcontSub = ProcessSignal.sigcont.watch().listen((_) {});
   }
 
+  /// Removes all installed signal listeners.
   void dispose() {
     _sigintSub?.cancel();
     _sigtermSub?.cancel();

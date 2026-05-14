@@ -3,10 +3,15 @@ import '../enums.dart' show MainAxisAlignment, CrossAxisAlignment;
 import 'package:core/core.dart'
     show Constraints, Size, LayoutItem, splitHorizontal;
 
+/// Lays out children horizontally with flexbox-like distribution.
 class Row extends Widget {
+  /// Children placed left to right.
   final List<Widget> children;
+  /// Gap in cells between children.
   final int gap;
+  /// Main axis alignment (horizontal).
   final MainAxisAlignment mainAxisAlignment;
+  /// Cross axis alignment (vertical).
   final CrossAxisAlignment crossAxisAlignment;
 
   Row({
@@ -102,6 +107,7 @@ class Row extends Widget {
     );
   }
 
+  /// Computes the main-axis offset based on alignment.
   int _mainAxisOffset(List<int> widths, int parentWidth) {
     final totalContent =
         widths.fold(0, (a, b) => a + b) + gap * (children.length - 1);
@@ -125,6 +131,7 @@ class Row extends Widget {
     }
   }
 
+  /// Computes the cross-axis offset based on alignment.
   int _crossAxisOffset(int childHeight, int parentHeight) {
     final pSize = _parentCrossSize;
     return switch (crossAxisAlignment) {
