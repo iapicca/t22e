@@ -16,7 +16,6 @@ workspace:
   - packages/lifecycle
   - packages/widgets
   - packages/testing
-  - app/t22e_cli
 
 dev_dependencies:
   melos: ^7.5.1
