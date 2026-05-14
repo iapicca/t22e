@@ -1,15 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:ansi/ansi.dart' show enableKittyKeyboard, disableKittyKeyboard;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
+import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
 import 'result.dart' show KeyboardProtocol;
 
-/// Probes whether the terminal supports the Kitty keyboard protocol.
 class KeyboardProbe {
-  /// Enables Kitty keyboard flags and checks for a response.
+  final TerminalIo _io;
+
+  KeyboardProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {
@@ -22,7 +24,7 @@ class KeyboardProbe {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = stdin.listen((bytes) {
+    sub = _io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is KeyboardEnhancementFlagsEvent) {
@@ -33,13 +35,13 @@ class KeyboardProbe {
       }
     });
 
-    stdout.write(enableKittyKeyboard(Defaults.kittyDisambiguate));
-    await stdout.flush();
+    _io.write(enableKittyKeyboard(Defaults.kittyDisambiguate));
+    await _io.flush();
 
     final result = await completer.future;
     await sub.cancel();
     if (result == KeyboardProtocol.basic) {
-      stdout.write(disableKittyKeyboard());
+      _io.write(disableKittyKeyboard());
     }
     return result;
   }

@@ -1,15 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:ansi/ansi.dart' show queryDa1;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
+import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
 import 'result.dart' show QueryResult, Da1Result;
 
-/// Probes the terminal's primary device attributes (DA1).
 class Da1Probe {
-  /// Sends a DA1 query and parses the response.
+  final TerminalIo _io;
+
+  Da1Probe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {
@@ -22,7 +24,7 @@ class Da1Probe {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = stdin.listen((bytes) {
+    sub = _io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is PrimaryDeviceAttributesEvent) {
@@ -38,8 +40,8 @@ class Da1Probe {
       }
     });
 
-    stdout.write(queryDa1());
-    await stdout.flush();
+    _io.write(queryDa1());
+    await _io.flush();
 
     final result = await completer.future;
     await sub.cancel();

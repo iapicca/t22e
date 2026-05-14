@@ -1,49 +1,38 @@
-import 'dart:io';
+import 'raw_mode_backend.dart';
+import 'ffi_raw_backend.dart';
+import 'io_raw_backend.dart';
 
-import 'raw_io.dart' as io;
-import 'raw_ffi.dart' as ffi;
-
-/// Manages raw mode lifecycle with FFI-first, IO-fallback strategy.
 class TerminalRunner {
+  final List<RawModeBackend> _backends;
+  RawModeBackend? _activeBackend;
   bool _isRawMode = false;
-  ffi.RawModeState? _ffiState;
 
-  /// Whether raw mode is currently active.
+  TerminalRunner({List<RawModeBackend>? backends})
+    : _backends = backends ?? [FfiRawModeBackend(), const IoRawModeBackend()];
+
   bool get isRawMode => _isRawMode;
 
-  /// Enters raw mode: tries FFI, falls back to dart:io.
   void enterRawMode() {
     if (_isRawMode) return;
-    if (!Platform.isWindows) {
-      final state = ffi.enableRawModeFfi();
-      if (state != null) {
-        _ffiState = state;
+    for (final backend in _backends) {
+      try {
+        backend.enable();
+        _activeBackend = backend;
         _isRawMode = true;
         return;
-      }
+      } catch (_) {}
     }
-    try {
-      io.enableRawModeIo();
-      _isRawMode = true;
-    } catch (_) {}
   }
 
-  /// Exits raw mode, restoring original terminal settings.
   void exitRawMode() {
     if (!_isRawMode) return;
-    if (_ffiState != null) {
-      try {
-        ffi.disableRawModeFfi(_ffiState!);
-      } catch (_) {}
-      _ffiState = null;
-    }
     try {
-      io.disableRawModeIo();
+      _activeBackend?.disable();
     } catch (_) {}
+    _activeBackend = null;
     _isRawMode = false;
   }
 
-  /// Runs [body] with raw mode active, restoring on exit.
   void runWithRawMode<T>(T Function() body) {
     enterRawMode();
     try {

@@ -1,43 +1,38 @@
-import 'dart:io';
-
 import 'package:ansi/ansi.dart' show hideCursor, showCursor;
 import 'package:ansi/ansi.dart'
     show enterAltScreen, exitAltScreen, enableMouse, disableMouse;
+import 'package:terminal/terminal.dart' show TerminalIo;
 
-/// Manages entering/exiting the alternate screen buffer.
 class AltScreenManager {
-  final Stdout _stdout;
+  final TerminalIo _io;
   bool _active = false;
   bool _mouseEnabled = false;
 
-  AltScreenManager(this._stdout);
+  AltScreenManager(this._io);
 
-  /// Switches to the alternate screen, hides cursor, optionally enables mouse.
   void enter({bool captureMouse = false}) {
     if (_active) return;
-    _stdout.write(enterAltScreen());
-    _stdout.write(hideCursor());
+    _io.write(enterAltScreen());
+    _io.write(hideCursor());
     if (captureMouse) {
-      _stdout.write(enableMouse());
+      _io.write(enableMouse());
       _mouseEnabled = true;
     }
-    _stdout.flush();
+    _io.flush();
     _active = true;
   }
 
-  /// Returns to the main screen, shows cursor, disables mouse if active.
   void exit() {
     if (!_active) return;
-    _stdout.write(showCursor());
+    _io.write(showCursor());
     if (_mouseEnabled) {
-      _stdout.write(disableMouse());
+      _io.write(disableMouse());
       _mouseEnabled = false;
     }
-    _stdout.write(exitAltScreen());
-    _stdout.flush();
+    _io.write(exitAltScreen());
+    _io.flush();
     _active = false;
   }
 
-  /// Whether the alternate screen is currently active.
   bool get isActive => _active;
 }

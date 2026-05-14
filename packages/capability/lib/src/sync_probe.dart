@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show querySyncUpdate;
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
+import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
 
-/// Probes whether the terminal supports DEC synchronized updates (DECSET 2026).
 class SyncProbe {
-  /// Queries sync update support and returns true/false.
+  final TerminalIo _io;
+
+  SyncProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
     final parser = TerminalParser();
     final completer = Completer<bool>();
@@ -17,7 +19,7 @@ class SyncProbe {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = stdin.listen((bytes) {
+    sub = _io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is QuerySyncUpdateEvent) {
@@ -28,8 +30,8 @@ class SyncProbe {
       }
     });
 
-    stdout.write(querySyncUpdate());
-    await stdout.flush();
+    _io.write(querySyncUpdate());
+    await _io.flush();
 
     final result = await completer.future;
     await sub.cancel();

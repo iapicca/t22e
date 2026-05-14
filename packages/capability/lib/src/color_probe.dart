@@ -5,11 +5,14 @@ import 'package:core/core.dart' show ColorProfile;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
+import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 
-/// Detects terminal color support via environment, DA1, and active probing.
 class ColorProbe {
-  /// Detects color profile from COLORTERM and TERM environment variables.
+  final TerminalIo _io;
+
+  ColorProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
     if (colorterm == Defaults.envColortermTruecolor ||
@@ -27,7 +30,6 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
-  /// Detects color profile from DA1 device attributes.
   ColorProfile detectFromDa1(QueryResult<Da1Result> da1Result) {
     if (da1Result is Supported<Da1Result>) {
       final attrs = da1Result.value.attributes;
@@ -41,7 +43,6 @@ class ColorProbe {
     return ColorProfile.ansi16;
   }
 
-  /// Actively probes color support by querying the terminal's foreground color.
   Future<ColorProfile> probe(
     QueryResult<Da1Result> da1Result, {
     Duration timeout = Defaults.defaultProbeTimeout,
@@ -58,7 +59,7 @@ class ColorProbe {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = stdin.listen((bytes) {
+    sub = _io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is ColorQueryEvent && event.r != null) {
@@ -69,8 +70,8 @@ class ColorProbe {
       }
     });
 
-    stdout.write('${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}');
-    await stdout.flush();
+    _io.write('${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}');
+    await _io.flush();
 
     final result = await completer.future;
     await sub.cancel();

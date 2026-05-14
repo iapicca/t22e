@@ -1,0 +1,4 @@
+- create wrapper for malloc (eg:mallocFfi)
+- rework backend structure
+- _ansiToRgb as const map
+- rethink TerminalRunner
