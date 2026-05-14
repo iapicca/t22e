@@ -17,8 +17,9 @@ class ColorProbe {
       return ColorProfile.trueColor;
     }
     final term = Platform.environment['TERM'] ?? '';
-    if (term.endsWith(Defaults.envTermSuffix256Color))
+    if (term.endsWith(Defaults.envTermSuffix256Color)) {
       return ColorProfile.indexed256;
+    }
     if (term.endsWith(Defaults.envTermSuffixTrueColor) ||
         term.endsWith(Defaults.envTermSuffixDirect)) {
       return ColorProfile.trueColor;
@@ -30,10 +31,12 @@ class ColorProbe {
   ColorProfile detectFromDa1(QueryResult<Da1Result> da1Result) {
     if (da1Result is Supported<Da1Result>) {
       final attrs = da1Result.value.attributes;
-      if (attrs.contains(Defaults.da1AttrTrueColor))
+      if (attrs.contains(Defaults.da1AttrTrueColor)) {
         return ColorProfile.trueColor;
-      if (attrs.contains(Defaults.da1AttrIndexed256))
+      }
+      if (attrs.contains(Defaults.da1AttrIndexed256)) {
         return ColorProfile.indexed256;
+      }
     }
     return ColorProfile.ansi16;
   }

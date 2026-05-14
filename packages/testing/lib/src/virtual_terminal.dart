@@ -107,8 +107,9 @@ class VirtualTerminal {
     var i = start;
     while (i < ansi.length) {
       final c = ansi.codeUnitAt(i);
-      if (c == Defaults.bellByte || c == Defaults.stringTerminatorByte)
+      if (c == Defaults.bellByte || c == Defaults.stringTerminatorByte) {
         return i + 1;
+      }
       i++;
     }
     return i;

@@ -32,13 +32,13 @@ class ProcessTimeout extends ProcessResult {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(int exitCode, String stdout, String stderr)? success,
     TResult Function(Duration duration)? timeout,
-    required TResult orElse(),
+    required TResult Function() orElse,
   }) => timeout != null ? timeout(duration) : orElse();
 
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ProcessSuccess value)? success,
     TResult Function(ProcessTimeout value)? timeout,
-    required TResult orElse(),
+    required TResult Function() orElse,
   }) => timeout != null ? timeout(this) : orElse();
 
   @override

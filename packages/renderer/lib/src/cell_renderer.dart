@@ -64,17 +64,21 @@ class CellRenderer {
     if (s.bold == true) buf.write('${Defaults.csi}${Defaults.sgrBold}m');
     if (s.dim == true) buf.write('${Defaults.csi}${Defaults.sgrFaint}m');
     if (s.italic == true) buf.write('${Defaults.csi}${Defaults.sgrItalic}m');
-    if (s.underline == true)
+    if (s.underline == true) {
       buf.write('${Defaults.csi}${Defaults.sgrUnderline}m');
+    }
     if (s.blink == true) buf.write('${Defaults.csi}${Defaults.sgrBlink}m');
     if (s.reverse == true) buf.write('${Defaults.csi}${Defaults.sgrReverse}m');
-    if (s.strikethrough == true)
+    if (s.strikethrough == true) {
       buf.write('${Defaults.csi}${Defaults.sgrStrikethrough}m');
-    if (s.overline == true)
+    }
+    if (s.overline == true) {
       buf.write('${Defaults.csi}${Defaults.sgrOverline}m');
+    }
     if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
-    if (s.background != null)
+    if (s.background != null) {
       buf.write(s.background!.sgrSequence(background: true));
+    }
     if (linkUri != null) buf.write(hyperlink(linkUri, ''));
     return buf.toString();
   }

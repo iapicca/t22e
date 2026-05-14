@@ -183,8 +183,9 @@ class Color {
         final off = background
             ? Defaults.sgrBgAnsiBase
             : Defaults.sgrFgAnsiBase;
-        if (value < Defaults.ansiDarkThreshold)
+        if (value < Defaults.ansiDarkThreshold) {
           return '${Defaults.csi}${off + value}m';
+        }
         return '${Defaults.csi}${off + Defaults.ansiBrightOffset + value - Defaults.ansiDarkThreshold}m';
       case ColorKind.indexed:
         return '${Defaults.csi}$prefix;5;${value}m';

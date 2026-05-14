@@ -1,4 +1,4 @@
-/// Event types emitted by the terminal parser: key, mouse, clipboard, and responses.
+// Event types emitted by the terminal parser: key, mouse, clipboard, and responses.
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'events.freezed.dart';

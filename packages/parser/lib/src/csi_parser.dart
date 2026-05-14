@@ -149,20 +149,22 @@ final class CsiParser {
     final x = params[1] - 1;
     final y = params[2] - 1;
 
-    if (cb == Defaults.mouseWheelUpCode)
+    if (cb == Defaults.mouseWheelUpCode) {
       return MouseEvent(
         button: MouseButton.wheelUp,
         action: MouseAction.press,
         x: x,
         y: y,
       );
-    if (cb == Defaults.mouseWheelDownCode)
+    }
+    if (cb == Defaults.mouseWheelDownCode) {
       return MouseEvent(
         button: MouseButton.wheelDown,
         action: MouseAction.press,
         x: x,
         y: y,
       );
+    }
 
     if ((cb & Defaults.mouseDragBit) != 0 &&
         (cb & Defaults.mouseButtonMask) != 3) {

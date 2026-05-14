@@ -1,4 +1,4 @@
-/// Core types: geometry, color, cell, style, surface, and flexbox layout.
+// Core types: geometry, color, cell, style, surface, and flexbox layout.
 export 'src/geometry.dart';
 export 'src/color.dart';
 export 'src/cell.dart';

@@ -1,4 +1,4 @@
-/// Unicode character width, emoji detection, and grapheme cluster segmentation.
+// Unicode character width, emoji detection, and grapheme cluster segmentation.
 export 'src/tables.dart'
     show
         charWidthFromTable,

@@ -1,4 +1,4 @@
-/// Placeholder type for public facing exports.
+// Placeholder type for public facing exports.
 // TODO: Put public facing types in this file.
 
 /// Checks if you are awesome. Spoiler: you are.
