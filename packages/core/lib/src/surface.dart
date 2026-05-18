@@ -1,4 +1,5 @@
 import 'cell.dart';
+import 'color.dart';
 import 'geometry.dart';
 import 'style.dart';
 import 'package:unicode/unicode.dart' show graphemeClusters;

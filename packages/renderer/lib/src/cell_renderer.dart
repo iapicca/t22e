@@ -1,4 +1,4 @@
-import 'package:core/core.dart' show TextStyle;
+import 'package:core/core.dart' show ColorSgr, TextStyle;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show hyperlink;
 import 'frame.dart' show Frame;

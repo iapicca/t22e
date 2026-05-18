@@ -213,14 +213,14 @@ class VirtualTerminal {
         case Defaults.sgrFgAnsiBase + 6:
         case Defaults.sgrFgAnsiBase + 7:
           _currentStyle = TextStyle(
-            foreground: Color.fromAnsi(AnsiColor(p - Defaults.sgrFgAnsiBase)),
+            foreground: AnsiColor(p - Defaults.sgrFgAnsiBase).toColor(),
           ).merge(_currentStyle);
         case Defaults.sgrFgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
               _currentStyle = TextStyle(
-                foreground: Color.fromIndexed(IndexedColor(params[i + 2])),
+                foreground: IndexedColor(params[i + 2]).toColor(),
               ).merge(_currentStyle);
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&
@@ -246,14 +246,14 @@ class VirtualTerminal {
         case Defaults.sgrBgAnsiBase + 6:
         case Defaults.sgrBgAnsiBase + 7:
           _currentStyle = TextStyle(
-            background: Color.fromAnsi(AnsiColor(p - Defaults.sgrBgAnsiBase)),
+            background: AnsiColor(p - Defaults.sgrBgAnsiBase).toColor(),
           ).merge(_currentStyle);
         case Defaults.sgrBgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
               _currentStyle = TextStyle(
-                background: Color.fromIndexed(IndexedColor(params[i + 2])),
+                background: IndexedColor(params[i + 2]).toColor(),
               ).merge(_currentStyle);
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&

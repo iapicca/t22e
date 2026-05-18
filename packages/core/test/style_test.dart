@@ -56,7 +56,7 @@ void main() {
 
     test('inherit fills null fields from parent', () {
       final parent = TextStyle(
-        foreground: Color.fromAnsi(AnsiColor(1)),
+        foreground: AnsiColor(1).toColor(),
         bold: true,
       );
       const child = TextStyle(italic: true);
@@ -67,13 +67,13 @@ void main() {
     });
 
     test('inherit preserves child non-null fields', () {
-      final parent = TextStyle(foreground: Color.fromAnsi(AnsiColor(1)));
+      final parent = TextStyle(foreground: AnsiColor(1).toColor());
       final child = TextStyle(
-        foreground: Color.fromAnsi(AnsiColor(2)),
+        foreground: AnsiColor(2).toColor(),
         italic: true,
       );
       final inherited = child.inherit(parent);
-      expect(inherited.foreground, Color.fromAnsi(AnsiColor(2)));
+      expect(inherited.foreground, AnsiColor(2).toColor());
     });
 
     test('inherit from empty returns child unchanged', () {
@@ -89,14 +89,14 @@ void main() {
     });
 
     test('deep nesting: child.inherit(parent).inherit(grandparent)', () {
-      final grandparent = TextStyle(foreground: Color.fromAnsi(AnsiColor(1)));
+      final grandparent = TextStyle(foreground: AnsiColor(1).toColor());
       final parent = TextStyle(
-        foreground: Color.fromAnsi(AnsiColor(2)),
+        foreground: AnsiColor(2).toColor(),
         bold: true,
       );
       const child = TextStyle(italic: true);
       final inherited = child.inherit(parent).inherit(grandparent);
-      expect(inherited.foreground, Color.fromAnsi(AnsiColor(2)));
+      expect(inherited.foreground, AnsiColor(2).toColor());
       expect(inherited.bold, isTrue);
       expect(inherited.italic, isTrue);
     });

@@ -43,14 +43,14 @@ void main() {
       });
 
       test('fromAnsi', () {
-        final c = Color.fromAnsi(AnsiColor(1));
+        final c = AnsiColor(1).toColor();
         expect(c.red, 153);
         expect(c.green, 0);
         expect(c.blue, 0);
       });
 
       test('fromIndexed', () {
-        final c = Color.fromIndexed(IndexedColor(196));
+        final c = IndexedColor(196).toColor();
         expect(c.red, 255);
         expect(c.green, 0);
         expect(c.blue, 0);
@@ -87,7 +87,7 @@ void main() {
 
       test('fromAnsi preserves code', () {
         for (var i = 0; i < 16; i++) {
-          final c = Color.fromAnsi(AnsiColor(i));
+          final c = AnsiColor(i).toColor();
           expect(c.ansi.code, i);
         }
       });
@@ -112,17 +112,17 @@ void main() {
       });
 
       test('ansi16 foreground dark', () {
-        final c = Color.fromAnsi(AnsiColor(1));
+        final c = AnsiColor(1).toColor();
         expect(c.sgrSequence(profile: ColorProfile.ansi16), '\x1b[31m');
       });
 
       test('ansi16 foreground bright', () {
-        final c = Color.fromAnsi(AnsiColor(9));
+        final c = AnsiColor(9).toColor();
         expect(c.sgrSequence(profile: ColorProfile.ansi16), '\x1b[91m');
       });
 
       test('ansi16 background', () {
-        final c = Color.fromAnsi(AnsiColor(1));
+        final c = AnsiColor(1).toColor();
         expect(
           c.sgrSequence(background: true, profile: ColorProfile.ansi16),
           '\x1b[41m',
@@ -130,7 +130,7 @@ void main() {
       });
 
       test('ansi16 background bright', () {
-        final c = Color.fromAnsi(AnsiColor(9));
+        final c = AnsiColor(9).toColor();
         expect(
           c.sgrSequence(background: true, profile: ColorProfile.ansi16),
           '\x1b[101m',
@@ -138,7 +138,7 @@ void main() {
       });
 
       test('indexed256 foreground', () {
-        final c = Color.fromIndexed(IndexedColor(42));
+        final c = IndexedColor(42).toColor();
         expect(
           c.sgrSequence(profile: ColorProfile.indexed256),
           '\x1b[38;5;42m',
@@ -146,7 +146,7 @@ void main() {
       });
 
       test('indexed256 background', () {
-        final c = Color.fromIndexed(IndexedColor(42));
+        final c = IndexedColor(42).toColor();
         expect(
           c.sgrSequence(background: true, profile: ColorProfile.indexed256),
           '\x1b[48;5;42m',
