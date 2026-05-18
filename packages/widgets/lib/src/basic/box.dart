@@ -10,14 +10,19 @@ import 'package:unicode/unicode.dart' show stringWidth;
 class Box extends Widget {
   /// Optional child widget inside the border.
   final Widget? child;
+
   /// The border line style.
   final BorderStyle borderStyle;
+
   /// Internal padding applied inside the border.
   final Insets padding;
+
   /// Optional title text on the top border.
   final String? title;
+
   /// Style for the title text.
   final TextStyle? titleStyle;
+
   /// Style for border characters and content text.
   final TextStyle? borderTextStyle;
 

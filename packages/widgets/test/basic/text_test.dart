@@ -72,10 +72,7 @@ void main() {
       const own = TextStyle(bold: true);
       final text = Text('Hi', style: own);
       text.layout(constraints(10, 3));
-      text.paint(PaintingContext(
-        surface: surface,
-        inheritedStyle: inherited,
-      ));
+      text.paint(PaintingContext(surface: surface, inheritedStyle: inherited));
       expect(surface.grid[0][0].style.bold, isTrue);
       expect(surface.grid[0][0].style.italic, isTrue);
     });

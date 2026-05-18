@@ -9,10 +9,13 @@ import 'package:unicode/unicode.dart' show stringWidth, charWidth;
 class Text extends Widget {
   /// The text content to display.
   final String text;
+
   /// Text style (colors, attributes).
   final TextStyle style;
+
   /// Horizontal text alignment.
   final TextAlign align;
+
   /// Whether to wrap text at the available width.
   final bool wordWrap;
 

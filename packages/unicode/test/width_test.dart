@@ -23,7 +23,10 @@ void main() {
   });
 
   group('isAmbiguousWidth', () {
-    test('Latin A not ambiguous', () => expect(isAmbiguousWidth(0x41), isFalse));
+    test(
+      'Latin A not ambiguous',
+      () => expect(isAmbiguousWidth(0x41), isFalse),
+    );
     test('block element is not ambiguous by default', () {
       expect(isAmbiguousWidth(0x2592), isFalse);
     });

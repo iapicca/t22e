@@ -18,24 +18,18 @@ class FakeRawModeBackend implements RawModeBackend {
 void main() {
   group('TerminalRunner', () {
     test('initial state is not raw mode', () {
-      final runner = TerminalRunner(
-        backends: [FakeRawModeBackend()],
-      );
+      final runner = TerminalRunner(backends: [FakeRawModeBackend()]);
       expect(runner.isRawMode, isFalse);
     });
 
     test('enterRawMode sets raw mode', () {
-      final runner = TerminalRunner(
-        backends: [FakeRawModeBackend()],
-      );
+      final runner = TerminalRunner(backends: [FakeRawModeBackend()]);
       runner.enterRawMode();
       expect(runner.isRawMode, isTrue);
     });
 
     test('exitRawMode unsets raw mode', () {
-      final runner = TerminalRunner(
-        backends: [FakeRawModeBackend()],
-      );
+      final runner = TerminalRunner(backends: [FakeRawModeBackend()]);
       runner.enterRawMode();
       runner.exitRawMode();
       expect(runner.isRawMode, isFalse);
@@ -51,9 +45,7 @@ void main() {
     });
 
     test('exitRawMode is idempotent', () {
-      final runner = TerminalRunner(
-        backends: [FakeRawModeBackend()],
-      );
+      final runner = TerminalRunner(backends: [FakeRawModeBackend()]);
       runner.enterRawMode();
       runner.exitRawMode();
       runner.exitRawMode();
@@ -61,9 +53,7 @@ void main() {
     });
 
     test('runWithRawMode enters and exits raw mode', () {
-      final runner = TerminalRunner(
-        backends: [FakeRawModeBackend()],
-      );
+      final runner = TerminalRunner(backends: [FakeRawModeBackend()]);
       var ran = false;
       runner.runWithRawMode(() {
         expect(runner.isRawMode, isTrue);

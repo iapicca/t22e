@@ -25,8 +25,14 @@ void main() {
     test('blink off', () => expect(blink(false), equals('\x1b[25m')));
     test('reverse on', () => expect(reverse(true), equals('\x1b[7m')));
     test('reverse off', () => expect(reverse(false), equals('\x1b[27m')));
-    test('strikethrough on', () => expect(strikethrough(true), equals('\x1b[9m')));
-    test('strikethrough off', () => expect(strikethrough(false), equals('\x1b[29m')));
+    test(
+      'strikethrough on',
+      () => expect(strikethrough(true), equals('\x1b[9m')),
+    );
+    test(
+      'strikethrough off',
+      () => expect(strikethrough(false), equals('\x1b[29m')),
+    );
     test('overLine on', () => expect(overLine(true), equals('\x1b[53m')));
     test('overLine off', () => expect(overLine(false), equals('\x1b[55m')));
     test('resetAll', () => expect(resetAll(), equals('\x1b[0m')));

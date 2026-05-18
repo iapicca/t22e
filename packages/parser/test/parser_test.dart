@@ -53,7 +53,16 @@ void main() {
     });
 
     test('CPR response', () {
-      final events = parser.advance([0x1B, 0x5B, 0x31, 0x30, 0x3B, 0x32, 0x30, 0x52]);
+      final events = parser.advance([
+        0x1B,
+        0x5B,
+        0x31,
+        0x30,
+        0x3B,
+        0x32,
+        0x30,
+        0x52,
+      ]);
       expect(events.length, equals(1));
       expect(events[0], isA<CursorPositionEvent>());
       final cpr = events[0] as CursorPositionEvent;

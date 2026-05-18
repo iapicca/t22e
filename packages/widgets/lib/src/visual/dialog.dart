@@ -17,6 +17,7 @@ import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 class DialogButton {
   /// Button label text.
   final String label;
+
   /// Whether this button has focus.
   final bool focused;
 
@@ -27,12 +28,16 @@ class DialogButton {
 class Dialog extends Model<Dialog> {
   /// Dialog title text.
   final String title;
+
   /// Content widget inside the dialog.
   final Widget content;
+
   /// Action buttons at the bottom.
   final List<DialogButton> buttons;
+
   /// Whether pressing Escape closes the dialog.
   final bool dismissible;
+
   /// Index of the currently focused button.
   final int focusedButton;
 
@@ -209,8 +214,10 @@ class _DialogOverlay extends Widget {
 class SizedBox extends Widget {
   /// Forced width, or null to let child choose.
   final int? width;
+
   /// Forced height, or null to let child choose.
   final int? height;
+
   /// The child widget.
   final Widget child;
 

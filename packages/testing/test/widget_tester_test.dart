@@ -33,7 +33,11 @@ void main() {
 
     test('Hyperlink renders through pumpWidget', () {
       final tester = WidgetTester(width: 40, height: 10);
-      tester.pumpWidget(Hyperlink('https://example.com', 'Click'), width: 40, height: 10);
+      tester.pumpWidget(
+        Hyperlink('https://example.com', 'Click'),
+        width: 40,
+        height: 10,
+      );
       expect(tester.virtualTerminal.cellAt(0, 0).char, equals('C'));
       expect(tester.virtualTerminal.cellAt(0, 4).char, equals('k'));
     });

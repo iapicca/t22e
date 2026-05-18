@@ -19,7 +19,11 @@ void main() {
     });
 
     test('copyWith preserves unchanged fields', () {
-      const cell = Cell(char: 'X', style: TextStyle.empty, wideContinuation: false);
+      const cell = Cell(
+        char: 'X',
+        style: TextStyle.empty,
+        wideContinuation: false,
+      );
       final copy = cell.copyWith(char: 'Y');
       expect(copy.char, 'Y');
       expect(copy.style, cell.style);

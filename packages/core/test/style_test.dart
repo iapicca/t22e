@@ -31,17 +31,13 @@ void main() {
     });
 
     test('resolveColor noColor clears colors', () {
-      const s = TextStyle(
-        foreground: Color(red: 255, green: 0, blue: 0),
-      );
+      const s = TextStyle(foreground: Color(red: 255, green: 0, blue: 0));
       final resolved = s.resolveColor(ColorProfile.noColor);
       expect(resolved.foreground, isNull);
     });
 
     test('resolveColor ansi16 keeps color (sgrSequence handles format)', () {
-      const s = TextStyle(
-        foreground: Color(red: 255, green: 0, blue: 0),
-      );
+      const s = TextStyle(foreground: Color(red: 255, green: 0, blue: 0));
       final resolved = s.resolveColor(ColorProfile.ansi16);
       expect(identical(resolved, s), isTrue);
     });
@@ -71,9 +67,7 @@ void main() {
     });
 
     test('inherit preserves child non-null fields', () {
-      final parent = TextStyle(
-        foreground: Color.fromAnsi(AnsiColor(1)),
-      );
+      final parent = TextStyle(foreground: Color.fromAnsi(AnsiColor(1)));
       final child = TextStyle(
         foreground: Color.fromAnsi(AnsiColor(2)),
         italic: true,
@@ -95,9 +89,7 @@ void main() {
     });
 
     test('deep nesting: child.inherit(parent).inherit(grandparent)', () {
-      final grandparent = TextStyle(
-        foreground: Color.fromAnsi(AnsiColor(1)),
-      );
+      final grandparent = TextStyle(foreground: Color.fromAnsi(AnsiColor(1)));
       final parent = TextStyle(
         foreground: Color.fromAnsi(AnsiColor(2)),
         bold: true,

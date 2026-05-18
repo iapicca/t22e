@@ -2,6 +2,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'events.freezed.dart';
+
 sealed class Event {
   const Event();
 }
@@ -69,10 +70,13 @@ enum KeyEventType { down, up, repeat }
 final class KeyEvent extends Event {
   /// Which logical key was pressed.
   final KeyCode keyCode;
+
   /// Modifier keys held at the time.
   final KeyModifiers modifiers;
+
   /// Event type (down/up/repeat).
   final KeyEventType type;
+
   /// Unicode codepoint for char events, null otherwise.
   final int? codepoint;
 
@@ -109,10 +113,13 @@ enum MouseAction { press, release, move, drag }
 final class MouseEvent extends Event {
   /// Which mouse button was involved.
   final MouseButton button;
+
   /// Press, release, move, or drag.
   final MouseAction action;
+
   /// Column position (0-based).
   final int x;
+
   /// Row position (0-based).
   final int y;
 
@@ -160,6 +167,7 @@ final class PasteEvent extends Event {
 final class CursorPositionEvent extends Event {
   /// Row (1-based).
   final int row;
+
   /// Column (1-based).
   final int col;
 
@@ -180,10 +188,13 @@ final class CursorPositionEvent extends Event {
 final class ColorQueryEvent extends Event {
   /// OSC color number (10=fg, 11=bg).
   final int colorNumber;
+
   /// Red component, or null if not available.
   final int? r;
+
   /// Green component, or null if not available.
   final int? g;
+
   /// Blue component, or null if not available.
   final int? b;
 
@@ -245,10 +256,13 @@ final class KeyboardEnhancementFlagsEvent extends Event {
 final class WindowResizeEvent extends Event {
   /// New terminal rows.
   final int rows;
+
   /// New terminal columns.
   final int cols;
+
   /// Width in pixels (optional).
   final int? widthPixels;
+
   /// Height in pixels (optional).
   final int? heightPixels;
 
@@ -314,6 +328,7 @@ final class QuerySyncUpdateEvent extends Event {
 final class ClipboardEvent extends Event {
   /// Clipboard selection name (e.g. 'c' for system).
   final String clipboard;
+
   /// Base64-encoded clipboard data, or null for a query.
   final String? base64;
 
@@ -337,6 +352,7 @@ final class ClipboardEvent extends Event {
 final class ErrorEvent extends Event {
   /// Human-readable error message.
   final String message;
+
   /// Optional underlying cause.
   final Object? cause;
 
@@ -350,6 +366,7 @@ final class ErrorEvent extends Event {
 final class InternalEvent extends Event {
   /// Event kind string.
   final String kind;
+
   /// Optional key-value data payload.
   final Map<String, Object?>? data;
 

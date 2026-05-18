@@ -5,30 +5,21 @@ import 'package:widgets/widgets.dart';
 void main() {
   group('Box', () {
     test('layout adds border to child size', () {
-      final box = Box(
-        child: Text('Hi'),
-        padding: Insets.all(0),
-      );
+      final box = Box(child: Text('Hi'), padding: Insets.all(0));
       final size = box.layout(Constraints(maxWidth: 80, maxHeight: 24));
       expect(size.width, greaterThanOrEqualTo(4));
       expect(size.height, greaterThanOrEqualTo(2));
     });
 
     test('layout adds border and padding', () {
-      final box = Box(
-        child: Text('Hi'),
-        padding: Insets.all(2),
-      );
+      final box = Box(child: Text('Hi'), padding: Insets.all(2));
       final size = box.layout(Constraints(maxWidth: 80, maxHeight: 24));
       expect(size.width, greaterThanOrEqualTo(8));
     });
 
     test('paint draws border corners', () {
       final surface = Surface(20, 10);
-      final box = Box(
-        child: Text('Hi'),
-        padding: Insets.all(1),
-      );
+      final box = Box(child: Text('Hi'), padding: Insets.all(1));
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
       expect(surface.grid[0][0].char, '┌');
@@ -90,10 +81,7 @@ void main() {
 
     test('child content area is inset by border + padding', () {
       final surface = Surface(20, 10);
-      final box = Box(
-        child: Text('Hi'),
-        padding: Insets.all(1),
-      );
+      final box = Box(child: Text('Hi'), padding: Insets.all(1));
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
       expect(surface.grid[2][2].char, 'H');

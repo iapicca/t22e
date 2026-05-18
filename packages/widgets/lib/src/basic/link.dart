@@ -8,8 +8,10 @@ import 'package:unicode/unicode.dart' show stringWidth;
 class Hyperlink extends Widget {
   /// The target URI.
   final String uri;
+
   /// The display text.
   final String text;
+
   /// Optional text style override.
   final TextStyle? style;
   int _width = 0;

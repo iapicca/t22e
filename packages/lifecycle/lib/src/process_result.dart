@@ -20,7 +20,8 @@ class ProcessTimeout extends ProcessResult {
   const ProcessTimeout(this.duration) : super._();
 
   TResult when<TResult extends Object?>({
-    required TResult Function(int exitCode, String stdout, String stderr) success,
+    required TResult Function(int exitCode, String stdout, String stderr)
+    success,
     required TResult Function(Duration duration) timeout,
   }) => timeout(duration);
 
@@ -46,7 +47,8 @@ class ProcessTimeout extends ProcessResult {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is ProcessTimeout && other.duration == duration);
+      identical(this, other) ||
+      (other is ProcessTimeout && other.duration == duration);
 
   @override
   String toString() => 'ProcessResult.timeout($duration)';

@@ -3,17 +3,29 @@ import 'package:ansi/ansi.dart';
 
 void main() {
   group('alternate screen', () {
-    test('enterAltScreen', () => expect(enterAltScreen(), equals('\x1b[?1049h')));
+    test(
+      'enterAltScreen',
+      () => expect(enterAltScreen(), equals('\x1b[?1049h')),
+    );
     test('exitAltScreen', () => expect(exitAltScreen(), equals('\x1b[?1049l')));
   });
 
   group('mouse modes', () {
-    test('enableNormalMouse', () => expect(enableNormalMouse(), equals('\x1b[?1000h')));
+    test(
+      'enableNormalMouse',
+      () => expect(enableNormalMouse(), equals('\x1b[?1000h')),
+    );
     test('disableMouse', () {
       expect(disableMouse(), equals('\x1b[?1000l\x1b[?1002l\x1b[?1006l'));
     });
-    test('enableButtonEvents', () => expect(enableButtonEvents(), equals('\x1b[?1002h')));
-    test('enableSgrMouse', () => expect(enableSgrMouse(), equals('\x1b[?1006h')));
+    test(
+      'enableButtonEvents',
+      () => expect(enableButtonEvents(), equals('\x1b[?1002h')),
+    );
+    test(
+      'enableSgrMouse',
+      () => expect(enableSgrMouse(), equals('\x1b[?1006h')),
+    );
   });
 
   group('sync updates', () {
@@ -44,16 +56,24 @@ void main() {
   });
 
   test('hyperlink', () {
-    expect(hyperlink('https://dart.dev', 'Dart'),
-        equals('\x1b]8;;https://dart.dev\x07Dart\x1b]8;;\x07'));
+    expect(
+      hyperlink('https://dart.dev', 'Dart'),
+      equals('\x1b]8;;https://dart.dev\x07Dart\x1b]8;;\x07'),
+    );
   });
 
   group('kitty keyboard protocol', () {
     test('enableKittyKeyboard', () {
       expect(enableKittyKeyboard(1), equals('\x1b[>1u'));
     });
-    test('disableKittyKeyboard', () => expect(disableKittyKeyboard(), equals('\x1b[<u')));
-    test('queryKittyKeyboard', () => expect(queryKittyKeyboard(), equals('\x1b[?u')));
+    test(
+      'disableKittyKeyboard',
+      () => expect(disableKittyKeyboard(), equals('\x1b[<u')),
+    );
+    test(
+      'queryKittyKeyboard',
+      () => expect(queryKittyKeyboard(), equals('\x1b[?u')),
+    );
   });
 
   group('color queries', () {

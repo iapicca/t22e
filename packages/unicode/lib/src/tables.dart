@@ -2,11 +2,13 @@ import 'dart:typed_data';
 
 /// Length of the stage-1 lookup table.
 const int _stage1Len = 0x1100;
+
 /// Length of the stage-2 lookup table.
 const int _stage2Len = 0x10000;
 
 /// Two-stage lookup table for Unicode character properties.
 final Uint8List _stage1 = Uint8List(_stage1Len);
+
 /// Stage-2 table with packed width/emoji/printable flags.
 final Uint8List _stage2 = Uint8List(_stage2Len);
 
@@ -23,10 +25,13 @@ int _prop(int width, bool emoji, bool printable, bool privateUse) {
 
 /// Width 0, not printable.
 const _propN = 0x00;
+
 /// Width 1, printable.
 const _prop1 = 0x09;
+
 /// Width 2, printable.
 const _prop2 = 0x0A;
+
 /// Width 2, printable, emoji.
 const _propE = 0x0E;
 

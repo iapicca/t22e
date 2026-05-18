@@ -10,10 +10,13 @@ import '../container/row.dart' show Row;
 class Spinner extends Model<Spinner> {
   /// Current animation frame index.
   final int frame;
+
   /// The set of braille pattern frames to cycle through.
   final List<String> frames;
+
   /// Animation interval.
   final Duration interval;
+
   /// Optional label text.
   final String? label;
 

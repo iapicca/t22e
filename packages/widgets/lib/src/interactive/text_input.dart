@@ -13,18 +13,25 @@ import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 class TextInput extends Model<TextInput> {
   /// Current text value.
   final String value;
+
   /// Cursor position (code unit index).
   final int cursorPosition;
+
   /// Selection start, or null if no selection.
   final int? selectionStart;
+
   /// Maximum allowed length (-1 = unlimited).
   final int maxLength;
+
   /// Echo mode (normal, password bullets, no echo).
   final EchoMode echoMode;
+
   /// Optional validation function.
   final String? Function(String)? validator;
+
   /// Whether the cursor is currently visible (for blinking).
   final bool cursorVisible;
+
   /// Blink interval duration.
   final Duration blinkInterval;
 

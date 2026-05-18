@@ -13,7 +13,11 @@ void main() {
 
     test('key event with modifiers', () {
       final mods = KeyModifiers(ctrl: true, shift: true);
-      final event = KeyEvent(keyCode: KeyCode.char, modifiers: mods, codepoint: 0x41);
+      final event = KeyEvent(
+        keyCode: KeyCode.char,
+        modifiers: mods,
+        codepoint: 0x41,
+      );
       expect(event.modifiers.ctrl, isTrue);
       expect(event.modifiers.shift, isTrue);
       expect(event.codepoint, equals(0x41));
@@ -33,7 +37,12 @@ void main() {
 
   group('MouseEvent', () {
     test('basic mouse event', () {
-      final event = MouseEvent(button: MouseButton.left, action: MouseAction.press, x: 10, y: 20);
+      final event = MouseEvent(
+        button: MouseButton.left,
+        action: MouseAction.press,
+        x: 10,
+        y: 20,
+      );
       expect(event.button, equals(MouseButton.left));
       expect(event.action, equals(MouseAction.press));
       expect(event.x, equals(10));
@@ -41,8 +50,18 @@ void main() {
     });
 
     test('equality', () {
-      final a = MouseEvent(button: MouseButton.left, action: MouseAction.press, x: 5, y: 10);
-      final b = MouseEvent(button: MouseButton.left, action: MouseAction.press, x: 5, y: 10);
+      final a = MouseEvent(
+        button: MouseButton.left,
+        action: MouseAction.press,
+        x: 5,
+        y: 10,
+      );
+      final b = MouseEvent(
+        button: MouseButton.left,
+        action: MouseAction.press,
+        x: 5,
+        y: 10,
+      );
       expect(a, equals(b));
     });
   });

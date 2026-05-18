@@ -12,16 +12,22 @@ import 'package:parser/terminal_parser.dart' show KeyEvent;
 class Scrollable extends Model<Scrollable> {
   /// Horizontal scroll offset.
   final int scrollX;
+
   /// Vertical scroll offset.
   final int scrollY;
+
   /// The child widget to scroll.
   final Widget child;
+
   /// Scroll axis direction.
   final Axis axis;
+
   /// Lines to scroll per step.
   final int scrollStep;
+
   /// Width of the viewport in columns.
   final int viewportWidth;
+
   /// Height of the viewport in rows.
   final int viewportHeight;
 

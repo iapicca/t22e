@@ -12,6 +12,7 @@ abstract class Point with _$Point {
 
   /// Adds two points component-wise.
   Point operator +(Point other) => Point(x + other.x, y + other.y);
+
   /// Subtracts two points component-wise.
   Point operator -(Point other) => Point(x - other.x, y - other.y);
 }
@@ -25,14 +26,18 @@ abstract class Rect with _$Rect {
   @Assert('height >= 0', 'height must be non-negative')
   const factory Rect(int x, int y, int width, int height) = _Rect;
 
-  factory Rect.fromLTWH(int left, int top, int w, int h) => Rect(left, top, w, h);
+  factory Rect.fromLTWH(int left, int top, int w, int h) =>
+      Rect(left, top, w, h);
 
   /// Left edge column.
   int get left => x;
+
   /// Top edge row.
   int get top => y;
+
   /// Right edge column (exclusive).
   int get right => x + width;
+
   /// Bottom edge row (exclusive).
   int get bottom => y + height;
 
@@ -97,14 +102,19 @@ abstract class Insets with _$Insets {
       Insets(horizontal, vertical, horizontal, vertical);
 
   /// Specify individual sides.
-  factory Insets.only({int left = 0, int top = 0, int right = 0, int bottom = 0}) =>
-      Insets(left, top, right, bottom);
+  factory Insets.only({
+    int left = 0,
+    int top = 0,
+    int right = 0,
+    int bottom = 0,
+  }) => Insets(left, top, right, bottom);
 
   /// Creates from left, top, right, bottom values.
   factory Insets.fromLTRB(int l, int t, int r, int b) => Insets(l, t, r, b);
 
   /// Total horizontal inset (left + right).
   int get horizontal => left + right;
+
   /// Total vertical inset (top + bottom).
   int get vertical => top + bottom;
 

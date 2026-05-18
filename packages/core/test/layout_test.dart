@@ -19,7 +19,12 @@ void main() {
     });
 
     test('constrain clamps to bounds', () {
-      const c = Constraints(minWidth: 5, maxWidth: 15, minHeight: 3, maxHeight: 10);
+      const c = Constraints(
+        minWidth: 5,
+        maxWidth: 15,
+        minHeight: 3,
+        maxHeight: 10,
+      );
       expect(c.constrain(const Size(0, 0)), const Size(5, 3));
       expect(c.constrain(const Size(20, 20)), const Size(15, 10));
       expect(c.constrain(const Size(10, 5)), const Size(10, 5));
@@ -64,20 +69,14 @@ void main() {
     });
 
     test('all flexible items split evenly', () {
-      final items = [
-        const LayoutItem(),
-        const LayoutItem(),
-      ];
+      final items = [const LayoutItem(), const LayoutItem()];
       final result = splitHorizontal(20, items, 0);
       expect(result[0] + result[1], 20);
       expect((result[0] - result[1]).abs() <= 1, isTrue);
     });
 
     test('flexible items with different flex factors', () {
-      final items = [
-        const LayoutItem(flex: 1),
-        const LayoutItem(flex: 2),
-      ];
+      final items = [const LayoutItem(flex: 1), const LayoutItem(flex: 2)];
       final result = splitHorizontal(30, items, 0);
       expect(result, [10, 20]);
     });
@@ -100,10 +99,7 @@ void main() {
     });
 
     test('zero remaining space gives flexible items minimum 1', () {
-      final items = [
-        const LayoutItem(fixedSize: 10),
-        const LayoutItem(),
-      ];
+      final items = [const LayoutItem(fixedSize: 10), const LayoutItem()];
       final result = splitHorizontal(12, items, 1);
       expect(result[0], 10);
       expect(result[1], 1);
@@ -126,10 +122,7 @@ void main() {
 
   group('splitVertical', () {
     test('same algorithm as horizontal', () {
-      final items = [
-        const LayoutItem(fixedSize: 5),
-        const LayoutItem(),
-      ];
+      final items = [const LayoutItem(fixedSize: 5), const LayoutItem()];
       final result = splitVertical(20, items, 1);
       expect(result[0], 5);
       expect(result[1] > 0, isTrue);

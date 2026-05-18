@@ -15,6 +15,7 @@ import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 class ListItem {
   /// Display text for the item.
   final String label;
+
   /// Optional icon string.
   final String? icon;
 
@@ -25,12 +26,16 @@ class ListItem {
 class ListView extends Model<ListView> {
   /// The list items to display.
   final List<ListItem> items;
+
   /// Index of the currently selected item.
   final int selectedIndex;
+
   /// Indices of multi-selected items (for checkboxes).
   final Set<int> multiSelected;
+
   /// Enable multi-select mode.
   final bool multiSelect;
+
   /// Number of visible rows in the viewport.
   final int viewportHeight;
 

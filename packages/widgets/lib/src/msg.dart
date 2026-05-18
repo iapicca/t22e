@@ -29,6 +29,7 @@ final class ResumeMsg extends Msg {
 final class WindowSizeMsg extends Msg {
   /// New width in columns.
   final int width;
+
   /// New height in rows.
   final int height;
 
@@ -112,6 +113,7 @@ final class CursorBlinkMsg extends Msg {
 final class ListEnterMsg extends Msg {
   /// Index of the selected item.
   final int index;
+
   /// Label of the selected item.
   final String label;
   const ListEnterMsg(this.index, this.label);
@@ -126,6 +128,7 @@ final class DialogCloseMsg extends Msg {
 final class DialogButtonMsg extends Msg {
   /// Button index in the button list.
   final int index;
+
   /// Button label.
   final String label;
   const DialogButtonMsg(this.index, this.label);

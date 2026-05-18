@@ -14,12 +14,16 @@ import 'package:core/core.dart' show TextStyle;
 class Table extends Model<Table> {
   /// Column headers.
   final List<String> columns;
+
   /// Data rows (each row is a list of cell values).
   final List<List<String>> rows;
+
   /// Index of the currently sorted column, or null.
   final int? sortColumn;
+
   /// Sort direction (true = ascending).
   final bool sortAscending;
+
   /// Whether to show row numbers.
   final bool showRowNumbers;
 

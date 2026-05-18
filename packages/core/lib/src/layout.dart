@@ -61,10 +61,8 @@ abstract class Size with _$Size {
 abstract class LayoutItem with _$LayoutItem {
   const LayoutItem._();
 
-  const factory LayoutItem({
-    int? fixedSize,
-    @Default(1) int flex,
-  }) = _LayoutItem;
+  const factory LayoutItem({int? fixedSize, @Default(1) int flex}) =
+      _LayoutItem;
 
   /// True if this item stretches to fill available space.
   bool get isFlexible => fixedSize == null;

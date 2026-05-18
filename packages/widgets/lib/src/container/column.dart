@@ -7,10 +7,13 @@ import 'package:core/core.dart'
 class Column extends Widget {
   /// Children placed top to bottom.
   final List<Widget> children;
+
   /// Gap in cells between children.
   final int gap;
+
   /// Main axis alignment (vertical).
   final MainAxisAlignment mainAxisAlignment;
+
   /// Cross axis alignment (horizontal).
   final CrossAxisAlignment crossAxisAlignment;
 

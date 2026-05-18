@@ -184,9 +184,11 @@ abstract class Color with _$Color {
     final ansiB = cubeB < 3 ? 0 : 1;
     final ansiIdx = ansiR * 4 + ansiG * 2 + ansiB;
     final ansi = map[ansiIdx];
-    final maxVal = [cubeR, cubeG, cubeB]
-        .where((v) => v >= 3)
-        .fold(0, (a, b) => a > b ? a : b);
+    final maxVal = [
+      cubeR,
+      cubeG,
+      cubeB,
+    ].where((v) => v >= 3).fold(0, (a, b) => a > b ? a : b);
     return maxVal >= 5 ? ansi + 8 : ansi;
   }
 

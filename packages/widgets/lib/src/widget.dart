@@ -8,6 +8,7 @@ abstract class Widget {
 
   /// Computes the widget's size given the provided constraints.
   Size layout(Constraints constraints);
+
   /// Paints the widget onto the surface via the given painting context.
   void paint(PaintingContext context);
 }
@@ -16,10 +17,13 @@ abstract class Widget {
 class PaintingContext {
   /// The target surface to paint onto.
   final Surface surface;
+
   /// X offset from the parent's origin.
   final int offsetX;
+
   /// Y offset from the parent's origin.
   final int offsetY;
+
   /// Resolved text style inherited from parent widgets.
   final TextStyle inheritedStyle;
 

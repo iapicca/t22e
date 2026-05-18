@@ -8,7 +8,11 @@ part 'frame.freezed.dart';
 abstract class Frame with _$Frame {
   const Frame._();
 
-  factory Frame(List<String> plainLines, List<String> styledLines, {List<List<Cell>>? cells}) = _Frame;
+  factory Frame(
+    List<String> plainLines,
+    List<String> styledLines, {
+    List<List<Cell>>? cells,
+  }) = _Frame;
 
   /// Creates a Frame from a Surface, optionally including the cell grid.
   factory Frame.fromSurface(Surface surface, {bool includeCells = false}) {

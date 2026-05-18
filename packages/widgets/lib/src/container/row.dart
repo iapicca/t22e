@@ -7,10 +7,13 @@ import 'package:core/core.dart'
 class Row extends Widget {
   /// Children placed left to right.
   final List<Widget> children;
+
   /// Gap in cells between children.
   final int gap;
+
   /// Main axis alignment (horizontal).
   final MainAxisAlignment mainAxisAlignment;
+
   /// Cross axis alignment (vertical).
   final CrossAxisAlignment crossAxisAlignment;
 

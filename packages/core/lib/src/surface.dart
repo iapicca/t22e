@@ -21,8 +21,10 @@ import 'package:ansi/ansi.dart' show hyperlink;
 class Surface {
   /// Total width in columns.
   final int width;
+
   /// Total height in rows.
   final int height;
+
   /// Row-major grid of Cell objects.
   final List<List<Cell>> grid;
 

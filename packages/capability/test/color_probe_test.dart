@@ -30,8 +30,7 @@ void main() {
     test('equality', () {
       expect(QueryResult.supported(1), QueryResult.supported(1));
       expect(QueryResult.supported(1), isNot(QueryResult.supported(2)));
-      expect(const QueryResult.unavailable(),
-          const QueryResult.unavailable());
+      expect(const QueryResult.unavailable(), const QueryResult.unavailable());
     });
   });
 
