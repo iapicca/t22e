@@ -1,4 +1,4 @@
-import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show Capabilities;
 import 'da1_probe.dart' show Da1Probe;
 import 'color_probe.dart' show ColorProbe;
@@ -18,7 +18,7 @@ class ProbePipeline {
     SyncProbe? syncProbe,
     KeyboardProbe? keyboardProbe,
     TerminalIo? io,
-  }) : _io = io ?? const RealTerminalIo(),
+  }) : _io = io ?? const TerminalIo(),
        da1Probe = da1Probe ?? Da1Probe(io: io),
        colorProbe = colorProbe ?? ColorProbe(io: io),
        syncProbe = syncProbe ?? SyncProbe(io: io),

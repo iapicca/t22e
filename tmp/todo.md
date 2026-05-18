@@ -1,2 +1,3 @@
-- rework backend structure
+- rework ColorProbe, Da1Probe, TerminalRunner, IoRawModeBackend, KeyboardProbe, ProbePipeline, SyncProbe (https://github.com/dart-lang/sdk/blob/main/CHANGELOG.md#private-named-parameters)
+- rename RealSystemIo in NativeIo;
 - rethink TerminalRunner

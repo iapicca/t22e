@@ -4,13 +4,13 @@ import 'package:ansi/ansi.dart' show queryDa1;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
-import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Da1Result;
 
 class Da1Probe {
   final TerminalIo _io;
 
-  Da1Probe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+  Da1Probe({TerminalIo? io}) : _io = io ?? const TerminalIo();
 
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,

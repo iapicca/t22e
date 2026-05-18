@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'system_io.dart';
 import 'platform_service.dart';
 
 /// Abstract interface for libc FFI calls used to manage terminal raw mode.
@@ -61,6 +62,6 @@ final class TermiosBindingsImpl implements TermiosBindings {
   }
 
   /// Uses [PlatformService] to open the platform libc.
-  static TermiosBindingsImpl fromPlatformService() =>
-      TermiosBindingsImpl(PlatformService().library);
+  static TermiosBindingsImpl fromPlatformService(SystemIo io) =>
+      TermiosBindingsImpl(PlatformService(io: io).library);
 }

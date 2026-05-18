@@ -4,10 +4,15 @@ import 'package:test/test.dart';
 import 'package:terminal/terminal.dart';
 import 'package:lifecycle/lifecycle.dart';
 
-class FakeTerminalIo implements TerminalIo {
+class FakeSystemIo implements SystemIo {
   final controller = StreamController<List<int>>();
   final output = StringBuffer();
   void Function()? onFlush;
+  int _columns = 80;
+  int _rows = 24;
+  bool _echoMode = true;
+  bool _lineMode = true;
+  String _operatingSystem = 'macos';
 
   @override
   Stream<List<int>> get inputStream => controller.stream;
@@ -23,10 +28,26 @@ class FakeTerminalIo implements TerminalIo {
   }
 
   @override
-  int get columns => 80;
+  int get columns => _columns;
+  set columns(int value) => _columns = value;
 
   @override
-  int get rows => 24;
+  int get rows => _rows;
+  set rows(int value) => _rows = value;
+
+  @override
+  bool get echoMode => _echoMode;
+  @override
+  set echoMode(bool value) => _echoMode = value;
+
+  @override
+  bool get lineMode => _lineMode;
+  @override
+  set lineMode(bool value) => _lineMode = value;
+
+  @override
+  String get operatingSystem => _operatingSystem;
+  set operatingSystem(String value) => _operatingSystem = value;
 }
 
 class FakeRawModeBackend implements RawModeBackend {
@@ -46,53 +67,59 @@ class FakeRawModeBackend implements RawModeBackend {
 void main() {
   group('AltScreenManager', () {
     test('initial state is not active', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       expect(manager.isActive, isFalse);
     });
 
     test('enter writes alt screen and hide cursor sequences', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       manager.enter();
-      expect(io.output.toString(), contains('\x1b['));
+      expect(fakeIo.output.toString(), contains('\x1b['));
       expect(manager.isActive, isTrue);
     });
 
     test('enter is idempotent', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       manager.enter();
-      final afterFirst = io.output.toString();
+      final afterFirst = fakeIo.output.toString();
       manager.enter();
-      expect(io.output.toString(), afterFirst);
+      expect(fakeIo.output.toString(), afterFirst);
     });
 
     test('exit writes show cursor and exit alt screen sequences', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       manager.enter();
-      io.output.clear();
+      fakeIo.output.clear();
       manager.exit();
-      expect(io.output.toString(), contains('\x1b['));
+      expect(fakeIo.output.toString(), contains('\x1b['));
       expect(manager.isActive, isFalse);
     });
 
     test('exit is idempotent', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       manager.enter();
       manager.exit();
-      io.output.clear();
+      fakeIo.output.clear();
       manager.exit();
-      expect(io.output.toString(), isEmpty);
+      expect(fakeIo.output.toString(), isEmpty);
     });
 
     test('enter with captureMouse writes mouse enable sequence', () {
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
       manager.enter(captureMouse: true);
-      expect(io.output.toString(), contains('\x1b['));
+      expect(fakeIo.output.toString(), contains('\x1b['));
     });
   });
 
@@ -100,7 +127,8 @@ void main() {
     test('arm and restore calls exit', () {
       final backend = FakeRawModeBackend();
       final runner = TerminalRunner(backends: [backend]);
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
@@ -115,7 +143,8 @@ void main() {
     test('disarm prevents restore', () {
       final backend = FakeRawModeBackend();
       final runner = TerminalRunner(backends: [backend]);
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
@@ -131,7 +160,8 @@ void main() {
     test('restore is idempotent', () {
       final backend = FakeRawModeBackend();
       final runner = TerminalRunner(backends: [backend]);
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
@@ -144,7 +174,8 @@ void main() {
     test('runGuarded calls body and restores', () {
       final backend = FakeRawModeBackend();
       final runner = TerminalRunner(backends: [backend]);
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
@@ -163,7 +194,8 @@ void main() {
     test('runGuarded restores even when body throws', () {
       final backend = FakeRawModeBackend();
       final runner = TerminalRunner(backends: [backend]);
-      final io = FakeTerminalIo();
+      final fakeIo = FakeSystemIo();
+      final io = TerminalIo(io: fakeIo);
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 

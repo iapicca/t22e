@@ -4,12 +4,12 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show querySyncUpdate;
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
-import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIo;
 
 class SyncProbe {
   final TerminalIo _io;
 
-  SyncProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+  SyncProbe({TerminalIo? io}) : _io = io ?? const TerminalIo();
 
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
     final parser = TerminalParser();

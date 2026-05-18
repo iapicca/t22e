@@ -1,6 +1,7 @@
-import 'dart:io';
-
 import 'package:protocol/protocol.dart' show Defaults;
+
+import 'system_io.dart';
+import 'native_io.dart';
 import 'raw_mode_backend.dart';
 import 'raw_mode_state.dart';
 import 'pointer_extensions.dart';
@@ -9,15 +10,19 @@ import 'termios_bindings.dart';
 /// Raw mode backend using libc FFI (tcgetattr/tcsetattr).
 final class FfiRawModeBackend implements RawModeBackend {
   final TermiosBindings _bindings;
+  final SystemIo _io;
   RawModeState? _state;
 
-  /// Optionally injects a custom [TermiosBindings].
-  FfiRawModeBackend({TermiosBindings? bindings})
-    : _bindings = bindings ?? TermiosBindingsImpl.fromPlatformService();
+  /// Optionally injects custom [bindings] and [io].
+  FfiRawModeBackend({
+    TermiosBindings? bindings,
+    SystemIo io = const NativeIo(),
+  }) : _bindings = bindings ?? TermiosBindingsImpl.fromPlatformService(io),
+       _io = io;
 
   @override
   void enable() {
-    if (Platform.isWindows) {
+    if (_io.operatingSystem == 'windows') {
       throw UnsupportedError('FFI raw mode is not supported on Windows');
     }
     final buf = _bindings.malloc(Defaults.termiosStructSize);

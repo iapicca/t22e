@@ -1,6 +1,7 @@
 import 'dart:ffi';
-import 'dart:io';
 
+import 'system_io.dart';
+import 'native_io.dart';
 import 'mac_impl.dart';
 import 'linux_impl.dart';
 
@@ -10,8 +11,8 @@ abstract class PlatformService {
   DynamicLibrary get library;
 
   /// Returns the appropriate PlatformService for the current OS.
-  factory PlatformService() {
-    switch (Platform.operatingSystem) {
+  factory PlatformService({SystemIo io = const NativeIo()}) {
+    switch (io.operatingSystem) {
       case MacService.operatingSystem:
         return MacService();
       case LinuxService.operatingSystem:

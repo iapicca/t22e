@@ -1,8 +1,54 @@
+import 'dart:async';
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart' show calloc;
 import 'package:test/test.dart';
 import 'package:terminal/terminal.dart';
+
+/// Fake [SystemIo] for unit testing.
+class FakeSystemIo implements SystemIo {
+  final StreamController<List<int>> _input = StreamController<List<int>>();
+  final StringBuffer output = StringBuffer();
+  int _columns = 80;
+  int _rows = 24;
+  bool _echoMode = true;
+  bool _lineMode = true;
+  String _operatingSystem = 'macos';
+
+  @override
+  Stream<List<int>> get inputStream => _input.stream;
+
+  @override
+  void write(String data) => output.write(data);
+
+  @override
+  Future<void> flush() async {}
+
+  @override
+  int get columns => _columns;
+  set columns(int value) => _columns = value;
+
+  @override
+  int get rows => _rows;
+  set rows(int value) => _rows = value;
+
+  @override
+  bool get echoMode => _echoMode;
+  @override
+  set echoMode(bool value) => _echoMode = value;
+
+  @override
+  bool get lineMode => _lineMode;
+  @override
+  set lineMode(bool value) => _lineMode = value;
+
+  @override
+  String get operatingSystem => _operatingSystem;
+  set operatingSystem(String value) => _operatingSystem = value;
+
+  void addInput(List<int> bytes) => _input.add(bytes);
+  Future<void> close() => _input.close();
+}
 
 class FakeRawModeBackend implements RawModeBackend {
   bool enabled = false;
@@ -110,9 +156,15 @@ void main() {
   });
 
   group('FfiRawModeBackend', () {
+    late FakeSystemIo io;
+
+    setUp(() {
+      io = FakeSystemIo();
+    });
+
     test('enable calls malloc, tcgetattr, tcsetattr in order', () {
       final bindings = MockTermiosBindings();
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.enable();
 
@@ -124,7 +176,7 @@ void main() {
     test('enable throws when tcgetattr fails', () {
       final bindings = MockTermiosBindings();
       bindings.seedTcGetAttrResult(-1);
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       expect(() => backend.enable(), throwsStateError);
       expect(bindings.freeCalled, isTrue);
@@ -133,7 +185,7 @@ void main() {
     test('enable throws when tcsetattr fails', () {
       final bindings = MockTermiosBindings();
       bindings.seedTcSetAttrResult(-1);
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       expect(() => backend.enable(), throwsStateError);
       expect(bindings.freeCalled, isTrue);
@@ -141,7 +193,7 @@ void main() {
 
     test('disable is a no-op when not enabled', () {
       final bindings = MockTermiosBindings();
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.disable();
 
@@ -150,7 +202,7 @@ void main() {
 
     test('enable writes raw mode flags to termios struct', () {
       final bindings = MockTermiosBindings();
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.enable();
 
@@ -163,7 +215,7 @@ void main() {
 
     test('disable calls tcsetattr and free', () {
       final bindings = MockTermiosBindings();
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.enable();
       bindings._calls.clear();
@@ -175,7 +227,7 @@ void main() {
 
     test('disable is idempotent', () {
       final bindings = MockTermiosBindings();
-      final backend = FfiRawModeBackend(bindings: bindings);
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.enable();
       backend.disable();
@@ -183,6 +235,71 @@ void main() {
       backend.disable();
 
       expect(bindings.calls, isEmpty);
+    });
+
+    test('enable throws UnsupportedError on Windows', () {
+      io.operatingSystem = 'windows';
+      final bindings = MockTermiosBindings();
+      final backend = FfiRawModeBackend(bindings: bindings, io: io);
+
+      expect(() => backend.enable(), throwsUnsupportedError);
+    });
+  });
+
+  group('IoRawModeBackend', () {
+    test('enable disables echo and line mode', () {
+      final io = FakeSystemIo();
+      final backend = IoRawModeBackend(io: io);
+
+      backend.enable();
+
+      expect(io.echoMode, isFalse);
+      expect(io.lineMode, isFalse);
+    });
+
+    test('disable restores echo and line mode', () {
+      final io = FakeSystemIo();
+      final backend = IoRawModeBackend(io: io);
+
+      backend.enable();
+      backend.disable();
+
+      expect(io.echoMode, isTrue);
+      expect(io.lineMode, isTrue);
+    });
+  });
+
+  group('TerminalIo', () {
+    test('delegates inputStream to SystemIo', () {
+      final io = FakeSystemIo();
+      final terminalIo = TerminalIo(io: io);
+      io.addInput([0x1b]);
+
+      expect(terminalIo.inputStream, emits([0x1b]));
+    });
+
+    test('delegates write to SystemIo', () {
+      final io = FakeSystemIo();
+      final terminalIo = TerminalIo(io: io);
+      terminalIo.write('hello');
+
+      expect(io.output.toString(), 'hello');
+    });
+
+    test('delegates columns to SystemIo', () {
+      final io = FakeSystemIo();
+      final terminalIo = TerminalIo(io: io);
+      io.columns = 120;
+
+      expect(terminalIo.columns, 120);
+    });
+
+    test('delegates rows to SystemIo', () {
+      final io = FakeSystemIo();
+      final terminalIo = TerminalIo(io: io);
+      io.rows = 40;
+
+      expect(terminalIo.rows, 40);
     });
   });
 }

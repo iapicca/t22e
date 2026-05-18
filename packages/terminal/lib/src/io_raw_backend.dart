@@ -1,20 +1,23 @@
-import 'dart:io';
-
+import 'system_io.dart';
+import 'native_io.dart';
 import 'raw_mode_backend.dart';
 
-/// Raw mode backend using dart:io stdin settings.
+/// Raw mode backend using dart:io stdin echo/line mode settings.
 final class IoRawModeBackend implements RawModeBackend {
-  const IoRawModeBackend();
+  final SystemIo _io;
+
+  /// Creates with injected [io] (defaults to [NativeIo]).
+  const IoRawModeBackend({SystemIo io = const NativeIo()}) : _io = io;
 
   @override
   void enable() {
-    stdin.echoMode = false;
-    stdin.lineMode = false;
+    _io.echoMode = false;
+    _io.lineMode = false;
   }
 
   @override
   void disable() {
-    stdin.echoMode = true;
-    stdin.lineMode = true;
+    _io.echoMode = true;
+    _io.lineMode = true;
   }
 }

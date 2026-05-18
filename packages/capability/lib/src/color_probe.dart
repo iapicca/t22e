@@ -5,13 +5,13 @@ import 'package:core/core.dart' show ColorProfile;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
-import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 
 class ColorProbe {
   final TerminalIo _io;
 
-  ColorProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+  ColorProbe({TerminalIo? io}) : _io = io ?? const TerminalIo();
 
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];

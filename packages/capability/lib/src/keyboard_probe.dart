@@ -4,13 +4,13 @@ import 'package:ansi/ansi.dart' show enableKittyKeyboard, disableKittyKeyboard;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
-import 'package:terminal/terminal.dart' show TerminalIo, RealTerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show KeyboardProtocol;
 
 class KeyboardProbe {
   final TerminalIo _io;
 
-  KeyboardProbe({TerminalIo? io}) : _io = io ?? const RealTerminalIo();
+  KeyboardProbe({TerminalIo? io}) : _io = io ?? const TerminalIo();
 
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
