@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'raw_mode_backend.dart';
 
+/// Raw mode backend using dart:io stdin settings.
 final class IoRawModeBackend implements RawModeBackend {
   const IoRawModeBackend();
 

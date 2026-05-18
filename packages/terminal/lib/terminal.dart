@@ -4,4 +4,5 @@ export 'src/io_raw_backend.dart' show IoRawModeBackend;
 export 'src/terminal_io.dart' show TerminalIo;
 export 'src/real_terminal_io.dart' show RealTerminalIo;
 export 'src/runner.dart' show TerminalRunner;
-export 'src/raw_ffi.dart' show RawModeState;
+export 'src/raw_mode_state.dart' show RawModeState;
+export 'src/termios_bindings.dart' show TermiosBindings;

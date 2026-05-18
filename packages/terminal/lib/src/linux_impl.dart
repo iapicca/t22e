@@ -3,9 +3,11 @@ import 'dart:ffi';
 import 'package:protocol/protocol.dart';
 import 'platform_service.dart';
 
-/// Linux implementation of PlatformService (tries libc.so.6, falls back to .7).
+/// Linux implementation of [PlatformService] (tries libc.so.6, then .7).
 class LinuxService implements PlatformService {
+  /// Platform identifier string for Linux.
   static const operatingSystem = 'linux';
+
   @override
   DynamicLibrary get library {
     try {
