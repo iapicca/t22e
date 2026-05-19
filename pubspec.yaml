@@ -14,6 +14,7 @@ workspace:
   - packages/renderer
   - packages/capability
   - packages/lifecycle
+  - packages/notifier
   - packages/widgets
   - packages/testing
 

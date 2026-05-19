@@ -1,20 +1,22 @@
 import 'dart:async';
 
 import 'package:ansi/ansi.dart' show queryDa1;
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Da1Result;
 
-class Da1Probe {
+class Da1Probe with Disposable {
   final TerminalIo _io;
 
-  const Da1Probe({this._io = const TerminalIo()});
+  Da1Probe({this._io = const TerminalIo()});
 
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {
+    check();
     final parser = TerminalParser();
     final completer = Completer<QueryResult<Da1Result>>();
     final timer = Timer(timeout, () {
@@ -46,5 +48,11 @@ class Da1Probe {
     final result = await completer.future;
     await sub.cancel();
     return result;
+  }
+
+  // ignore: unnecessary_overrides
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
   }
 }

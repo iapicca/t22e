@@ -2,16 +2,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart' show ColorProfile;
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 
-class ColorProbe {
+class ColorProbe with Disposable {
   final TerminalIo _io;
 
-  const ColorProbe({this._io = const TerminalIo()});
+  ColorProbe({this._io = const TerminalIo()});
 
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
@@ -47,6 +48,7 @@ class ColorProbe {
     QueryResult<Da1Result> da1Result, {
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {
+    check();
     final env = detectFromEnv();
     if (env == ColorProfile.trueColor) return env;
 
@@ -76,5 +78,11 @@ class ColorProbe {
     final result = await completer.future;
     await sub.cancel();
     return result;
+  }
+
+  // ignore: unnecessary_overrides
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
   }
 }

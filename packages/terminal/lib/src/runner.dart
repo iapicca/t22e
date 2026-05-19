@@ -2,8 +2,10 @@ import 'raw_mode_backend.dart';
 import 'ffi_raw_backend.dart';
 import 'io_raw_backend.dart';
 
+import 'package:notifier/notifier.dart' show Disposable;
+
 /// Orchestrates multiple [RawModeBackend]s with fallback.
-class TerminalRunner {
+class TerminalRunner with Disposable {
   final List<RawModeBackend> _backends;
   RawModeBackend? _activeBackend;
   bool _isRawMode = false;
@@ -20,6 +22,7 @@ class TerminalRunner {
 
   /// Enables raw mode via the first successful backend.
   void enterRawMode() {
+    check();
     if (_isRawMode) return;
     for (final backend in _backends) {
       try {
@@ -49,5 +52,11 @@ class TerminalRunner {
     } finally {
       exitRawMode();
     }
+  }
+
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
+    exitRawMode();
   }
 }

@@ -2,16 +2,18 @@ import 'dart:async';
 
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show querySyncUpdate;
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
 import 'package:terminal/terminal.dart' show TerminalIo;
 
-class SyncProbe {
+class SyncProbe with Disposable {
   final TerminalIo _io;
 
   SyncProbe({this._io = const TerminalIo()});
 
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
+    check();
     final parser = TerminalParser();
     final completer = Completer<bool>();
     final timer = Timer(timeout, () {
@@ -36,5 +38,11 @@ class SyncProbe {
     final result = await completer.future;
     await sub.cancel();
     return result;
+  }
+
+  // ignore: unnecessary_overrides
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
   }
 }

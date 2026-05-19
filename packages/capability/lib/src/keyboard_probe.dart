@@ -1,20 +1,22 @@
 import 'dart:async';
 
 import 'package:ansi/ansi.dart' show enableKittyKeyboard, disableKittyKeyboard;
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show KeyboardProtocol;
 
-class KeyboardProbe {
+class KeyboardProbe with Disposable {
   final TerminalIo _io;
 
-  const KeyboardProbe({this._io = const TerminalIo()});
+  KeyboardProbe({this._io = const TerminalIo()});
 
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
   }) async {
+    check();
     final parser = TerminalParser();
     final completer = Completer<KeyboardProtocol>();
     final timer = Timer(timeout, () {
@@ -44,5 +46,11 @@ class KeyboardProbe {
       _io.write(disableKittyKeyboard());
     }
     return result;
+  }
+
+  // ignore: unnecessary_overrides
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
   }
 }

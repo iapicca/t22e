@@ -1,9 +1,10 @@
 import 'package:ansi/ansi.dart' show hideCursor, showCursor;
 import 'package:ansi/ansi.dart'
     show enterAltScreen, exitAltScreen, enableMouse, disableMouse;
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:terminal/terminal.dart' show TerminalIo;
 
-class AltScreenManager {
+class AltScreenManager with Disposable {
   final TerminalIo _io;
   bool _active = false;
   bool _mouseEnabled = false;
@@ -11,6 +12,7 @@ class AltScreenManager {
   AltScreenManager(this._io);
 
   void enter({bool captureMouse = false}) {
+    check();
     if (_active) return;
     _io.write(enterAltScreen());
     _io.write(hideCursor());
@@ -35,4 +37,10 @@ class AltScreenManager {
   }
 
   bool get isActive => _active;
+
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
+    exit();
+  }
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:notifier/notifier.dart' show Disposable;
+
 import 'msg.dart' show Msg;
 
 /// Base sealed class for side-effect commands in the MVU runtime.
@@ -26,14 +28,15 @@ final class TickCmd extends Cmd {
 }
 
 /// Starts a periodic timer that enqueues messages at a fixed interval.
-final class EveryCmd extends Cmd {
+final class EveryCmd extends Cmd with Disposable {
   final Duration interval;
   final Msg Function(DateTime) createMsg;
 
-  const EveryCmd(this.interval, this.createMsg);
+  EveryCmd(this.interval, this.createMsg);
 
   @override
   FutureOr<Msg?> execute(void Function(Msg) enqueue) {
+    check();
     final now = DateTime.now();
     final alignMs = now.millisecondsSinceEpoch % interval.inMilliseconds;
     final firstDelay = Duration(milliseconds: alignMs);
@@ -42,6 +45,12 @@ final class EveryCmd extends Cmd {
       Timer.periodic(interval, (_) => enqueue(createMsg(DateTime.now())));
     });
     return null;
+  }
+
+  // ignore: unnecessary_overrides
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
   }
 }
 

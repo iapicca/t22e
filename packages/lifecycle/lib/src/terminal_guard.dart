@@ -1,8 +1,9 @@
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:terminal/terminal.dart' show TerminalRunner;
 import 'alt_screen_manager.dart' show AltScreenManager;
 
 /// Ensures the terminal is restored to its original state on exit or crash.
-class TerminalGuard {
+class TerminalGuard with Disposable {
   final TerminalRunner _runner;
   final AltScreenManager _altScreen;
   bool _restored = false;
@@ -11,6 +12,7 @@ class TerminalGuard {
 
   /// Arms the guard so the next [restore] call will take effect.
   void arm() {
+    check();
     _restored = false;
   }
 
@@ -29,6 +31,7 @@ class TerminalGuard {
 
   /// Runs [body] with a guarantee that restore is called in the finally block.
   void runGuarded<T>(T Function() body) {
+    check();
     try {
       body();
     } finally {
@@ -38,4 +41,10 @@ class TerminalGuard {
 
   /// Whether the terminal has already been restored.
   bool get isRestored => _restored;
+
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
+    restore();
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:protocol/protocol.dart' show Defaults;
 
 import 'system_io.dart';
@@ -8,7 +9,7 @@ import 'pointer_extensions.dart';
 import 'termios_bindings.dart';
 
 /// Raw mode backend using libc FFI (tcgetattr/tcsetattr).
-final class FfiRawModeBackend implements RawModeBackend {
+final class FfiRawModeBackend with Disposable implements RawModeBackend {
   final TermiosBindings _bindings;
   final SystemIo _io;
   RawModeState? _state;
@@ -21,6 +22,7 @@ final class FfiRawModeBackend implements RawModeBackend {
 
   @override
   void enable() {
+    check();
     if (_io.operatingSystem == 'windows') {
       throw UnsupportedError('FFI raw mode is not supported on Windows');
     }
@@ -73,5 +75,11 @@ final class FfiRawModeBackend implements RawModeBackend {
     _bindings.setAttr(Defaults.stdinFd, Defaults.tcsaNow, state.buf);
     _bindings.free(state.buf);
     _state = null;
+  }
+
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
+    disable();
   }
 }

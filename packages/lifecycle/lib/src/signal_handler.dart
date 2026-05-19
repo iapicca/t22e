@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:notifier/notifier.dart' show Disposable;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'terminal_guard.dart' show TerminalGuard;
 
 /// Handles POSIX signals (SIGINT, SIGTERM, SIGTSTP, SIGCONT) for graceful shutdown.
-class SignalHandler {
+class SignalHandler with Disposable {
   final TerminalGuard _guard;
 
   /// Callback invoked on SIGINT (Ctrl+C).
@@ -19,6 +20,7 @@ class SignalHandler {
 
   /// Installs signal listeners for all handled signals.
   void install() {
+    check();
     _sigintSub = ProcessSignal.sigint.watch().listen((_) {
       onInterrupt();
     });
@@ -36,7 +38,9 @@ class SignalHandler {
   }
 
   /// Removes all installed signal listeners.
-  void dispose() {
+  @override
+  void dispose(String? message) {
+    super.dispose(message);
     _sigintSub?.cancel();
     _sigtermSub?.cancel();
     _sigtstpSub?.cancel();
