@@ -8,8 +8,7 @@ class SyncRenderer {
   final bool syncSupported;
   final LineRenderer _lineRenderer;
 
-  const SyncRenderer({this.syncSupported = false, LineRenderer? lineRenderer})
-    : _lineRenderer = lineRenderer ?? const LineRenderer();
+  const SyncRenderer({this.syncSupported = false, this._lineRenderer = const LineRenderer()});
 
   /// Renders changed lines, wrapping with sync markers if supported.
   String render(DiffResult diff, Frame currentFrame) {

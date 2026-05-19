@@ -11,7 +11,7 @@ import 'result.dart' show QueryResult, Supported, Da1Result;
 class ColorProbe {
   final TerminalIo _io;
 
-  ColorProbe({TerminalIo? io}) : _io = io ?? const TerminalIo();
+  ColorProbe({this._io = const TerminalIo()});
 
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];

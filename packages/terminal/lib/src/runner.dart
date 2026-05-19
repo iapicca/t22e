@@ -1,5 +1,3 @@
-import 'system_io.dart';
-import 'native_io.dart';
 import 'raw_mode_backend.dart';
 import 'ffi_raw_backend.dart';
 import 'io_raw_backend.dart';
@@ -11,10 +9,10 @@ class TerminalRunner {
   bool _isRawMode = false;
 
   /// Tries backends in order; defaults to Ffi + Io backends.
-  TerminalRunner({List<RawModeBackend>? backends, SystemIo? io})
+  TerminalRunner({List<RawModeBackend>? backends})
     : _backends = backends ?? [
-        FfiRawModeBackend(io: io ?? const NativeIo()),
-        IoRawModeBackend(io: io ?? const NativeIo()),
+        FfiRawModeBackend(),
+        IoRawModeBackend(),
       ];
 
   /// Whether raw mode is currently active.

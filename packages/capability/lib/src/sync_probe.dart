@@ -9,7 +9,7 @@ import 'package:terminal/terminal.dart' show TerminalIo;
 class SyncProbe {
   final TerminalIo _io;
 
-  SyncProbe({TerminalIo? io}) : _io = io ?? const TerminalIo();
+  SyncProbe({this._io = const TerminalIo()});
 
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
     final parser = TerminalParser();

@@ -6,7 +6,7 @@ final class TerminalIo {
   final SystemIo _io;
 
   /// Creates with injected [io] (defaults to [NativeIo]).
-  const TerminalIo({SystemIo io = const NativeIo()}) : _io = io;
+  const TerminalIo({this._io = const NativeIo()});
 
   /// Stream of raw input bytes from the terminal.
   Stream<List<int>> get inputStream => _io.inputStream;

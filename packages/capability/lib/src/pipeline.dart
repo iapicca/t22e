@@ -17,12 +17,11 @@ class ProbePipeline {
     ColorProbe? colorProbe,
     SyncProbe? syncProbe,
     KeyboardProbe? keyboardProbe,
-    TerminalIo? io,
-  }) : _io = io ?? const TerminalIo(),
-       da1Probe = da1Probe ?? Da1Probe(io: io),
-       colorProbe = colorProbe ?? ColorProbe(io: io),
-       syncProbe = syncProbe ?? SyncProbe(io: io),
-       keyboardProbe = keyboardProbe ?? KeyboardProbe(io: io);
+    this._io = const TerminalIo(),
+  }) : da1Probe = da1Probe ?? Da1Probe(io: _io),
+       colorProbe = colorProbe ?? ColorProbe(io: _io),
+       syncProbe = syncProbe ?? SyncProbe(io: _io),
+       keyboardProbe = keyboardProbe ?? KeyboardProbe(io: _io);
 
   Future<Capabilities> run() async {
     final da1 = await da1Probe.probe();

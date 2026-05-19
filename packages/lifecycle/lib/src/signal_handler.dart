@@ -15,8 +15,7 @@ class SignalHandler {
   StreamSubscription<ProcessSignal>? _sigtstpSub;
   StreamSubscription<ProcessSignal>? _sigcontSub;
 
-  SignalHandler({required TerminalGuard guard, required this.onInterrupt})
-    : _guard = guard;
+  SignalHandler({required this._guard, required this.onInterrupt});
 
   /// Installs signal listeners for all handled signals.
   void install() {

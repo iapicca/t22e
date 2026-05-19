@@ -16,9 +16,8 @@ final class FfiRawModeBackend implements RawModeBackend {
   /// Optionally injects custom [bindings] and [io].
   FfiRawModeBackend({
     TermiosBindings? bindings,
-    SystemIo io = const NativeIo(),
-  }) : _bindings = bindings ?? TermiosBindingsImpl.fromPlatformService(io),
-       _io = io;
+    this._io = const NativeIo(),
+  }) : _bindings = bindings ?? TermiosBindingsImpl.fromPlatformService(_io);
 
   @override
   void enable() {

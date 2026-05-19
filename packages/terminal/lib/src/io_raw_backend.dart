@@ -7,7 +7,7 @@ final class IoRawModeBackend implements RawModeBackend {
   final SystemIo _io;
 
   /// Creates with injected [io] (defaults to [NativeIo]).
-  const IoRawModeBackend({SystemIo io = const NativeIo()}) : _io = io;
+  const IoRawModeBackend({this._io = const NativeIo()});
 
   @override
   void enable() {
