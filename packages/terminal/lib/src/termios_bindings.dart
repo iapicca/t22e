@@ -3,13 +3,16 @@ import 'dart:ffi';
 import 'system_io.dart';
 import 'platform_service.dart';
 
+typedef GetAttr = int Function(int fd, Pointer<Uint8> buf);
+typedef SetAttr = int Function(int fd, int opt, Pointer<Uint8> buf);
+
 /// Abstract interface for libc FFI calls used to manage terminal raw mode.
 abstract class TermiosBindings {
   /// Posix tcgetattr: read terminal attributes into [buf].
-  int tcGetAttr(int fd, Pointer<Uint8> buf);
+  GetAttr get getAttr;
 
   /// Posix tcsetattr: set terminal attributes from [buf].
-  int tcSetAttr(int fd, int opt, Pointer<Uint8> buf);
+  SetAttr get setAttr;
 
   /// C malloc: allocate [size] bytes.
   Pointer<Uint8> malloc(int size);
@@ -22,26 +25,25 @@ abstract class TermiosBindings {
 final class TermiosBindingsImpl implements TermiosBindings {
   final DynamicLibrary _libc;
 
-  final int Function(int, Pointer<Uint8>) _tcGetAttr;
-  final int Function(int, int, Pointer<Uint8>) _tcSetAttr;
+  final int Function(int, Pointer<Uint8>) _getAttr;
+  final int Function(int, int, Pointer<Uint8>) _setAttr;
 
   /// Looks up tcgetattr and tcsetattr from the given [library].
   TermiosBindingsImpl(this._libc)
-    : _tcGetAttr = _libc.lookupFunction<
+    : _getAttr = _libc.lookupFunction<
           Int32 Function(Int32, Pointer<Uint8>),
           int Function(int, Pointer<Uint8>)
         >('tcgetattr'),
-      _tcSetAttr = _libc.lookupFunction<
+      _setAttr = _libc.lookupFunction<
           Int32 Function(Int32, Int32, Pointer<Uint8>),
           int Function(int, int, Pointer<Uint8>)
         >('tcsetattr');
 
   @override
-  int tcGetAttr(int fd, Pointer<Uint8> buf) => _tcGetAttr(fd, buf);
+  GetAttr get getAttr => _getAttr;
 
   @override
-  int tcSetAttr(int fd, int opt, Pointer<Uint8> buf) =>
-      _tcSetAttr(fd, opt, buf);
+  SetAttr get setAttr => _setAttr;
 
   @override
   Pointer<Uint8> malloc(int size) {

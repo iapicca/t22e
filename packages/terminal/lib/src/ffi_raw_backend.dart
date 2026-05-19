@@ -25,7 +25,7 @@ final class FfiRawModeBackend implements RawModeBackend {
       throw UnsupportedError('FFI raw mode is not supported on Windows');
     }
     final buf = _bindings.malloc(Defaults.termiosStructSize);
-    final result = _bindings.tcGetAttr(Defaults.stdinFd, buf);
+    final result = _bindings.getAttr(Defaults.stdinFd, buf);
     if (result != 0) {
       _bindings.free(buf);
       throw StateError('tcgetattr failed (stdin is not a TTY?)');
@@ -49,7 +49,7 @@ final class FfiRawModeBackend implements RawModeBackend {
     buf.write8(Defaults.termiosOffsetCCMin, Defaults.termiosVminRaw);
     buf.write8(Defaults.termiosOffsetCCTime, Defaults.termiosVtimeRaw);
 
-    final setResult = _bindings.tcSetAttr(
+    final setResult = _bindings.setAttr(
       Defaults.stdinFd,
       Defaults.tcsaNow,
       buf,
@@ -70,7 +70,7 @@ final class FfiRawModeBackend implements RawModeBackend {
     state.buf.write32(Defaults.termiosOffsetOFlag, state.cOflag);
     state.buf.write32(Defaults.termiosOffsetCFlag, state.cCflag);
     state.buf.write32(Defaults.termiosOffsetLFlag, state.cLflag);
-    _bindings.tcSetAttr(Defaults.stdinFd, Defaults.tcsaNow, state.buf);
+    _bindings.setAttr(Defaults.stdinFd, Defaults.tcsaNow, state.buf);
     _bindings.free(state.buf);
     _state = null;
   }

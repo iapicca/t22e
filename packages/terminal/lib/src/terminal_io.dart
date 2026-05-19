@@ -1,6 +1,9 @@
 import 'system_io.dart';
 import 'native_io.dart';
 
+typedef Write = void Function(String data);
+typedef Flush = Future<void> Function();
+
 /// Terminal I/O facade for input/output operations.
 final class TerminalIo {
   final SystemIo _io;
@@ -12,10 +15,10 @@ final class TerminalIo {
   Stream<List<int>> get inputStream => _io.inputStream;
 
   /// Writes [data] to the terminal output.
-  void write(String data) => _io.write(data);
+  Write get write => _io.write;
 
   /// Flushes the output buffer.
-  Future<void> flush() => _io.flush();
+  Flush get flush => _io.flush;
 
   /// Current terminal width in columns.
   int get columns => _io.columns;

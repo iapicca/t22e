@@ -67,17 +67,29 @@ class FakeRawModeBackend implements RawModeBackend {
 class MockTermiosBindings implements TermiosBindings {
   final _calls = <String>[];
   final _mallocs = <Pointer<Uint8>>[];
-  int _tcGetAttrResult = 0;
-  int _tcSetAttrResult = 0;
+  int _getAttrResult = 0;
+  int _setAttrResult = 0;
 
   List<String> get calls => List.unmodifiable(_calls);
   bool get mallocCalled => _calls.contains('malloc');
   bool get freeCalled => _calls.contains('free');
-  bool get tcGetAttrCalled => _calls.contains('tcgetattr');
-  bool get tcSetAttrCalled => _calls.contains('tcsetattr');
+  bool get getAttrCalled => _calls.contains('getAttr');
+  bool get setAttrCalled => _calls.contains('setAttr');
 
-  void seedTcGetAttrResult(int value) => _tcGetAttrResult = value;
-  void seedTcSetAttrResult(int value) => _tcSetAttrResult = value;
+  void seedGetAttrResult(int value) => _getAttrResult = value;
+  void seedSetAttrResult(int value) => _setAttrResult = value;
+
+  @override
+  GetAttr get getAttr => (int fd, Pointer<Uint8> buf) {
+    _calls.add('getAttr');
+    return _getAttrResult;
+  };
+
+  @override
+  SetAttr get setAttr => (int fd, int opt, Pointer<Uint8> buf) {
+    _calls.add('setAttr');
+    return _setAttrResult;
+  };
 
   @override
   Pointer<Uint8> malloc(int size) {
@@ -91,18 +103,6 @@ class MockTermiosBindings implements TermiosBindings {
   void free(Pointer<Uint8> ptr) {
     _calls.add('free');
     calloc.free(ptr);
-  }
-
-  @override
-  int tcGetAttr(int fd, Pointer<Uint8> buf) {
-    _calls.add('tcgetattr');
-    return _tcGetAttrResult;
-  }
-
-  @override
-  int tcSetAttr(int fd, int opt, Pointer<Uint8> buf) {
-    _calls.add('tcsetattr');
-    return _tcSetAttrResult;
   }
 }
 
@@ -162,29 +162,29 @@ void main() {
       io = FakeSystemIo();
     });
 
-    test('enable calls malloc, tcgetattr, tcsetattr in order', () {
+    test('enable calls malloc, getAttr, setAttr in order', () {
       final bindings = MockTermiosBindings();
       final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       backend.enable();
 
       expect(bindings.mallocCalled, isTrue);
-      expect(bindings.tcGetAttrCalled, isTrue);
-      expect(bindings.tcSetAttrCalled, isTrue);
+      expect(bindings.getAttrCalled, isTrue);
+      expect(bindings.setAttrCalled, isTrue);
     });
 
-    test('enable throws when tcgetattr fails', () {
+    test('enable throws when getAttr fails', () {
       final bindings = MockTermiosBindings();
-      bindings.seedTcGetAttrResult(-1);
+      bindings.seedGetAttrResult(-1);
       final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       expect(() => backend.enable(), throwsStateError);
       expect(bindings.freeCalled, isTrue);
     });
 
-    test('enable throws when tcsetattr fails', () {
+    test('enable throws when setAttr fails', () {
       final bindings = MockTermiosBindings();
-      bindings.seedTcSetAttrResult(-1);
+      bindings.seedSetAttrResult(-1);
       final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
       expect(() => backend.enable(), throwsStateError);
@@ -208,12 +208,12 @@ void main() {
 
       expect(bindings.calls, [
         'malloc',
-        'tcgetattr',
-        'tcsetattr',
+        'getAttr',
+        'setAttr',
       ]);
     });
 
-    test('disable calls tcsetattr and free', () {
+    test('disable calls setAttr and free', () {
       final bindings = MockTermiosBindings();
       final backend = FfiRawModeBackend(bindings: bindings, io: io);
 
@@ -221,7 +221,7 @@ void main() {
       bindings._calls.clear();
       backend.disable();
 
-      expect(bindings.tcSetAttrCalled, isTrue);
+      expect(bindings.setAttrCalled, isTrue);
       expect(bindings.freeCalled, isTrue);
     });
 
