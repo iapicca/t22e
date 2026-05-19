@@ -2,6 +2,7 @@ import 'dart:ffi';
 
 import 'system_io.dart';
 import 'platform_service.dart';
+import 'symbols_ffi.dart';
 
 typedef GetAttr = int Function(int fd, Pointer<Uint8> buf);
 typedef SetAttr = int Function(int fd, int opt, Pointer<Uint8> buf);
@@ -33,11 +34,11 @@ final class TermiosBindingsImpl implements TermiosBindings {
     : _getAttr = _libc.lookupFunction<
           Int32 Function(Int32, Pointer<Uint8>),
           int Function(int, Pointer<Uint8>)
-        >('tcgetattr'),
+        >(SymbolsFFI.getAttrName),
       _setAttr = _libc.lookupFunction<
           Int32 Function(Int32, Int32, Pointer<Uint8>),
           int Function(int, int, Pointer<Uint8>)
-        >('tcsetattr');
+        >(SymbolsFFI.setAttrName);
 
   @override
   GetAttr get getAttr => _getAttr;
@@ -50,7 +51,7 @@ final class TermiosBindingsImpl implements TermiosBindings {
     final fn = _libc.lookupFunction<
         Pointer<Void> Function(IntPtr),
         Pointer<Void> Function(int)
-      >('malloc');
+      >(SymbolsFFI.mallocName);
     return fn(size).cast();
   }
 
@@ -59,7 +60,7 @@ final class TermiosBindingsImpl implements TermiosBindings {
     final fn = _libc.lookupFunction<
         Void Function(Pointer<Void>),
         void Function(Pointer<Void>)
-      >('free');
+      >(SymbolsFFI.freeName);
     fn(ptr.cast());
   }
 

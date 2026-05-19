@@ -7,3 +7,4 @@ export 'src/terminal_io.dart' show TerminalIo;
 export 'src/runner.dart' show TerminalRunner;
 export 'src/raw_mode_state.dart' show RawModeState;
 export 'src/termios_bindings.dart' show TermiosBindings, GetAttr, SetAttr;
+export 'src/symbols_ffi.dart' show SymbolsFFI;

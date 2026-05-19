@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
-import 'package:protocol/protocol.dart';
 import 'platform_service.dart';
+import 'symbols_ffi.dart';
 
 /// Linux implementation of [PlatformService] (tries libc.so.6, then .7).
 class LinuxService implements PlatformService {
@@ -11,9 +11,9 @@ class LinuxService implements PlatformService {
   @override
   DynamicLibrary get library {
     try {
-      return DynamicLibrary.open(Defaults.libcLinux6);
+      return DynamicLibrary.open(SymbolsFFI.libcLinux6);
     } catch (_) {
-      return DynamicLibrary.open(Defaults.libcLinux7);
+      return DynamicLibrary.open(SymbolsFFI.libcLinux7);
     }
   }
 }
