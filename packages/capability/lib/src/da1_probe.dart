@@ -10,7 +10,7 @@ import 'result.dart' show QueryResult, Da1Result;
 class Da1Probe {
   final TerminalIo _io;
 
-  Da1Probe({this._io = const TerminalIo()});
+  const Da1Probe({this._io = const TerminalIo()});
 
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,

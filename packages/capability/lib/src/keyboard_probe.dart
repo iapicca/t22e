@@ -10,7 +10,7 @@ import 'result.dart' show KeyboardProtocol;
 class KeyboardProbe {
   final TerminalIo _io;
 
-  KeyboardProbe({this._io = const TerminalIo()});
+  const KeyboardProbe({this._io = const TerminalIo()});
 
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,

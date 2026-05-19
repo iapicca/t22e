@@ -26,3 +26,11 @@ The constructor remains in initializer-list form:
 TerminalRunner({List<RawModeBackend>? backends})
   : _backends = backends ?? [FfiRawModeBackend(), IoRawModeBackend()];
 ```
+
+#######
+
+lifiecycle package sucks!
+
+ProbePipeline non const
+
+unicode has a lot of hardcoded values, wtf!
