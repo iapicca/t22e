@@ -33,4 +33,4 @@ lifiecycle package sucks!
 
 ProbePipeline non const
 
-unicode has a lot of hardcoded values, wtf!
+unicode tables need to be reworked

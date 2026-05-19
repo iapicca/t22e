@@ -113,18 +113,18 @@ final class CsiParser {
 
   /// Mapping from Kitty key codes to logical KeyCodes.
   static const _kittyCodeMap = <int, KeyCode>{
-    0x1B: KeyCode.escape,
-    0x09: KeyCode.tab,
-    0x0D: KeyCode.enter,
-    0x08: KeyCode.backspace,
-    0x7F: KeyCode.backspace,
-    0x01: KeyCode.home,
-    0x04: KeyCode.end,
-    0x05: KeyCode.pageUp,
-    0x06: KeyCode.pageDown,
-    0x02: KeyCode.insert,
-    0x03: KeyCode.delete,
-    0x1A: KeyCode.delete,
+    Defaults.kittyKeyEscape: KeyCode.escape,
+    Defaults.kittyKeyTab: KeyCode.tab,
+    Defaults.kittyKeyEnter: KeyCode.enter,
+    Defaults.kittyKeyBackspace: KeyCode.backspace,
+    Defaults.kittyKeyBackspaceAlt: KeyCode.backspace,
+    Defaults.kittyKeyHome: KeyCode.home,
+    Defaults.kittyKeyEnd: KeyCode.end,
+    Defaults.kittyKeyPageUp: KeyCode.pageUp,
+    Defaults.kittyKeyPageDown: KeyCode.pageDown,
+    Defaults.kittyKeyInsert: KeyCode.insert,
+    Defaults.kittyKeyDelete: KeyCode.delete,
+    Defaults.kittyKeyDeleteAlt: KeyCode.delete,
   };
 
   /// Extracts KeyModifiers from Kitty modifier bits.

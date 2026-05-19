@@ -1,59 +1,79 @@
 import 'width.dart';
+import 'package:protocol/protocol.dart' show Defaults;
 
 /// Describes a grapheme cluster: rune range [start, end) and column width.
 typedef GraphemeCluster = ({int start, int end, int columnWidth});
 
 /// Returns the grapheme break property for a codepoint.
 int _graphemeBreakProperty(int codepoint) {
-  if (codepoint == 0x200D) {
-    return 1;
+  if (codepoint == Defaults.codepointZwj) {
+    return Defaults.graphemePropZwj;
   }
-  if (codepoint >= 0xFE00 && codepoint <= 0xFE0F) {
-    return 2;
+  if (codepoint >= Defaults.codepointVariationSelectorStart &&
+      codepoint <= Defaults.codepointVariationSelectorEnd) {
+    return Defaults.graphemePropVariationSelector;
   }
-  if (codepoint >= 0x1F1E6 && codepoint <= 0x1F1FF) {
-    return 3;
+  if (codepoint >= Defaults.codepointRegionalIndicatorStart &&
+      codepoint <= Defaults.codepointRegionalIndicatorEnd) {
+    return Defaults.graphemePropRegionalIndicator;
   }
-  if ((codepoint >= 0x0300 && codepoint <= 0x036F) ||
-      (codepoint >= 0x1AB0 && codepoint <= 0x1AFF) ||
-      (codepoint >= 0x1DC0 && codepoint <= 0x1DFF) ||
-      (codepoint >= 0x20D0 && codepoint <= 0x20FF) ||
-      (codepoint >= 0xFE20 && codepoint <= 0xFE2F)) {
-    return 4;
+  if ((codepoint >= Defaults.codepointCombiningDiacriticalStart &&
+          codepoint <= Defaults.codepointCombiningDiacriticalEnd) ||
+      (codepoint >= Defaults.codepointCombiningDiacriticalExtStart &&
+          codepoint <= Defaults.codepointCombiningDiacriticalExtEnd) ||
+      (codepoint >= Defaults.codepointCombiningDiacriticalSuppStart &&
+          codepoint <= Defaults.codepointCombiningDiacriticalSuppEnd) ||
+      (codepoint >= Defaults.codepointCombiningMarksSymbolsStart &&
+          codepoint <= Defaults.codepointCombiningMarksSymbolsEnd) ||
+      (codepoint >= Defaults.codepointCombiningHalfMarksStart &&
+          codepoint <= Defaults.codepointCombiningHalfMarksEnd)) {
+    return Defaults.graphemePropCombiningMark;
   }
-  if (codepoint >= 0x1F3FB && codepoint <= 0x1F3FF) {
-    return 5;
+  if (codepoint >= Defaults.codepointEmojiModifierStart &&
+      codepoint <= Defaults.codepointEmojiModifierEnd) {
+    return Defaults.graphemePropEmojiModifier;
   }
-  if (codepoint == 0xE0020 || (codepoint >= 0xE0100 && codepoint <= 0xE01EF)) {
-    return 6;
+  if (codepoint == Defaults.codepointTag ||
+      (codepoint >= Defaults.codepointVariationSelectorSuppStart &&
+          codepoint <= Defaults.codepointVariationSelectorSuppEnd)) {
+    return Defaults.graphemePropTag;
   }
-  if (codepoint >= 0x1100 && codepoint <= 0x115F) {
-    return 7;
+  if (codepoint >= Defaults.codepointHangulLeadingStart &&
+      codepoint <= Defaults.codepointHangulLeadingEnd) {
+    return Defaults.graphemePropHangulLeading;
   }
-  if ((codepoint >= 0x1160 && codepoint <= 0x11A2) ||
-      (codepoint >= 0xAC00 && codepoint <= 0xD7AF)) {
-    return 8;
+  if ((codepoint >= Defaults.codepointHangulVowelStart &&
+          codepoint <= Defaults.codepointHangulVowelEnd) ||
+      (codepoint >= Defaults.codepointHangulSyllableStart &&
+          codepoint <= Defaults.codepointHangulSyllableEnd)) {
+    return Defaults.graphemePropHangulVowel;
   }
-  if (codepoint >= 0x11A8 && codepoint <= 0x11F9) {
-    return 9;
+  if (codepoint >= Defaults.codepointHangulTrailingStart &&
+      codepoint <= Defaults.codepointHangulTrailingEnd) {
+    return Defaults.graphemePropHangulTrailing;
   }
-  if (codepoint >= 0x1F900 && codepoint <= 0x1F9FF) {
-    return 10;
+  if (codepoint >= Defaults.codepointExtendedPictographicStart &&
+      codepoint <= Defaults.codepointExtendedPictographicEnd) {
+    return Defaults.graphemePropExtendedPictographic;
   }
-  if (codepoint == 0x00AD ||
-      codepoint == 0x061C ||
-      codepoint == 0x180E ||
-      (codepoint >= 0x2000 && codepoint <= 0x200A) ||
-      codepoint == 0x2028 ||
-      codepoint == 0x2029 ||
-      (codepoint >= 0x202A && codepoint <= 0x202E) ||
-      (codepoint >= 0x2060 && codepoint <= 0x2064) ||
-      codepoint == 0x2066 ||
-      codepoint == 0x2067 ||
-      codepoint == 0x2068 ||
-      (codepoint >= 0x2069 && codepoint <= 0x206F) ||
-      codepoint == 0xFEFF) {
-    return 11;
+  if (codepoint == Defaults.codepointSoftHyphen ||
+      codepoint == Defaults.codepointArabicFormatChar ||
+      codepoint == Defaults.codepointMongolianVowelSeparator ||
+      (codepoint >= Defaults.codepointEnQuadStart &&
+          codepoint <= Defaults.codepointEnQuadEnd) ||
+      codepoint == Defaults.codepointLineSeparator ||
+      codepoint == Defaults.codepointParagraphSeparator ||
+      (codepoint >= Defaults.codepointBidiOverrideStart &&
+          codepoint <= Defaults.codepointBidiOverrideEnd) ||
+      (codepoint >= Defaults.codepointWordJoinerStart &&
+          codepoint <= Defaults.codepointWordJoinerEnd) ||
+      codepoint == Defaults.codepointBidiIsolateLri ||
+      codepoint == Defaults.codepointBidiIsolateRli ||
+      codepoint == Defaults.codepointBidiIsolateFsi ||
+      (codepoint >= Defaults.codepointBidiIsolatePdiStart &&
+          codepoint <= Defaults.codepointBidiIsolatePdiEnd) ||
+      codepoint == Defaults.codepointBomZwnbsp) {
+    return Defaults.graphemePropInvisible;
   }
   return 0;
 }
@@ -77,7 +97,10 @@ List<GraphemeCluster> graphemeClusters(String text) {
     final cw = charWidth(cp);
 
     if (i > 0) {
-      if (prop == 1 || prop == 2 || prop == 4 || prop == 5) {
+      if (prop == Defaults.graphemePropZwj ||
+          prop == Defaults.graphemePropVariationSelector ||
+          prop == Defaults.graphemePropCombiningMark ||
+          prop == Defaults.graphemePropEmojiModifier) {
         clusterWidth += cw;
         continue;
       }

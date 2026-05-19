@@ -376,7 +376,7 @@ class Vt500Engine {
         return SequenceData.osc(content);
       }
       _oscBuffer.writeCharCode(Defaults.escapeByte);
-      if (byte >= Defaults.byteRangePrintableLow && byte <= 0x7F) {
+      if (byte >= Defaults.byteRangePrintableLow && byte <= Defaults.codepointDel) {
         _oscBuffer.writeCharCode(byte);
       }
       return null;
@@ -397,7 +397,7 @@ class Vt500Engine {
       _oscBuffer.clear();
       return SequenceData.osc(content);
     }
-    if (byte >= Defaults.byteRangePrintableLow && byte <= 0x7F) {
+    if (byte >= Defaults.byteRangePrintableLow && byte <= Defaults.codepointDel) {
       _oscBuffer.writeCharCode(byte);
       return null;
     }

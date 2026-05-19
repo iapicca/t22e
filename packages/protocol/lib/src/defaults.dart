@@ -794,6 +794,146 @@ final class Defaults {
   /// Zero-width joiner (ZWJ) codepoint.
   static const int codepointZwj = 0x200D;
 
+  /// Soft hyphen codepoint.
+  static const int codepointSoftHyphen = 0x00AD;
+
+  /// Arabic format character (ALM).
+  static const int codepointArabicFormatChar = 0x061C;
+
+  /// Mongolian vowel separator.
+  static const int codepointMongolianVowelSeparator = 0x180E;
+
+  /// En quad (start of fixed-width space range).
+  static const int codepointEnQuadStart = 0x2000;
+
+  /// Hair space (end of fixed-width space range).
+  static const int codepointEnQuadEnd = 0x200A;
+
+  /// Line separator.
+  static const int codepointLineSeparator = 0x2028;
+
+  /// Paragraph separator.
+  static const int codepointParagraphSeparator = 0x2029;
+
+  /// Start of bidi overrides / embedding marks.
+  static const int codepointBidiOverrideStart = 0x202A;
+
+  /// End of bidi overrides / embedding marks.
+  static const int codepointBidiOverrideEnd = 0x202E;
+
+  /// Word joiner.
+  static const int codepointWordJoinerStart = 0x2060;
+
+  /// End of invisible operators range.
+  static const int codepointWordJoinerEnd = 0x2064;
+
+  /// Left-to-right isolate.
+  static const int codepointBidiIsolateLri = 0x2066;
+
+  /// Right-to-left isolate.
+  static const int codepointBidiIsolateRli = 0x2067;
+
+  /// First strong isolate.
+  static const int codepointBidiIsolateFsi = 0x2068;
+
+  /// Pop directional isolate (start of range).
+  static const int codepointBidiIsolatePdiStart = 0x2069;
+
+  /// End of bidi isolate control range.
+  static const int codepointBidiIsolatePdiEnd = 0x206F;
+
+  /// Byte order mark / zero-width no-break space.
+  static const int codepointBomZwnbsp = 0xFEFF;
+
+  // ── Unicode codepoint ranges ──
+
+  /// Start of variation selector range.
+  static const int codepointVariationSelectorStart = 0xFE00;
+
+  /// End of variation selector range.
+  static const int codepointVariationSelectorEnd = 0xFE0F;
+
+  /// Start of variation selector supplement.
+  static const int codepointVariationSelectorSuppStart = 0xE0100;
+
+  /// End of variation selector supplement.
+  static const int codepointVariationSelectorSuppEnd = 0xE01EF;
+
+  /// Start of regional indicator symbol range.
+  static const int codepointRegionalIndicatorStart = 0x1F1E6;
+
+  /// End of regional indicator symbol range.
+  static const int codepointRegionalIndicatorEnd = 0x1F1FF;
+
+  /// Start of combining diacritical marks.
+  static const int codepointCombiningDiacriticalStart = 0x0300;
+
+  /// End of combining diacritical marks.
+  static const int codepointCombiningDiacriticalEnd = 0x036F;
+
+  /// Start of combining diacritical marks extended.
+  static const int codepointCombiningDiacriticalExtStart = 0x1AB0;
+
+  /// End of combining diacritical marks extended.
+  static const int codepointCombiningDiacriticalExtEnd = 0x1AFF;
+
+  /// Start of combining diacritical marks supplement.
+  static const int codepointCombiningDiacriticalSuppStart = 0x1DC0;
+
+  /// End of combining diacritical marks supplement.
+  static const int codepointCombiningDiacriticalSuppEnd = 0x1DFF;
+
+  /// Start of combining marks for symbols.
+  static const int codepointCombiningMarksSymbolsStart = 0x20D0;
+
+  /// End of combining marks for symbols.
+  static const int codepointCombiningMarksSymbolsEnd = 0x20FF;
+
+  /// Start of combining half marks.
+  static const int codepointCombiningHalfMarksStart = 0xFE20;
+
+  /// End of combining half marks.
+  static const int codepointCombiningHalfMarksEnd = 0xFE2F;
+
+  /// Start of emoji skin-tone modifier range.
+  static const int codepointEmojiModifierStart = 0x1F3FB;
+
+  /// End of emoji skin-tone modifier range.
+  static const int codepointEmojiModifierEnd = 0x1F3FF;
+
+  /// Tag codepoint (used with variation selector supplement).
+  static const int codepointTag = 0xE0020;
+
+  /// Start of Hangul Jamo leading consonants.
+  static const int codepointHangulLeadingStart = 0x1100;
+
+  /// End of Hangul Jamo leading consonants.
+  static const int codepointHangulLeadingEnd = 0x115F;
+
+  /// Start of Hangul Jamo vowels.
+  static const int codepointHangulVowelStart = 0x1160;
+
+  /// End of Hangul Jamo vowels.
+  static const int codepointHangulVowelEnd = 0x11A2;
+
+  /// Start of Hangul syllables.
+  static const int codepointHangulSyllableStart = 0xAC00;
+
+  /// End of Hangul syllables.
+  static const int codepointHangulSyllableEnd = 0xD7AF;
+
+  /// Start of Hangul Jamo trailing consonants.
+  static const int codepointHangulTrailingStart = 0x11A8;
+
+  /// End of Hangul Jamo trailing consonants.
+  static const int codepointHangulTrailingEnd = 0x11F9;
+
+  /// Start of extended pictographic (emoticons) range.
+  static const int codepointExtendedPictographicStart = 0x1F900;
+
+  /// End of extended pictographic (emoticons) range.
+  static const int codepointExtendedPictographicEnd = 0x1F9FF;
+
   // ── Unicode box-drawing / UI glyphs ──
 
   /// Full block character for solid fill.
@@ -863,6 +1003,18 @@ final class Defaults {
 
   /// Grapheme break property: emoji modifier.
   static const int graphemePropEmojiModifier = 5;
+
+  /// Grapheme break property: tag sequence.
+  static const int graphemePropTag = 6;
+
+  /// Grapheme break property: Hangul leading consonant (choseong).
+  static const int graphemePropHangulLeading = 7;
+
+  /// Grapheme break property: Hangul vowel (jungseong).
+  static const int graphemePropHangulVowel = 8;
+
+  /// Grapheme break property: Hangul trailing consonant (jongseong).
+  static const int graphemePropHangulTrailing = 9;
 
   /// Grapheme break property: extended pictographic.
   static const int graphemePropExtendedPictographic = 10;
