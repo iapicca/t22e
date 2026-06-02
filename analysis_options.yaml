@@ -27,6 +27,9 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
 
+plugins:
+  riverpod_lint: ^3.1.3
+
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints
 
