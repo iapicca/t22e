@@ -5,7 +5,12 @@ void main() {
   late TerminalParser parser;
 
   setUp(() {
-    parser = TerminalParser();
+    parser = TerminalParser(
+      csiParser: parseCsi,
+      escParser: parseEsc,
+      oscParser: parseOsc,
+      dcsParser: parseDcs,
+    );
   });
 
   group('end-to-end parsing', () {

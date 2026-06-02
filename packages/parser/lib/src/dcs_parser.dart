@@ -1,25 +1,23 @@
+import 'package:meta/meta.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
-/// Parses DCS sequences (Kitty graphics protocol).
-final class DcsParser {
-    // TODO why is this not constant?!
+@internal
+Event? parseDcs(SequenceData data) {
+  final sequenceData = data as DcsSequenceData;
+  final finalByte = sequenceData.finalByte;
+  final intermediates = sequenceData.intermediates;
 
-  /// const DcsParser();
-  /// Dispatches a DCS sequence based on final byte and intermediates.
-  Event? parse(SequenceData data) {
-    final d = data as DcsSequenceData;
-    if (d.finalByte == Defaults.dcsKittyGraphicsP &&
-        d.intermediates.contains(Defaults.dcsKittyIntermediate)) {
-      return InternalEvent('kitty_graphics');
-    }
-
-    if (d.finalByte == Defaults.dcsKittyGraphicsQ &&
-        d.intermediates.contains(Defaults.dcsKittyIntermediate)) {
-      return InternalEvent('kitty_graphics');
-    }
-
-    return null;
+  if (finalByte == Defaults.dcsKittyGraphicsP &&
+      intermediates.contains(Defaults.dcsKittyIntermediate)) {
+    return InternalEvent('kitty_graphics');
   }
+
+  if (finalByte == Defaults.dcsKittyGraphicsQ &&
+      intermediates.contains(Defaults.dcsKittyIntermediate)) {
+    return InternalEvent('kitty_graphics');
+  }
+
+  return null;
 }

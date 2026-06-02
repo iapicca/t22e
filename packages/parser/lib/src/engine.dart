@@ -1,9 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
+import 'events.dart';
+
 part 'engine.freezed.dart';
 
-/// move unrelated classes and enum to distinct files
+typedef Parser = Event? Function(SequenceData);
+
+/// TODO move unrelated classes and enum to distinct files
 
 /// States for the VT500 state machine.
 enum VtState {

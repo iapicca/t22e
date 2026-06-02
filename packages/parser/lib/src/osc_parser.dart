@@ -1,64 +1,60 @@
+import 'package:meta/meta.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
-/// Parses OSC sequences (title, hyperlink, color queries, clipboard).
-final class OscParser {
-  /// Dispatches an OSC sequence by parameter number.
-  Event? parse(SequenceData data) {
-    final content = (data as OscSequenceData).content;
-    final semicolon = content.indexOf(';');
-    if (semicolon == -1) return null;
+@internal
+Event? parseOsc(SequenceData data) {
+  final sequenceData = data as OscSequenceData;
+  final content = sequenceData.content;
+  final semicolonIndex = content.indexOf(';');
+  if (semicolonIndex == -1) return null;
 
-    final pnStr = content.substring(0, semicolon);
-    final pn = int.tryParse(pnStr);
-    if (pn == null) return null;
+  final parameterNumberStr = content.substring(0, semicolonIndex);
+  final parameterNumber = int.tryParse(parameterNumberStr);
+  if (parameterNumber == null) return null;
 
-    final value = content.substring(semicolon + 1);
+  final value = content.substring(semicolonIndex + 1);
 
-    return switch (pn) {
-      Defaults.oscTitle ||
-      1 ||
-      2 => InternalEvent('title_changed', {'title': value}),
-      Defaults.oscHyperlink => _parseHyperlink(value),
-      Defaults.oscFgQuery => _parseColor(value, Defaults.oscFgQuery),
-      Defaults.oscBgQuery => _parseColor(value, Defaults.oscBgQuery),
-      Defaults.oscClipboard => _parseClipboard(value),
-      _ => null,
-    };
-  }
+  return switch (parameterNumber) {
+    Defaults.oscTitle ||
+    1 ||
+    2 => InternalEvent('title_changed', {'title': value}),
+    Defaults.oscHyperlink => _parseOscHyperlink(value),
+    Defaults.oscFgQuery => _parseOscColorResponse(value, Defaults.oscFgQuery),
+    Defaults.oscBgQuery => _parseOscColorResponse(value, Defaults.oscBgQuery),
+    Defaults.oscClipboard => _parseOscClipboard(value),
+    _ => null,
+  };
+}
 
-  /// Parses an OSC 8 hyperlink value (params;uri).
-  InternalEvent? _parseHyperlink(String value) {
-    final firstSemicolon = value.indexOf(';');
-    if (firstSemicolon == -1) return null;
-    final uri = value.substring(firstSemicolon + 1);
-    return InternalEvent('hyperlink', {'uri': uri});
-  }
+InternalEvent? _parseOscHyperlink(String value) {
+  final firstSemicolon = value.indexOf(';');
+  if (firstSemicolon == -1) return null;
+  final uri = value.substring(firstSemicolon + 1);
+  return InternalEvent('hyperlink', {'uri': uri});
+}
 
-  /// Parses an OSC 52 clipboard value.
-  ClipboardEvent? _parseClipboard(String value) {
-    final semicolon = value.indexOf(';');
-    if (semicolon == -1) return null;
-    final clipboard = value.substring(0, semicolon);
-    final base64 = value.substring(semicolon + 1);
-    return ClipboardEvent(clipboard, base64.isEmpty ? null : base64);
-  }
+ClipboardEvent? _parseOscClipboard(String value) {
+  final semicolonIndex = value.indexOf(';');
+  if (semicolonIndex == -1) return null;
+  final clipboard = value.substring(0, semicolonIndex);
+  final base64Data = value.substring(semicolonIndex + 1);
+  return ClipboardEvent(clipboard, base64Data.isEmpty ? null : base64Data);
+}
 
-  /// Parses an OSC 10/11 color query response (rgb:RR/GG/BB).
-  ColorQueryEvent? _parseColor(String value, int colorNumber) {
-    if (!value.startsWith('rgb:')) return null;
+ColorQueryEvent? _parseOscColorResponse(String value, int colorNumber) {
+  if (!value.startsWith('rgb:')) return null;
 
-    final rgbParts = value.substring(4).split('/');
-    if (rgbParts.length != 3) return null;
+  final rgbParts = value.substring(4).split('/');
+  if (rgbParts.length != 3) return null;
 
-    try {
-      final r = int.parse(rgbParts[0].substring(0, 2), radix: 16);
-      final g = int.parse(rgbParts[1].substring(0, 2), radix: 16);
-      final b = int.parse(rgbParts[2].substring(0, 2), radix: 16);
-      return ColorQueryEvent(colorNumber, r, g, b);
-    } catch (_) {
-      return null;
-    }
+  try {
+    final red = int.parse(rgbParts[0].substring(0, 2), radix: 16);
+    final green = int.parse(rgbParts[1].substring(0, 2), radix: 16);
+    final blue = int.parse(rgbParts[2].substring(0, 2), radix: 16);
+    return ColorQueryEvent(colorNumber, red, green, blue);
+  } catch (_) {
+    return null;
   }
 }

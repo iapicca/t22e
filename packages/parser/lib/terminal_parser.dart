@@ -8,9 +8,15 @@ export 'src/engine.dart'
         CsiSequenceData,
         EscSequenceData,
         OscSequenceData,
-        DcsSequenceData;
-export 'src/csi_parser.dart' show CsiParser;
-export 'src/esc_parser.dart' show EscParser;
-export 'src/osc_parser.dart' show OscParser;
-export 'src/dcs_parser.dart' show DcsParser;
-export 'src/parser.dart' show TerminalParser;
+        DcsSequenceData,
+        Parser;
+export 'src/terminal_parser.dart' show TerminalParser;
+export 'src/csi_parser.dart' show parseCsi;
+export 'src/esc_parser.dart' show parseEsc;
+export 'src/osc_parser.dart' show parseOsc;
+export 'src/dcs_parser.dart' show parseDcs;
+export 'src/csi_parser_provider.dart';
+export 'src/esc_parser_provider.dart';
+export 'src/osc_parser_provider.dart';
+export 'src/dcs_parser_provider.dart';
+export 'src/terminal_parser_provider.dart';
