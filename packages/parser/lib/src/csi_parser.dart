@@ -4,6 +4,9 @@ import 'events.dart';
 
 /// Parses CSI sequences into key, mouse, and response events.
 final class CsiParser {
+  // TODO why is this not constant?!
+
+  /// const CsiParser();
   /// Dispatches a CSI sequence to the appropriate handler by final byte.
   Event? parse(SequenceData data) {
     final d = data as CsiSequenceData;

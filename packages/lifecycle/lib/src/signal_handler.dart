@@ -6,6 +6,8 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'terminal_guard.dart' show TerminalGuard;
 
 /// Handles POSIX signals (SIGINT, SIGTERM, SIGTSTP, SIGCONT) for graceful shutdown.
+
+/// TODO rework with init(); dispose(); and riverpod
 class SignalHandler with Disposable {
   final TerminalGuard _guard;
 

@@ -12,7 +12,7 @@ sealed class ProcessResult with _$ProcessResult {
     @Default('') String stderr,
   }) = ProcessSuccess;
 
-  factory ProcessResult.timeout(Duration duration) = ProcessTimeout;
+  const factory ProcessResult.timeout(Duration duration) = ProcessTimeout;
 }
 
 class ProcessTimeout extends ProcessResult {

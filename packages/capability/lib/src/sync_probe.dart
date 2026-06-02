@@ -8,20 +8,21 @@ import 'package:parser/terminal_parser.dart'
 import 'package:terminal/terminal.dart' show TerminalIo;
 
 class SyncProbe with Disposable {
-  final TerminalIo _io;
+  final TerminalIo io;
 
-  SyncProbe({this._io = const TerminalIo()});
+  SyncProbe({required this.io});
 
   Future<bool> probe({Duration timeout = Defaults.defaultProbeTimeout}) async {
     check();
     final parser = TerminalParser();
     final completer = Completer<bool>();
+        /// TODO what the fuck is this?!
     final timer = Timer(timeout, () {
       if (!completer.isCompleted) completer.complete(false);
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = _io.inputStream.listen((bytes) {
+    sub = io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is QuerySyncUpdateEvent) {
@@ -32,8 +33,8 @@ class SyncProbe with Disposable {
       }
     });
 
-    _io.write(querySyncUpdate());
-    await _io.flush();
+    io.write(querySyncUpdate());
+    await io.flush();
 
     final result = await completer.future;
     await sub.cancel();

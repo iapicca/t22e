@@ -3,6 +3,8 @@ import 'package:protocol/protocol.dart' show Defaults;
 
 part 'engine.freezed.dart';
 
+/// move unrelated classes and enum to distinct files
+
 /// States for the VT500 state machine.
 enum VtState {
   ground,

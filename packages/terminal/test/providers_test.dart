@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('terminalIoProvider', () {
     test('creates a TerminalIo', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final io = container.read(terminalIoProvider);
@@ -13,7 +13,7 @@ void main() {
     });
 
     test('can write to terminal', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final io = container.read(terminalIoProvider);
@@ -23,7 +23,7 @@ void main() {
 
   group('ioRawBackendProvider', () {
     test('creates an IoRawModeBackend', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final backend = container.read(ioRawBackendProvider);
@@ -32,7 +32,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final backend = container.read(ioRawBackendProvider);
       try {
         container.dispose();
@@ -46,7 +46,7 @@ void main() {
 
   group('ffiRawBackendProvider', () {
     test('creates a FfiRawModeBackend', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final backend = container.read(ffiRawBackendProvider);
@@ -55,7 +55,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final backend = container.read(ffiRawBackendProvider);
       container.dispose();
 
@@ -65,7 +65,7 @@ void main() {
 
   group('terminalRunnerProvider', () {
     test('creates a TerminalRunner', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final runner = container.read(terminalRunnerProvider);
@@ -75,7 +75,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final runner = container.read(terminalRunnerProvider);
       container.dispose();
 

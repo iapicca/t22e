@@ -20,7 +20,7 @@ part 'providers.g.dart';
 /// ```
 @riverpod
 AltScreenManager altScreenManager(Ref ref) {
-  final manager = AltScreenManager(const TerminalIo());
+  final manager = AltScreenManager(ref.watch(terminalIoProvider));
   ref.onDispose(() => manager.dispose(null));
   return manager;
 }

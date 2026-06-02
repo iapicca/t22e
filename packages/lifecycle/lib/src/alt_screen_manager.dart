@@ -4,6 +4,8 @@ import 'package:ansi/ansi.dart'
 import 'package:notifier/notifier.dart' show Disposable;
 import 'package:terminal/terminal.dart' show TerminalIo;
 
+/// TODO refactor to riverpod
+
 class AltScreenManager with Disposable {
   final TerminalIo _io;
   bool _active = false;
@@ -23,7 +25,7 @@ class AltScreenManager with Disposable {
     _io.flush();
     _active = true;
   }
-
+  /// TODO why isn't this just "dispose"?
   void exit() {
     if (!_active) return;
     _io.write(showCursor());

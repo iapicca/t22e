@@ -4,6 +4,9 @@ import 'events.dart';
 
 /// Parses DCS sequences (Kitty graphics protocol).
 final class DcsParser {
+    // TODO why is this not constant?!
+
+  /// const DcsParser();
   /// Dispatches a DCS sequence based on final byte and intermediates.
   Event? parse(SequenceData data) {
     final d = data as DcsSequenceData;

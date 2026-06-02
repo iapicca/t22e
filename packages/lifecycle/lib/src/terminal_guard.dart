@@ -3,6 +3,7 @@ import 'package:terminal/terminal.dart' show TerminalRunner;
 import 'alt_screen_manager.dart' show AltScreenManager;
 
 /// Ensures the terminal is restored to its original state on exit or crash.
+/// TODO rework with init(); dispose(); and riverpod, _restored can be a valuenotifier 
 class TerminalGuard with Disposable {
   final TerminalRunner _runner;
   final AltScreenManager _altScreen;

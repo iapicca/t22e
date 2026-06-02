@@ -8,11 +8,11 @@ import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
-
+/// TODO this should just be a function!
 class ColorProbe with Disposable {
-  final TerminalIo _io;
+  final TerminalIo io;
 
-  ColorProbe({this._io = const TerminalIo()});
+  ColorProbe({required this.io});
 
   ColorProfile detectFromEnv() {
     final colorterm = Platform.environment['COLORTERM'];
@@ -61,7 +61,7 @@ class ColorProbe with Disposable {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = _io.inputStream.listen((bytes) {
+    sub = io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is ColorQueryEvent && event.r != null) {
@@ -72,8 +72,8 @@ class ColorProbe with Disposable {
       }
     });
 
-    _io.write('${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}');
-    await _io.flush();
+    io.write('${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}');
+    await io.flush();
 
     final result = await completer.future;
     await sub.cancel();

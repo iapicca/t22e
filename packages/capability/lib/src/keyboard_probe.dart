@@ -8,10 +8,11 @@ import 'package:parser/terminal_parser.dart'
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show KeyboardProtocol;
 
+/// TODO this should just be a function!
 class KeyboardProbe with Disposable {
-  final TerminalIo _io;
+  final TerminalIo io;
 
-  KeyboardProbe({this._io = const TerminalIo()});
+  KeyboardProbe({required this.io});
 
   Future<KeyboardProtocol> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
@@ -19,6 +20,7 @@ class KeyboardProbe with Disposable {
     check();
     final parser = TerminalParser();
     final completer = Completer<KeyboardProtocol>();
+    /// TODO what the fuck is this?!
     final timer = Timer(timeout, () {
       if (!completer.isCompleted) {
         completer.complete(KeyboardProtocol.basic);
@@ -26,7 +28,7 @@ class KeyboardProbe with Disposable {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = _io.inputStream.listen((bytes) {
+    sub = io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is KeyboardEnhancementFlagsEvent) {
@@ -37,13 +39,13 @@ class KeyboardProbe with Disposable {
       }
     });
 
-    _io.write(enableKittyKeyboard(Defaults.kittyDisambiguate));
-    await _io.flush();
+    io.write(enableKittyKeyboard(Defaults.kittyDisambiguate));
+    await io.flush();
 
     final result = await completer.future;
     await sub.cancel();
     if (result == KeyboardProtocol.basic) {
-      _io.write(disableKittyKeyboard());
+      io.write(disableKittyKeyboard());
     }
     return result;
   }

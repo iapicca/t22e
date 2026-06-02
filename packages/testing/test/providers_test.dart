@@ -5,7 +5,7 @@ import 'package:testing/testing.dart';
 void main() {
   group('virtualTerminalProvider', () {
     test('creates a VirtualTerminal', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final terminal = container.read(virtualTerminalProvider);
@@ -13,7 +13,7 @@ void main() {
     });
 
     test('can write to terminal', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final terminal = container.read(virtualTerminalProvider);
@@ -21,7 +21,7 @@ void main() {
     });
 
     test('can read plain text', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final terminal = container.read(virtualTerminalProvider);
@@ -32,7 +32,7 @@ void main() {
 
   group('virtualTerminalWithSizeProvider', () {
     test('creates a VirtualTerminal with custom size', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final terminal = container.read(
@@ -45,7 +45,7 @@ void main() {
 
   group('widgetTesterProvider', () {
     test('creates a WidgetTester', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final tester = container.read(widgetTesterProvider);
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('has a virtual terminal', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final tester = container.read(widgetTesterProvider);

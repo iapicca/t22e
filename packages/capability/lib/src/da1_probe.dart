@@ -8,10 +8,11 @@ import 'package:parser/terminal_parser.dart'
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Da1Result;
 
+/// TODO this should just be a function!
 class Da1Probe with Disposable {
-  final TerminalIo _io;
+  final TerminalIo io;
 
-  Da1Probe({this._io = const TerminalIo()});
+  Da1Probe({required this.io});
 
   Future<QueryResult<Da1Result>> probe({
     Duration timeout = Defaults.defaultProbeTimeout,
@@ -26,7 +27,7 @@ class Da1Probe with Disposable {
     });
 
     late final StreamSubscription<List<int>> sub;
-    sub = _io.inputStream.listen((bytes) {
+    sub = io.inputStream.listen((bytes) {
       final events = parser.advance(bytes);
       for (final event in events) {
         if (event is PrimaryDeviceAttributesEvent) {
@@ -42,8 +43,8 @@ class Da1Probe with Disposable {
       }
     });
 
-    _io.write(queryDa1());
-    await _io.flush();
+    io.write(queryDa1());
+    await io.flush();
 
     final result = await completer.future;
     await sub.cancel();

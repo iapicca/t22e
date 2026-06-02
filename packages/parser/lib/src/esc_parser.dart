@@ -3,6 +3,7 @@ import 'engine.dart';
 import 'events.dart';
 
 /// Parses ESC sequences (SS3 function keys, reset, save/restore screen).
+/// TODO this should be a function I don't like the naming `d` and `fb`, not human readable
 final class EscParser {
   /// Dispatches an ESC sequence to the appropriate handler.
   Event? parse(SequenceData data) {

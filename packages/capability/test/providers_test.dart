@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('da1ProbeProvider', () {
     test('creates a Da1Probe', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final probe = container.read(da1ProbeProvider);
@@ -14,7 +14,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final probe = container.read(da1ProbeProvider);
       container.dispose();
 
@@ -24,7 +24,7 @@ void main() {
 
   group('colorProbeProvider', () {
     test('creates a ColorProbe', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final probe = container.read(colorProbeProvider);
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final probe = container.read(colorProbeProvider);
       container.dispose();
 
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('detectFromEnv returns a ColorProfile', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final probe = container.read(colorProbeProvider);
@@ -52,7 +52,7 @@ void main() {
 
   group('syncProbeProvider', () {
     test('creates a SyncProbe', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final probe = container.read(syncProbeProvider);
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final probe = container.read(syncProbeProvider);
       container.dispose();
 
@@ -71,7 +71,7 @@ void main() {
 
   group('keyboardProbeProvider', () {
     test('creates a KeyboardProbe', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final probe = container.read(keyboardProbeProvider);
@@ -80,7 +80,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final probe = container.read(keyboardProbeProvider);
       container.dispose();
 
@@ -88,24 +88,13 @@ void main() {
     });
   });
 
-  group('probePipelineProvider', () {
-    test('creates a ProbePipeline', () {
-      final container = ProviderContainer();
+  group('capabilitiesProvider', () {
+    test('provider is defined', () {
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
-      final pipeline = container.read(probePipelineProvider);
-      expect(pipeline, isA<ProbePipeline>());
-    });
-
-    test('pipeline has non-null probes', () {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
-
-      final pipeline = container.read(probePipelineProvider);
-      expect(pipeline.da1Probe, isNotNull);
-      expect(pipeline.colorProbe, isNotNull);
-      expect(pipeline.syncProbe, isNotNull);
-      expect(pipeline.keyboardProbe, isNotNull);
+      final future = container.read(capabilitiesProvider.future);
+      expect(future, isA<Future<Capabilities>>());
     });
   });
 }

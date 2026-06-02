@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'events.freezed.dart';
 
+/// TODO why are those classes not actually using freezed? why are all together?
+
 sealed class Event {
   const Event();
 }

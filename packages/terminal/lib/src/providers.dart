@@ -4,8 +4,22 @@ import 'ffi_raw_backend.dart';
 import 'io_raw_backend.dart';
 import 'runner.dart';
 import 'terminal_io.dart';
+import 'system_io.dart';
+import 'native_io.dart';
+import 'termios_bindings.dart';
 
 part 'providers.g.dart';
+
+/// Factory provider that creates a [SystemIo] managed by Riverpod.
+@riverpod
+SystemIo systemIo(Ref ref) => const NativeIo();
+
+/// Factory provider that creates [TermiosBindings] managed by Riverpod.
+@riverpod
+TermiosBindings termiosBindings(Ref ref) {
+  final io = ref.watch(systemIoProvider);
+  return TermiosBindingsImpl.fromPlatformService(io);
+}
 
 /// Factory provider that creates a [TerminalIo] managed by Riverpod.
 ///
@@ -18,7 +32,7 @@ part 'providers.g.dart';
 /// ```
 @riverpod
 TerminalIo terminalIo(Ref ref) {
-  return const TerminalIo();
+  return TerminalIo(io: ref.watch(systemIoProvider));
 }
 
 /// Factory provider that creates an [IoRawModeBackend] managed by Riverpod.
@@ -34,7 +48,7 @@ TerminalIo terminalIo(Ref ref) {
 /// ```
 @riverpod
 IoRawModeBackend ioRawBackend(Ref ref) {
-  final backend = IoRawModeBackend();
+  final backend = IoRawModeBackend(io: ref.watch(systemIoProvider));
   ref.onDispose(() {
     try {
       backend.dispose(null);
@@ -58,7 +72,10 @@ IoRawModeBackend ioRawBackend(Ref ref) {
 /// ```
 @riverpod
 FfiRawModeBackend ffiRawBackend(Ref ref) {
-  final backend = FfiRawModeBackend();
+  final backend = FfiRawModeBackend(
+    bindings: ref.watch(termiosBindingsProvider),
+    io: ref.watch(systemIoProvider),
+  );
   ref.onDispose(() => backend.dispose(null));
   return backend;
 }
@@ -66,7 +83,7 @@ FfiRawModeBackend ffiRawBackend(Ref ref) {
 /// Factory provider that creates a [TerminalRunner] managed by Riverpod.
 ///
 /// Riverpod handles disposal automatically via [ref.onDispose].
-/// The runner is created with default backends (Ffi + Io).
+/// The runner is created with Ffi + Io backends.
 ///
 /// Example:
 /// ```dart
@@ -79,7 +96,10 @@ FfiRawModeBackend ffiRawBackend(Ref ref) {
 /// ```
 @riverpod
 TerminalRunner terminalRunner(Ref ref) {
-  final runner = TerminalRunner();
+  final runner = TerminalRunner(backends: [
+    ref.watch(ffiRawBackendProvider),
+    ref.watch(ioRawBackendProvider),
+  ]);
   ref.onDispose(() => runner.dispose(null));
   return runner;
 }

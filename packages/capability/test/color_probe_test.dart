@@ -1,13 +1,15 @@
+import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 import 'package:core/core.dart' show ColorProfile;
 import 'package:capability/capability.dart';
 
 void main() {
   group('ColorProbe', () {
-    final probe = ColorProbe();
-
     test('detectFromEnv returns trueColor for truecolor COLORTERM', () {
-      // detectFromEnv reads real env vars, so we just verify the method works
+      final container = ProviderContainer.test();
+      addTearDown(container.dispose);
+
+      final probe = container.read(colorProbeProvider);
       final result = probe.detectFromEnv();
       expect(result, isA<ColorProfile>());
     });

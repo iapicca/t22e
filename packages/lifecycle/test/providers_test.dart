@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('altScreenManagerProvider', () {
     test('creates an AltScreenManager', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final manager = container.read(altScreenManagerProvider);
@@ -14,7 +14,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final manager = container.read(altScreenManagerProvider);
       container.dispose();
 
@@ -24,7 +24,7 @@ void main() {
 
   group('terminalGuardProvider', () {
     test('creates a TerminalGuard', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final guard = container.read(terminalGuardProvider);
@@ -33,7 +33,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final guard = container.read(terminalGuardProvider);
       container.dispose();
 
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('can arm and restore', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final guard = container.read(terminalGuardProvider);
@@ -52,7 +52,7 @@ void main() {
     });
 
     test('runGuarded restores after execution', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final guard = container.read(terminalGuardProvider);
@@ -66,7 +66,7 @@ void main() {
 
   group('signalHandlerProvider', () {
     test('creates a SignalHandler', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       addTearDown(container.dispose);
 
       final handler = container.read(
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer.test();
       final handler = container.read(
         signalHandlerProvider(onInterrupt: () {}),
       );
