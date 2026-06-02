@@ -11,3 +11,4 @@ export 'src/color_probe.dart' show ColorProbe;
 export 'src/sync_probe.dart' show SyncProbe;
 export 'src/keyboard_probe.dart' show KeyboardProbe;
 export 'src/pipeline.dart' show ProbePipeline;
+export 'src/providers.dart';

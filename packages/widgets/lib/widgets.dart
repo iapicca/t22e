@@ -19,3 +19,4 @@ export 'src/visual/progress.dart' show ProgressBar;
 export 'src/visual/spinner.dart' show Spinner;
 export 'src/visual/table.dart' show Table;
 export 'src/visual/dialog.dart' show Dialog, DialogButton, SizedBox;
+export 'src/providers.dart';

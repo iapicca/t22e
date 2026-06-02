@@ -657,3 +657,63 @@ melos test  # Code generation + dart test
 | `pubspec.yaml` | Add riverpod dependencies |
 | `lib/src/virtual_terminal.dart` | Integrate with ProviderContainer |
 | `lib/src/widget_tester.dart` | Create ProviderContainer with overrides |
+
+---
+
+## Phase 1-6 Implementation Notes (Completed)
+
+### Architecture: Riverpod as Lifecycle Manager for Legacy Objects
+
+**Decision:** Keep legacy classes (`ChangeNotifier`, `ValueNotifier`, `Disposable`, `Disposed`, and all domain classes) **unchanged**. Riverpod providers act as **lifecycle-managed factories** that instantiate, return, and dispose of these objects.
+
+### Why This Approach
+
+1. **Zero breaking changes** - All existing code continues to work without modification
+2. **Gradual migration** - Downstream packages can adopt Riverpod incrementally
+3. **No inheritance** - Providers are functional (`@riverpod` on functions), returning instances of the existing classes
+4. **Riverpod handles lifecycle** - `ref.onDispose()` replaces manual `dispose()` calls
+5. **Test overrides** - `ProviderContainer(overrides: [...])` enables easy mocking in tests
+
+### Pattern
+
+```dart
+@riverpod
+TerminalRunner terminalRunner(Ref ref) {
+  final runner = TerminalRunner();
+  ref.onDispose(() => runner.dispose(null));
+  return runner;
+}
+```
+
+**Key details:**
+- Providers are functional (annotated functions, not classes)
+- `ref.onDispose()` wraps the legacy `dispose(String?)` call with a closure
+- Some dispose methods may fail in non-terminal environments (e.g., `IoRawModeBackend.disable()`), so try-catch is used where needed
+- Cross-package dependencies are handled by importing providers from other packages (e.g., `terminalRunnerProvider` in lifecycle)
+
+### Completed Packages
+
+| Package | Providers Added | Tests | Status |
+|---------|----------------|-------|--------|
+| `terminal` | `terminalIoProvider`, `ioRawBackendProvider`, `ffiRawBackendProvider`, `terminalRunnerProvider` | 8 new tests | ✅ |
+| `capability` | `da1ProbeProvider`, `colorProbeProvider`, `syncProbeProvider`, `keyboardProbeProvider`, `probePipelineProvider` | 10 new tests | ✅ |
+| `lifecycle` | `altScreenManagerProvider`, `terminalGuardProvider`, `signalHandlerProvider` (family) | 8 new tests | ✅ |
+| `widgets` | `everyCmdProvider` (family) | 3 new tests | ✅ |
+| `testing` | `virtualTerminalProvider`, `virtualTerminalWithSizeProvider` (family), `widgetTesterProvider` | 6 new tests | ✅ |
+
+### File-by-File Summary
+
+| Package | Files Created | Files Modified |
+|---------|--------------|----------------|
+| `terminal` | `lib/src/providers.dart`, `lib/src/providers.g.dart`, `test/providers_test.dart` | `lib/terminal.dart` |
+| `capability` | `lib/src/providers.dart`, `lib/src/providers.g.dart`, `test/providers_test.dart` | `lib/capability.dart` |
+| `lifecycle` | `lib/src/providers.dart`, `lib/src/providers.g.dart`, `test/providers_test.dart` | `lib/lifecycle.dart` |
+| `widgets` | `lib/src/providers.dart`, `lib/src/providers.g.dart`, `test/providers_test.dart` | `lib/widgets.dart` |
+| `testing` | `lib/src/providers.dart`, `lib/src/providers.g.dart`, `test/providers_test.dart` | `lib/testing.dart` |
+
+### Implications for Future Work
+
+- All existing classes remain usable without Riverpod
+- Consumers can choose to use providers or instantiate classes directly
+- `ProviderContainer` can be used in tests for provider overrides
+- The `notifier` package was excluded from this implementation per user request

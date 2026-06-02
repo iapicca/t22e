@@ -6,3 +6,4 @@ export 'src/process_signal.dart'
     show ProcessSignal, Sigint, Sigterm, Sigtstp, Sigcont;
 export 'src/process_result.dart'
     show ProcessResult, ProcessSuccess, ProcessTimeout;
+export 'src/providers.dart';
