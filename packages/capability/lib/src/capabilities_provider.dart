@@ -11,11 +11,11 @@ part 'capabilities_provider.g.dart';
 
 @riverpod
 Future<Capabilities> capabilities(Ref ref) async {
-  final da1 = await ref.watch(da1ProbeProvider)();
-  final color = await ref.watch(colorProbeProvider)(da1);
-  final syncSupported = await ref.watch(syncProbeProvider)();
-  final keyboard = await ref.watch(keyboardProbeProvider)();
-  final io = ref.watch(terminalIoProvider);
+  final da1 = await ref.read(da1ProbeProvider)();
+  final color = await ref.read(colorProbeProvider)(da1);
+  final syncSupported = await ref.read(syncProbeProvider)();
+  final keyboard = await ref.read(keyboardProbeProvider)();
+  final io = ref.read(terminalIoProvider);
 
   return Capabilities(
     da1: da1,

@@ -10,7 +10,7 @@ import 'result.dart' show QueryResult, Da1Result;
 part 'color_probe_provider.g.dart';
 
 /// TODO rename 
-typedef ColorProbeFn = Future<ColorProfile> Function(
+typedef ColorProbe = Future<ColorProfile> Function(
   QueryResult<Da1Result> da1Result, {
   Duration? timeout,
 });
@@ -26,9 +26,9 @@ ColorProfile Function(QueryResult<Da1Result>) colorFromDa1(Ref ref) {
 }
 
 @riverpod
-ColorProbeFn colorProbe(Ref ref) {
-  final io = ref.watch(terminalIoProvider);
-  final parser = ref.watch(terminalParserProvider);
+ColorProbe colorProbe(Ref ref) {
+  final io = ref.read(terminalIoProvider);
+  final parser = ref.read(terminalParserProvider);
   return (da1Result, {timeout}) =>
       probe.probeColor(io, parser, da1Result, timeout: timeout ?? Defaults.defaultProbeTimeout);
 }

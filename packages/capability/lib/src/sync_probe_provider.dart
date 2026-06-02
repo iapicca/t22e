@@ -7,13 +7,13 @@ import 'sync_probe.dart' as probe;
 
 part 'sync_probe_provider.g.dart';
 
-typedef SyncProbeFn = Future<bool> Function({
+typedef SyncProbe = Future<bool> Function({
   Duration? timeout,
 });
 
 @riverpod
-SyncProbeFn syncProbe(Ref ref) {
-  final io = ref.watch(terminalIoProvider);
-  final parser = ref.watch(terminalParserProvider);
+SyncProbe syncProbe(Ref ref) {
+  final io = ref.read(terminalIoProvider);
+  final parser = ref.read(terminalParserProvider);
   return ({timeout}) => probe.probeSync(io, parser, timeout: timeout ?? Defaults.defaultProbeTimeout);
 }
