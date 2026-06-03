@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:ansi/ansi.dart' show querySyncUpdate;
 import 'package:notifier/notifier.dart' show Disposable;
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show TerminalIo;
+import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 @internal
 Future<bool> probeSync(
@@ -13,27 +12,11 @@ Future<bool> probeSync(
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {
-  final completer = Completer<bool>();
-  final timer = Timer(timeout, () {
-    if (!completer.isCompleted) completer.complete(false);
-  });
-
-  late final StreamSubscription<List<int>> sub;
-  sub = io.inputStream.listen((bytes) {
-    final events = parser.advance(bytes);
-    for (final event in events) {
-      if (event is QuerySyncUpdateEvent) {
-        timer.cancel();
-        sub.cancel();
-        completer.complete(event.supported);
-      }
-    }
-  });
-
-  io.write(querySyncUpdate());
-  await io.flush();
-
-  final result = await completer.future;
-  await sub.cancel();
-  return result;
+  return io.probe<QuerySyncUpdateEvent, bool>(
+    query: querySyncUpdate(),
+    parser: parser,
+    timeout: timeout,
+    onEvent: (event) => event.supported,
+    onTimeout: () => false,
+  );
 }

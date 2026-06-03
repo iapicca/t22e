@@ -9,7 +9,6 @@ import 'result.dart' show QueryResult, Da1Result;
 
 part 'color_probe_provider.g.dart';
 
-/// TODO rename 
 typedef ColorProbe = Future<ColorProfile> Function(
   QueryResult<Da1Result> da1Result, {
   Duration? timeout,

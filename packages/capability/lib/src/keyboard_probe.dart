@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:ansi/ansi.dart' show enableKittyKeyboard, disableKittyKeyboard;
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show KeyboardProtocol;
+import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 @internal
 Future<KeyboardProtocol> probeKeyboard(
@@ -13,31 +12,13 @@ Future<KeyboardProtocol> probeKeyboard(
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {
-  final completer = Completer<KeyboardProtocol>();
-  final timer = Timer(timeout, () {
-    if (!completer.isCompleted) {
-      completer.complete(KeyboardProtocol.basic);
-    }
-  });
-
-  late final StreamSubscription<List<int>> sub;
-  sub = io.inputStream.listen((bytes) {
-    final events = parser.advance(bytes);
-    for (final event in events) {
-      if (event is KeyboardEnhancementFlagsEvent) {
-        timer.cancel();
-        sub.cancel();
-        completer.complete(KeyboardProtocol.kitty);
-      }
-    }
-  });
-
-
-  io.write(enableKittyKeyboard(Defaults.kittyDisambiguate));
-  await io.flush();
-
-  final result = await completer.future;
-  await sub.cancel();
+  final result = await io.probe<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
+    query: enableKittyKeyboard(Defaults.kittyDisambiguate),
+    parser: parser,
+    timeout: timeout,
+    onEvent: (event) => KeyboardProtocol.kitty,
+    onTimeout: () => KeyboardProtocol.basic,
+  );
   if (result == KeyboardProtocol.basic) {
     io.write(disableKittyKeyboard());
   }

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:core/core.dart' show ColorProfile;
@@ -7,6 +6,7 @@ import 'package:parser/terminal_parser.dart'
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show TerminalIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
+import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 @internal
 ColorProfile detectColorFromEnv() {
@@ -50,29 +50,12 @@ Future<ColorProfile> probeColor(
   final env = detectColorFromEnv();
   if (env == ColorProfile.trueColor) return env;
 
-  final completer = Completer<ColorProfile>();
-  final timer = Timer(timeout, () {
-    if (!completer.isCompleted) {
-      completer.complete(detectColorFromDa1(da1Result));
-    }
-  });
-
-  late final StreamSubscription<List<int>> sub;
-  sub = io.inputStream.listen((bytes) {
-    final events = parser.advance(bytes);
-    for (final event in events) {
-      if (event is ColorQueryEvent && event.r != null) {
-        timer.cancel();
-        sub.cancel();
-        completer.complete(ColorProfile.trueColor);
-      }
-    }
-  });
-
-  io.write('${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}');
-  await io.flush();
-
-  final result = await completer.future;
-  await sub.cancel();
-  return result;
+  return io.probe<ColorQueryEvent, ColorProfile>(
+    query: '${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}',
+    parser: parser,
+    timeout: timeout,
+    where: (event) => event.r != null,
+    onEvent: (event) => ColorProfile.trueColor,
+    onTimeout: () => detectColorFromDa1(da1Result),
+  );
 }

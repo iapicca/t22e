@@ -10,6 +10,7 @@ export 'src/da1_probe.dart' show probeDa1;
 export 'src/color_probe.dart' show detectColorFromEnv, detectColorFromDa1, probeColor;
 export 'src/sync_probe.dart' show SyncProbe, probeSync;
 export 'src/keyboard_probe.dart' show probeKeyboard;
+export 'src/terminal_probe_extension.dart' show TerminalProbeExtension;
 export 'src/da1_probe_provider.dart' hide Da1ProbeFn;
 export 'src/color_probe_provider.dart' hide ColorProbeFn;
 export 'src/sync_probe_provider.dart' hide SyncProbeFn;
