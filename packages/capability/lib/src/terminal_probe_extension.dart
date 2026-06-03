@@ -22,7 +22,6 @@ extension TerminalProbeExtension on TerminalIoInterface {
   }) async {
     write(query);
     await flush();
-
     try {
       final matchedEvent = await inputStream
           .expand((bytes) => parser.advance(bytes))

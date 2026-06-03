@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:notifier/notifier.dart' show VoidCallback;
 import 'package:test/test.dart';
 import 'package:terminal/terminal.dart';
 import 'package:lifecycle/lifecycle.dart';
@@ -7,7 +8,7 @@ import 'package:lifecycle/lifecycle.dart';
 class FakeSystemIo implements SystemIo {
   final controller = StreamController<List<int>>();
   final output = StringBuffer();
-  void Function()? onFlush;
+  VoidCallback? onFlush;
   int _columns = 80;
   int _rows = 24;
   bool _echoMode = true;
@@ -77,6 +78,7 @@ void main() {
       final fakeIo = FakeSystemIo();
       final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
+      manager.init();
       manager.enter();
       expect(fakeIo.output.toString(), contains('\x1b['));
       expect(manager.isActive, isTrue);
@@ -86,6 +88,7 @@ void main() {
       final fakeIo = FakeSystemIo();
       final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
+      manager.init();
       manager.enter();
       final afterFirst = fakeIo.output.toString();
       manager.enter();
@@ -96,6 +99,7 @@ void main() {
       final fakeIo = FakeSystemIo();
       final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
+      manager.init();
       manager.enter();
       fakeIo.output.clear();
       manager.exit();
@@ -107,6 +111,7 @@ void main() {
       final fakeIo = FakeSystemIo();
       final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
+      manager.init();
       manager.enter();
       manager.exit();
       fakeIo.output.clear();
@@ -118,6 +123,7 @@ void main() {
       final fakeIo = FakeSystemIo();
       final io = TerminalIo(io: fakeIo);
       final manager = AltScreenManager(io);
+      manager.init();
       manager.enter(captureMouse: true);
       expect(fakeIo.output.toString(), contains('\x1b['));
     });
@@ -132,6 +138,7 @@ void main() {
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
+      guard.init();
       guard.arm();
       expect(guard.isRestored, isFalse);
 
@@ -148,6 +155,7 @@ void main() {
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
+      guard.init();
       guard.arm();
       guard.disarm();
       expect(guard.isRestored, isTrue);
@@ -165,6 +173,7 @@ void main() {
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
+      guard.init();
       guard.arm();
       guard.restore();
       guard.restore();
@@ -179,6 +188,7 @@ void main() {
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
+      guard.init();
       var called = false;
       guard.arm();
       guard.runGuarded(() {
@@ -199,6 +209,7 @@ void main() {
       final altScreen = AltScreenManager(io);
       final guard = TerminalGuard(runner, altScreen);
 
+      guard.init();
       guard.arm();
       runner.enterRawMode();
       try {

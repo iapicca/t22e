@@ -74,7 +74,7 @@ void main() {
 
     test('listener can remove itself during notification', () {
       final cn = ChangeNotifier();
-      late void Function() self;
+      late VoidCallback self;
       self = () {
         _counter++;
         cn.removeListener(self);
@@ -101,32 +101,32 @@ void main() {
     test('dispose clears listeners and marks disposed', () {
       final cn = ChangeNotifier();
       cn.addListener(_listener);
-      cn.dispose(null);
+      cn.dispose();
       expect(cn.isDisposed, isTrue);
       expect(cn.hasListeners, isFalse);
     });
 
     test('addListener throws after dispose', () {
       final cn = ChangeNotifier();
-      cn.dispose(null);
+      cn.dispose();
       expect(() => cn.addListener(_listener), throwsStateError);
     });
 
     test('removeListener throws after dispose', () {
       final cn = ChangeNotifier();
-      cn.dispose(null);
+      cn.dispose();
       expect(() => cn.removeListener(_listener), throwsStateError);
     });
 
     test('notifyListeners throws after dispose', () {
       final cn = ChangeNotifier();
-      cn.dispose(null);
+      cn.dispose();
       expect(() => cn.notifyListeners(), throwsStateError);
     });
 
     test('custom message on addListener after dispose', () {
       final cn = ChangeNotifier();
-      cn.dispose(null);
+      cn.dispose();
       expect(
         () => cn.addListener(_listener, message: 'Nope'),
         throwsA(
@@ -137,7 +137,7 @@ void main() {
 
     test('custom message on notifyListeners after dispose', () {
       final cn = ChangeNotifier();
-      cn.dispose(null);
+      cn.dispose();
       expect(
         () => cn.notifyListeners(message: 'Gone'),
         throwsA(

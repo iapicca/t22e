@@ -24,8 +24,8 @@ final class IoRawModeBackend with Disposable implements RawModeBackend {
   }
 
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
+    super.dispose(message: message);
     disable();
   }
 }

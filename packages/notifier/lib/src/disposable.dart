@@ -27,7 +27,7 @@ mixin Disposable {
 
   /// Marks as disposed, idempotent; call [super.dispose] in overrides.
   @mustCallSuper
-  void dispose(String? message) {
+  void dispose({String? message}) {
     check(message: message);
     _disposed = const Disposed(isDisposed: true);
   }

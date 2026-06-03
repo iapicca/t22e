@@ -35,8 +35,8 @@ class ChangeNotifier with Disposable {
   /// Clears all listeners and marks as disposed.
   @mustCallSuper
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
+    super.dispose(message: message);
     _listeners.clear();
   }
 }

@@ -1,14 +1,15 @@
 import 'package:ansi/ansi.dart' show queryDa1;
+import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIo;
+import 'package:terminal/terminal.dart' show TerminalIoInterface;
 import 'result.dart' show QueryResult, Da1Result;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 @internal
 Future<QueryResult<Da1Result>> probeDa1(
-  TerminalIo io,
+  TerminalIoInterface io,
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {

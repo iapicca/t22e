@@ -1,8 +1,10 @@
+import 'package:notifier/notifier.dart' show VoidCallback;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:terminal/terminal.dart';
 
 import 'alt_screen_manager.dart';
 import 'signal_handler.dart';
+import 'signal_providers.dart';
 import 'terminal_guard.dart';
 
 part 'providers.g.dart';
@@ -21,7 +23,7 @@ part 'providers.g.dart';
 @riverpod
 AltScreenManager altScreenManager(Ref ref) {
   final manager = AltScreenManager(ref.watch(terminalIoProvider));
-  ref.onDispose(() => manager.dispose(null));
+  ref.onDispose(manager.dispose);
   return manager;
 }
 
@@ -48,7 +50,8 @@ TerminalGuard terminalGuard(Ref ref) {
     ref.watch(terminalRunnerProvider),
     ref.watch(altScreenManagerProvider),
   );
-  ref.onDispose(() => guard.dispose(null));
+  guard.init();
+  ref.onDispose(guard.dispose);
   return guard;
 }
 
@@ -75,11 +78,15 @@ TerminalGuard terminalGuard(Ref ref) {
 /// container.dispose(); // automatically removes signal listeners
 /// ```
 @riverpod
-SignalHandler signalHandler(Ref ref, {required void Function() onInterrupt}) {
+SignalHandler signalHandler(Ref ref, {required VoidCallback onInterrupt}) {
   final handler = SignalHandler(
     guard: ref.watch(terminalGuardProvider),
     onInterrupt: onInterrupt,
+    sigint: ref.watch(sigintStreamProvider),
+    sigterm: ref.watch(sigtermStreamProvider),
+    sigtstp: ref.watch(sigtstpStreamProvider),
+    sigcont: ref.watch(sigcontStreamProvider),
   );
-  ref.onDispose(() => handler.dispose(null));
+  ref.onDispose(handler.dispose);
   return handler;
 }

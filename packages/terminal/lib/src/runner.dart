@@ -49,8 +49,8 @@ class TerminalRunner with Disposable {
   }
 
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
+    super.dispose(message: message);
     exitRawMode();
   }
 }

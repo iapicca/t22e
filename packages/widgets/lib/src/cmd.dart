@@ -49,8 +49,8 @@ final class EveryCmd extends Cmd with Disposable {
 
   // ignore: unnecessary_overrides
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
+    super.dispose(message: message);
   }
 }
 

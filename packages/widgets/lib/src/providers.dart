@@ -19,6 +19,6 @@ part 'providers.g.dart';
 @riverpod
 EveryCmd everyCmd(Ref ref, Duration interval) {
   final cmd = EveryCmd(interval, (now) => const ClearScreenMsg());
-  ref.onDispose(() => cmd.dispose(null));
+  ref.onDispose(cmd.dispose);
   return cmd;
 }

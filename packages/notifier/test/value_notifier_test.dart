@@ -32,7 +32,7 @@ void main() {
 
     test('value getter after dispose throws', () {
       final vn = ValueNotifier<int>(42);
-      vn.dispose(null);
+      vn.dispose();
       expect(vn.isDisposed, isTrue);
       // The getter does NOT have a check guard in the base class.
       // ValueNotifier.value getter currently has no guard.
@@ -42,13 +42,13 @@ void main() {
 
     test('value setter after dispose throws', () {
       final vn = ValueNotifier<int>(42);
-      vn.dispose(null);
+      vn.dispose();
       expect(() => vn.value = 0, throwsStateError);
     });
 
     test('value setter after dispose throws with custom message', () {
       final vn = ValueNotifier<int>(42, message: 'ValueNotifier done');
-      vn.dispose(null);
+      vn.dispose();
       expect(
         () => vn.value = 0,
         throwsA(
@@ -79,7 +79,7 @@ void main() {
     test('dispose on ValueNotifier blocks listener ops', () {
       final vn = ValueNotifier<String>('hello');
       vn.addListener(() {});
-      vn.dispose(null);
+      vn.dispose();
       expect(vn.isDisposed, isTrue);
       expect(vn.hasListeners, isFalse);
       expect(() => vn.addListener(() {}), throwsStateError);
@@ -108,7 +108,7 @@ void main() {
 
     test('_message propagates to all check points', () {
       final vn = ValueNotifier<int>(0, message: 'CustomMsg');
-      vn.dispose(null);
+      vn.dispose();
       // notifyListeners through value setter
       expect(
         () => vn.value = 1,

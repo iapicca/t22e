@@ -1,38 +1,33 @@
-import 'package:notifier/notifier.dart' show Disposable;
+import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
 import 'package:terminal/terminal.dart' show TerminalRunner;
 import 'alt_screen_manager.dart' show AltScreenManager;
 
-/// Ensures the terminal is restored to its original state on exit or crash.
-/// TODO rework with init(); dispose(); and riverpod, _restored can be a valuenotifier 
-class TerminalGuard with Disposable {
+class TerminalGuard extends ValueNotifier<bool> with InitMixin {
   final TerminalRunner _runner;
   final AltScreenManager _altScreen;
-  bool _restored = false;
 
-  TerminalGuard(this._runner, this._altScreen);
+  TerminalGuard(this._runner, this._altScreen) : super(false);
 
-  /// Arms the guard so the next [restore] call will take effect.
+  bool get isRestored => value;
+
   void arm() {
-    check();
-    _restored = false;
+    checkInit();
+    value = false;
   }
 
-  /// Restores the terminal (alt screen + raw mode exit) if armed.
   void restore() {
-    if (_restored) return;
-    _restored = true;
+    if (value) return;
+    value = true;
     _altScreen.exit();
     _runner.exitRawMode();
   }
 
-  /// Disarms the guard so restore becomes a no-op.
   void disarm() {
-    _restored = true;
+    value = true;
   }
 
-  /// Runs [body] with a guarantee that restore is called in the finally block.
   void runGuarded<T>(T Function() body) {
-    check();
+    checkInit();
     try {
       body();
     } finally {
@@ -40,12 +35,9 @@ class TerminalGuard with Disposable {
     }
   }
 
-  /// Whether the terminal has already been restored.
-  bool get isRestored => _restored;
-
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
     restore();
+    super.dispose(message: message);
   }
 }

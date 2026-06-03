@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io' as dart_io;
+
 import 'package:lifecycle/lifecycle.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -65,8 +68,17 @@ void main() {
   });
 
   group('signalHandlerProvider', () {
+    final emptyStream = Stream<dart_io.ProcessSignal>.empty();
+
     test('creates a SignalHandler', () {
-      final container = ProviderContainer.test();
+      final container = ProviderContainer.test(
+        overrides: [
+          sigintStreamProvider.overrideWithValue(emptyStream),
+          sigtermStreamProvider.overrideWithValue(emptyStream),
+          sigtstpStreamProvider.overrideWithValue(emptyStream),
+          sigcontStreamProvider.overrideWithValue(emptyStream),
+        ],
+      );
       addTearDown(container.dispose);
 
       final handler = container.read(
@@ -77,7 +89,14 @@ void main() {
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer.test();
+      final container = ProviderContainer.test(
+        overrides: [
+          sigintStreamProvider.overrideWithValue(emptyStream),
+          sigtermStreamProvider.overrideWithValue(emptyStream),
+          sigtstpStreamProvider.overrideWithValue(emptyStream),
+          sigcontStreamProvider.overrideWithValue(emptyStream),
+        ],
+      );
       final handler = container.read(
         signalHandlerProvider(onInterrupt: () {}),
       );

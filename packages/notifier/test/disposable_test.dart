@@ -11,8 +11,8 @@ class _TestResource with Disposable {
   }
 
   @override
-  void dispose(String? message) {
-    super.dispose(message);
+  void dispose({String? message}) {
+    super.dispose(message: message);
     callCount = -1;
   }
 }
@@ -32,26 +32,26 @@ void main() {
 
     test('dispose marks as disposed and runs cleanup', () {
       final r = _TestResource();
-      r.dispose(null);
+      r.dispose();
       expect(r.isDisposed, isTrue);
       expect(r.callCount, -1);
     });
 
     test('doWork throws after dispose', () {
       final r = _TestResource();
-      r.dispose(null);
+      r.dispose();
       expect(() => r.doWork(), throwsStateError);
     });
 
     test('dispose is idempotent (throws on second call)', () {
       final r = _TestResource();
-      r.dispose(null);
-      expect(() => r.dispose(null), throwsStateError);
+      r.dispose();
+      expect(() => r.dispose(), throwsStateError);
     });
 
     test('check throws with custom message', () {
       final r = _TestResource();
-      r.dispose(null);
+      r.dispose();
       expect(
         () => r.doWork(message: 'Cannot use: disposed'),
         throwsA(
@@ -67,7 +67,7 @@ void main() {
     test('super.dispose must be called (verifies chain)', () {
       final r = _TestResource();
       // The _TestResource.dispose calls super.dispose which sets isDisposed
-      r.dispose(null);
+      r.dispose();
       expect(r.isDisposed, isTrue);
     });
   });

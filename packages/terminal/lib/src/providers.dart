@@ -51,7 +51,7 @@ IoRawModeBackend ioRawBackend(Ref ref) {
   final backend = IoRawModeBackend(io: ref.watch(systemIoProvider));
   ref.onDispose(() {
     try {
-      backend.dispose(null);
+      backend.dispose();
     } catch (_) {
       // dispose() calls disable() which may fail in non-terminal environments
     }
@@ -76,7 +76,7 @@ FfiRawModeBackend ffiRawBackend(Ref ref) {
     bindings: ref.watch(termiosBindingsProvider),
     io: ref.watch(systemIoProvider),
   );
-  ref.onDispose(() => backend.dispose(null));
+  ref.onDispose(backend.dispose);
   return backend;
 }
 
@@ -100,6 +100,6 @@ TerminalRunner terminalRunner(Ref ref) {
     ref.watch(ffiRawBackendProvider),
     ref.watch(ioRawBackendProvider),
   ]);
-  ref.onDispose(() => runner.dispose(null));
+  ref.onDispose(runner.dispose);
   return runner;
 }
