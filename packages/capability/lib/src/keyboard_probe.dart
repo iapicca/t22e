@@ -13,13 +13,14 @@ Future<KeyboardProtocol> probeKeyboard(
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {
-  final result = await io.probe<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
-    query: enableKittyKeyboard(Defaults.kittyDisambiguate),
-    parser: parser,
-    timeout: timeout,
-    onEvent: (event) => KeyboardProtocol.kitty,
-    onTimeout: () => KeyboardProtocol.basic,
-  );
+  final result = await io
+      .probe<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
+        query: enableKittyKeyboard(Defaults.kittyDisambiguate),
+        parser: parser,
+        timeout: timeout,
+        onEvent: (event) => KeyboardProtocol.kitty,
+        onTimeout: () => KeyboardProtocol.basic,
+      );
   if (result == KeyboardProtocol.basic) {
     io.write(disableKittyKeyboard());
   }

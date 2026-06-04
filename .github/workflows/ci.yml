@@ -25,4 +25,4 @@ jobs:
         run: melos test
 
       - name: Format
-        run: dart format --output=none --set-exit-if-changed .
+        run: melos format

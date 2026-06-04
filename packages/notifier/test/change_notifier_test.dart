@@ -129,9 +129,7 @@ void main() {
       cn.dispose();
       expect(
         () => cn.addListener(_listener, message: 'Nope'),
-        throwsA(
-          isA<StateError>().having((e) => e.message, 'message', 'Nope'),
-        ),
+        throwsA(isA<StateError>().having((e) => e.message, 'message', 'Nope')),
       );
     });
 
@@ -140,9 +138,7 @@ void main() {
       cn.dispose();
       expect(
         () => cn.notifyListeners(message: 'Gone'),
-        throwsA(
-          isA<StateError>().having((e) => e.message, 'message', 'Gone'),
-        ),
+        throwsA(isA<StateError>().having((e) => e.message, 'message', 'Gone')),
       );
     });
   });

@@ -37,3 +37,6 @@ melos:
       run: |
         melos build
         melos exec -- dart test
+    format:
+      description: Check code formatting across all packages.
+      exec: dart format --output=none --set-exit-if-changed .

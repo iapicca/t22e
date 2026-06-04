@@ -70,38 +70,40 @@ void main() {
   group('signalHandlerProvider', () {
     final emptyStream = Stream<dart_io.ProcessSignal>.empty();
 
-    test('creates a SignalHandler', () {
-      final container = ProviderContainer.test(
+    late ProviderContainer container;
+    late SignalHandler handler;
+
+    setUp(() {
+      container = ProviderContainer.test(
         overrides: [
           sigintStreamProvider.overrideWithValue(emptyStream),
           sigtermStreamProvider.overrideWithValue(emptyStream),
           sigtstpStreamProvider.overrideWithValue(emptyStream),
           sigcontStreamProvider.overrideWithValue(emptyStream),
+          signalHandlerProvider(onInterrupt: () {}).overrideWith(
+            (ref) => SignalHandler(
+              guard: ref.watch(terminalGuardProvider),
+              onInterrupt: () {},
+              sigint: ref.watch(sigintStreamProvider),
+              sigterm: ref.watch(sigtermStreamProvider),
+              sigtstp: ref.watch(sigtstpStreamProvider),
+              sigcont: ref.watch(sigcontStreamProvider),
+            ),
+          ),
         ],
       );
-      addTearDown(container.dispose);
+      handler = container.read(signalHandlerProvider(onInterrupt: () {}));
+    });
 
-      final handler = container.read(
-        signalHandlerProvider(onInterrupt: () {}),
-      );
+    tearDown(() => container.dispose());
+
+    test('creates a SignalHandler', () {
       expect(handler, isA<SignalHandler>());
       expect(handler.isDisposed, isFalse);
     });
 
     test('disposes on container dispose', () {
-      final container = ProviderContainer.test(
-        overrides: [
-          sigintStreamProvider.overrideWithValue(emptyStream),
-          sigtermStreamProvider.overrideWithValue(emptyStream),
-          sigtstpStreamProvider.overrideWithValue(emptyStream),
-          sigcontStreamProvider.overrideWithValue(emptyStream),
-        ],
-      );
-      final handler = container.read(
-        signalHandlerProvider(onInterrupt: () {}),
-      );
       container.dispose();
-
       expect(handler.isDisposed, isTrue);
     });
   });

@@ -18,8 +18,9 @@ extension TerminalProbeExtension on TerminalIoInterface {
     required Duration timeout,
     required R Function(T event) onEvent,
     required R Function() onTimeout,
-    bool Function(T event) where = (_) => true,
+    bool Function(T event)? where,
   }) async {
+    final filter = where ?? (_) => true;
     write(query);
     await flush();
     try {
@@ -27,7 +28,7 @@ extension TerminalProbeExtension on TerminalIoInterface {
           .expand((bytes) => parser.advance(bytes))
           .where((event) => event is T)
           .cast<T>()
-          .firstWhere(where)
+          .firstWhere(filter)
           .timeout(timeout);
 
       return onEvent(matchedEvent);

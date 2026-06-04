@@ -7,7 +7,7 @@ extension type const UnicodeWidthProperty._(
   int get end => property.$2;
   int get width => property.$3;
 
-  const UnicodeWidthProperty(int start, int end, int width) 
+  const UnicodeWidthProperty(int start, int end, int width)
     : this._((start, end, width));
 }
 
@@ -277,8 +277,8 @@ final class UnicodeLookup {
 
   static int _lookupProperties(int codepoint) =>
       (codepoint < 0 || codepoint > UnicodeTable.maxCodepoint)
-          ? 0
-          : _propertyTable[codepoint];
+      ? 0
+      : _propertyTable[codepoint];
 
   // MARK: - Public API
 

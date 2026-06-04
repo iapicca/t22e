@@ -31,14 +31,16 @@ final class TermiosBindingsImpl implements TermiosBindings {
 
   /// Looks up tcgetattr and tcsetattr from the given [library].
   TermiosBindingsImpl(this._libc)
-    : _getAttr = _libc.lookupFunction<
-          Int32 Function(Int32, Pointer<Uint8>),
-          int Function(int, Pointer<Uint8>)
-        >(SymbolsFFI.getAttrName),
-      _setAttr = _libc.lookupFunction<
-          Int32 Function(Int32, Int32, Pointer<Uint8>),
-          int Function(int, int, Pointer<Uint8>)
-        >(SymbolsFFI.setAttrName);
+    : _getAttr = _libc
+          .lookupFunction<
+            Int32 Function(Int32, Pointer<Uint8>),
+            int Function(int, Pointer<Uint8>)
+          >(SymbolsFFI.getAttrName),
+      _setAttr = _libc
+          .lookupFunction<
+            Int32 Function(Int32, Int32, Pointer<Uint8>),
+            int Function(int, int, Pointer<Uint8>)
+          >(SymbolsFFI.setAttrName);
 
   @override
   GetAttr get getAttr => _getAttr;
@@ -48,19 +50,21 @@ final class TermiosBindingsImpl implements TermiosBindings {
 
   @override
   Pointer<Uint8> malloc(int size) {
-    final fn = _libc.lookupFunction<
-        Pointer<Void> Function(IntPtr),
-        Pointer<Void> Function(int)
-      >(SymbolsFFI.mallocName);
+    final fn = _libc
+        .lookupFunction<
+          Pointer<Void> Function(IntPtr),
+          Pointer<Void> Function(int)
+        >(SymbolsFFI.mallocName);
     return fn(size).cast();
   }
 
   @override
   void free(Pointer<Uint8> ptr) {
-    final fn = _libc.lookupFunction<
-        Void Function(Pointer<Void>),
-        void Function(Pointer<Void>)
-      >(SymbolsFFI.freeName);
+    final fn = _libc
+        .lookupFunction<
+          Void Function(Pointer<Void>),
+          void Function(Pointer<Void>)
+        >(SymbolsFFI.freeName);
     fn(ptr.cast());
   }
 

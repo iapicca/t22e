@@ -1,9 +1,7 @@
-import 'package:meta/meta.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
-@internal
 Event? parseCsi(SequenceData data) {
   final sequenceData = data as CsiSequenceData;
   final params = sequenceData.params;
@@ -101,7 +99,11 @@ Event? _parseCsiKittyKeyboard(List<int> params) {
 
   final mappedKeyCode = _kittyKeyCodeMap[code];
   if (mappedKeyCode != null) {
-    return KeyEvent(keyCode: mappedKeyCode, modifiers: keyModifiers, type: type);
+    return KeyEvent(
+      keyCode: mappedKeyCode,
+      modifiers: keyModifiers,
+      type: type,
+    );
   }
 
   return null;
@@ -161,7 +163,12 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
   if ((buttonCode & Defaults.mouseDragBit) != 0 &&
       (buttonCode & Defaults.mouseButtonMask) != 3) {
     final button = _mouseButtonFromCode(buttonCode & Defaults.mouseButtonMask);
-    return MouseEvent(button: button, action: MouseAction.drag, x: column, y: row);
+    return MouseEvent(
+      button: button,
+      action: MouseAction.drag,
+      x: column,
+      y: row,
+    );
   }
 
   if ((buttonCode & Defaults.mouseDragBit) != 0) {
@@ -174,7 +181,12 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
   }
 
   final button = _mouseButtonFromCode(buttonCode & Defaults.mouseButtonMask);
-  return MouseEvent(button: button, action: MouseAction.press, x: column, y: row);
+  return MouseEvent(
+    button: button,
+    action: MouseAction.press,
+    x: column,
+    y: row,
+  );
 }
 
 MouseButton _mouseButtonFromCode(int code) {

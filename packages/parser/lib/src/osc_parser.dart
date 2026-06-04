@@ -1,9 +1,7 @@
-import 'package:meta/meta.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
-@internal
 Event? parseOsc(SequenceData data) {
   final sequenceData = data as OscSequenceData;
   final content = sequenceData.content;

@@ -8,13 +8,15 @@ import 'result.dart' show KeyboardProtocol;
 
 part 'keyboard_probe_provider.g.dart';
 
-typedef KeyboardProbe = Future<KeyboardProtocol> Function({
-  Duration? timeout,
-});
+typedef KeyboardProbe = Future<KeyboardProtocol> Function({Duration? timeout});
 
 @riverpod
 KeyboardProbe keyboardProbe(Ref ref) {
   final io = ref.read(terminalIoProvider);
   final parser = ref.read(terminalParserProvider);
-  return ({timeout}) => probe.probeKeyboard(io, parser, timeout: timeout ?? Defaults.defaultProbeTimeout);
+  return ({timeout}) => probe.probeKeyboard(
+    io,
+    parser,
+    timeout: timeout ?? Defaults.defaultProbeTimeout,
+  );
 }

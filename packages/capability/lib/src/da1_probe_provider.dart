@@ -8,13 +8,15 @@ import 'result.dart' show QueryResult, Da1Result;
 
 part 'da1_probe_provider.g.dart';
 
-typedef Da1Probe = Future<QueryResult<Da1Result>> Function({
-  Duration? timeout,
-});
+typedef Da1Probe = Future<QueryResult<Da1Result>> Function({Duration? timeout});
 
 @riverpod
 Da1Probe da1Probe(Ref ref) {
   final io = ref.read(terminalIoProvider);
   final parser = ref.read(terminalParserProvider);
-  return ({timeout}) => probe.probeDa1(io, parser, timeout: timeout ?? Defaults.defaultProbeTimeout);
+  return ({timeout}) => probe.probeDa1(
+    io,
+    parser,
+    timeout: timeout ?? Defaults.defaultProbeTimeout,
+  );
 }

@@ -31,14 +31,16 @@ extension type IndexedColor._(int _index) {
 /// A terminal color stored as exact RGB, with conversion getters.
 extension type Color._((int, int, int) _rgb) {
   const Color({int red = 0, int green = 0, int blue = 0})
-      : assert(red >= 0 && red <= Defaults.rgbComponentMax, 'red out of range'),
-        assert(
-            green >= 0 && green <= Defaults.rgbComponentMax,
-            'green out of range'),
-        assert(
-            blue >= 0 && blue <= Defaults.rgbComponentMax,
-            'blue out of range'),
-        _rgb = (red, green, blue);
+    : assert(red >= 0 && red <= Defaults.rgbComponentMax, 'red out of range'),
+      assert(
+        green >= 0 && green <= Defaults.rgbComponentMax,
+        'green out of range',
+      ),
+      assert(
+        blue >= 0 && blue <= Defaults.rgbComponentMax,
+        'blue out of range',
+      ),
+      _rgb = (red, green, blue);
 
   // ── ANSI 16-color constants ──
 
@@ -146,8 +148,7 @@ const Map<int, Color> _ansiToRgb = {
     return (c.red, c.green, c.blue);
   }
   if (index >= Defaults.indexedColorGrayStart) {
-    final v =
-        (index - Defaults.indexedColorGrayStart) * _grayStep + _grayBase;
+    final v = (index - Defaults.indexedColorGrayStart) * _grayStep + _grayBase;
     return (v, v, v);
   }
   final i = index - Defaults.indexedColorCubeStart;
@@ -218,14 +219,7 @@ int _indexedToAnsi(int index) {
   return maxVal >= 5 ? ansi + 8 : ansi;
 }
 
-double _redmeanDistance(
-  int r1,
-  int g1,
-  int b1,
-  int r2,
-  int g2,
-  int b2,
-) {
+double _redmeanDistance(int r1, int g1, int b1, int r2, int g2, int b2) {
   final rBar = (r1 + r2) ~/ 2;
   final dr = r1 - r2;
   final dg = g1 - g2;

@@ -96,10 +96,12 @@ FfiRawModeBackend ffiRawBackend(Ref ref) {
 /// ```
 @riverpod
 TerminalRunner terminalRunner(Ref ref) {
-  final runner = TerminalRunner(backends: [
-    ref.watch(ffiRawBackendProvider),
-    ref.watch(ioRawBackendProvider),
-  ]);
+  final runner = TerminalRunner(
+    backends: [
+      ref.watch(ffiRawBackendProvider),
+      ref.watch(ioRawBackendProvider),
+    ],
+  );
   ref.onDispose(runner.dispose);
   return runner;
 }

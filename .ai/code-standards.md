@@ -18,7 +18,7 @@
 ## Naming Conventions
 
 - **Classes**: PascalCase (`Vt500Engine`, `TerminalRunner`)
-- **Functions/methods**: camelCase (`probeDa1()`, `splitHorizontal()`)
+- **Functions/methods**: camelCase (`splitHorizontal()`, `advance()`)
 - **Constants**: camelCase in `Defaults` class (`escapeByte`, `csiFinalSgr`)
 - **Files**: snake_case (`terminal_parser.dart`, `color_profile.dart`)
 - **Enums**: PascalCase with camelCase values (`KeyCode.none`, `MouseAction.press`)
@@ -79,3 +79,9 @@
 1. Raw bytes → `Vt500Engine.advance()` → `SequenceData`
 2. `SequenceData` → semantic parsers (`parseCsi`, `parseEsc`, etc.) → `Event`
 3. `Event` → wrapped as `Msg` → `Model.update()` → `(newModel, Cmd?)`
+
+## AI Agent Rules
+
+- After completing any implementation, AI agents **must** run `melos analyze`, `melos format`, and `melos test` (in that order) before considering the task complete
+- All three commands must pass without errors
+- If any command fails, fix the issues and re-run until all pass

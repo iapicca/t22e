@@ -47,11 +47,7 @@ final class FfiRawModeBackend with Disposable implements RawModeBackend {
     buf.write8(Defaults.termiosOffsetCCMin, Defaults.termiosVminRaw);
     buf.write8(Defaults.termiosOffsetCCTime, Defaults.termiosVtimeRaw);
 
-    final setResult = bindings.setAttr(
-      Defaults.stdinFd,
-      Defaults.tcsaNow,
-      buf,
-    );
+    final setResult = bindings.setAttr(Defaults.stdinFd, Defaults.tcsaNow, buf);
     if (setResult != 0) {
       bindings.free(buf);
       throw StateError('tcsetattr failed');

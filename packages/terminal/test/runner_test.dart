@@ -206,11 +206,7 @@ void main() {
 
       backend.enable();
 
-      expect(bindings.calls, [
-        'malloc',
-        'getAttr',
-        'setAttr',
-      ]);
+      expect(bindings.calls, ['malloc', 'getAttr', 'setAttr']);
     });
 
     test('disable calls setAttr and free', () {

@@ -113,22 +113,14 @@ void main() {
       expect(
         () => vn.value = 1,
         throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            'CustomMsg',
-          ),
+          isA<StateError>().having((e) => e.message, 'message', 'CustomMsg'),
         ),
       );
       // addListener with explicit message override
       expect(
         () => vn.addListener(() {}, message: 'CustomMsg'),
         throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            'CustomMsg',
-          ),
+          isA<StateError>().having((e) => e.message, 'message', 'CustomMsg'),
         ),
       );
     });

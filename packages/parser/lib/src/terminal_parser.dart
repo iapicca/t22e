@@ -1,9 +1,6 @@
-import 'package:meta/meta.dart';
-
 import 'engine.dart';
 import 'events.dart';
 
-@internal
 class TerminalParser {
   final _engine = Vt500Engine();
   final Parser csiParser;
@@ -11,7 +8,6 @@ class TerminalParser {
   final Parser oscParser;
   final Parser dcsParser;
 
-  @internal
   TerminalParser({
     required this.csiParser,
     required this.escParser,
