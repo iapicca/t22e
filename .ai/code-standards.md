@@ -15,6 +15,16 @@
 - Generated files (`.freezed.dart`, `.g.dart`) co-locate with source
 - `publish_to: none` — all packages are internal, not published
 
+## Workspace
+
+- Root `pubspec.yaml` defines workspace using glob pattern `packages/*` plus explicit entries (e.g. `example`)
+- All workspace members must declare `resolution: workspace` in their `pubspec.yaml`
+- Single shared `pubspec.lock` and `.dart_tool/package_config.json` at repository root
+- Stray lock-files and package configs in subdirectories are deleted by `dart pub get`
+- Interdependencies between workspace packages resolve to local versions automatically
+- Run `dart pub workspace list` to see all resolved packages
+- Example apps and non-library packages are included as workspace members, not excluded
+
 ## Naming Conventions
 
 - **Classes**: PascalCase (`Vt500Engine`, `TerminalRunner`)
@@ -54,7 +64,8 @@
 
 ## Dependencies
 
-- Workspace resolution — all internal packages use `path:` references
+- Workspace resolution via `resolution: workspace` — single shared lockfile
+- Internal packages use `path:` references (resolved to local versions automatically)
 - External deps: `riverpod`, `freezed_annotation`, `meta`, `ffi`
 - Dev deps: `build_runner`, `freezed`, `riverpod_generator`, `lints`, `test`
 - No circular dependencies between packages

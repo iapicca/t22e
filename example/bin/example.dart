@@ -37,10 +37,7 @@ Future<void> main() async {
   container.dispose();
 }
 
-Future<void> _runApp(
-  ProviderContainer container,
-  TerminalIo terminalIo,
-) async {
+Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   final parser = container.read(terminalParserProvider);
 
   final width = terminalIo.columns;
@@ -133,11 +130,7 @@ Frame _currentFrame(ChatModel model) {
   );
 }
 
-void _render(
-  ChatModel model,
-  TerminalIo terminalIo, {
-  required Frame? ref,
-}) {
+void _render(ChatModel model, TerminalIo terminalIo, {required Frame? ref}) {
   final surface = WidgetRenderer.render(
     model.view(),
     model.terminalWidth,

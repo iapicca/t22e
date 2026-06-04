@@ -1,6 +1,7 @@
 import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
+
 /// TODO hardcoded values should be in a "Default" class
 Event? parseDcs(SequenceData data) {
   final sequenceData = data as DcsSequenceData;

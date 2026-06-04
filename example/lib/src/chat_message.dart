@@ -5,10 +5,7 @@ class ChatMessage {
   const ChatMessage({required this.text, required this.isUser});
 
   ChatMessage copyWith({String? text, bool? isUser}) {
-    return ChatMessage(
-      text: text ?? this.text,
-      isUser: isUser ?? this.isUser,
-    );
+    return ChatMessage(text: text ?? this.text, isUser: isUser ?? this.isUser);
   }
 
   @override

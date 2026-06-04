@@ -2,6 +2,7 @@ name: example
 description: Example chat app demonstrating t22e capabilities.
 version: 0.0.1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ^3.12.0

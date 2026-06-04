@@ -6,6 +6,7 @@ import 'events.dart';
 part 'engine.freezed.dart';
 
 typedef Parser = Event? Function(SequenceData);
+
 /// TODO separate the engine from data classes and enum
 enum VtState {
   ground,

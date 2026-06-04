@@ -111,7 +111,7 @@ enum MouseAction { press, release, move, drag }
 
 /// A mouse input event.
 
-/// TODO why is this not using freezed? 
+/// TODO why is this not using freezed?
 /// events should be split in separate files!
 final class MouseEvent extends Event {
   /// Which mouse button was involved.

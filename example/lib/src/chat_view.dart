@@ -11,11 +11,7 @@ class ChatView extends Widget {
   late Size _size;
   late List<(int, ChatBubble, bool)> _laidOutBubbles;
 
-  ChatView({
-    required this.messages,
-    required this.width,
-    required this.height,
-  });
+  ChatView({required this.messages, required this.width, required this.height});
 
   @override
   Size layout(Constraints constraints) {

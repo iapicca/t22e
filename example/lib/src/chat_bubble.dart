@@ -42,14 +42,16 @@ class ChatBubble extends Widget {
     final bgColor = isUser ? Color.green() : Color.blue();
     final textColor = isUser ? Color.black() : Color.white();
 
-    final bubbleStyle = TextStyle(
-      foreground: textColor,
-      background: bgColor,
-    );
+    final bubbleStyle = TextStyle(foreground: textColor, background: bgColor);
 
     for (var y = 0; y < _size.height; y++) {
       for (var x = 0; x < _size.width; x++) {
-        context.surface.putChar(x + context.offsetX, y + context.offsetY, ' ', bubbleStyle);
+        context.surface.putChar(
+          x + context.offsetX,
+          y + context.offsetY,
+          ' ',
+          bubbleStyle,
+        );
       }
     }
 

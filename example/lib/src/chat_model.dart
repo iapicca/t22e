@@ -26,9 +26,7 @@ class ChatModel extends Model<ChatModel> {
     return ChatModel(
       terminalWidth: width,
       terminalHeight: height,
-      messages: const [
-        ChatMessage(text: 'Hello', isUser: false),
-      ],
+      messages: const [ChatMessage(text: 'Hello', isUser: false)],
     );
   }
 
@@ -39,17 +37,17 @@ class ChatModel extends Model<ChatModel> {
     }
     if (msg is WindowSizeMsg) {
       return (
-        copyWith(
-          terminalWidth: msg.width,
-          terminalHeight: msg.height,
-        ),
+        copyWith(terminalWidth: msg.width, terminalHeight: msg.height),
         null,
       );
     }
     if (msg is CursorBlinkMsg) {
       return (
         copyWith(cursorVisible: !cursorVisible),
-        TickCmd(const Duration(milliseconds: 500), (_) => const CursorBlinkMsg()),
+        TickCmd(
+          const Duration(milliseconds: 500),
+          (_) => const CursorBlinkMsg(),
+        ),
       );
     }
     return (this, null);
@@ -65,7 +63,9 @@ class ChatModel extends Model<ChatModel> {
 
     if (keyCode == KeyCode.char) {
       final cp = event.codepoint;
-      if (cp != null && cp >= Defaults.codepointSpace && cp != Defaults.codepointDel) {
+      if (cp != null &&
+          cp >= Defaults.codepointSpace &&
+          cp != Defaults.codepointDel) {
         return _insertChar(String.fromCharCode(cp));
       }
       return (this, null);
@@ -94,11 +94,10 @@ class ChatModel extends Model<ChatModel> {
     if (keyCode == KeyCode.backspace) {
       if (cursorPosition > 0) {
         final prev = _prevGraphemeBoundary(cursorPosition);
-        final newValue = inputValue.substring(0, prev) + inputValue.substring(cursorPosition);
-        return (
-          copyWith(value: newValue, cursorPosition: prev),
-          null,
-        );
+        final newValue =
+            inputValue.substring(0, prev) +
+            inputValue.substring(cursorPosition);
+        return (copyWith(value: newValue, cursorPosition: prev), null);
       }
       return (this, null);
     }
@@ -106,7 +105,9 @@ class ChatModel extends Model<ChatModel> {
     if (keyCode == KeyCode.delete) {
       if (cursorPosition < inputValue.length) {
         final next = _nextGraphemeBoundary(cursorPosition);
-        final newValue = inputValue.substring(0, cursorPosition) + inputValue.substring(next);
+        final newValue =
+            inputValue.substring(0, cursorPosition) +
+            inputValue.substring(next);
         return (copyWith(value: newValue), null);
       }
       return (this, null);
@@ -209,11 +210,7 @@ class ChatModel extends Model<ChatModel> {
 
     return Column(
       children: [
-        ChatView(
-          messages: messages,
-          width: terminalWidth,
-          height: chatHeight,
-        ),
+        ChatView(messages: messages, width: terminalWidth, height: chatHeight),
         Text(
           '─' * terminalWidth,
           style: TextStyle(foreground: Color.brightBlack()),
@@ -234,7 +231,10 @@ class ChatModel extends Model<ChatModel> {
       children: [
         Row(
           children: [
-            Text('> ', style: TextStyle(foreground: Color.brightGreen(), bold: true)),
+            Text(
+              '> ',
+              style: TextStyle(foreground: Color.brightGreen(), bold: true),
+            ),
             Text(beforeCursor),
             Text(cursorChar, style: const TextStyle(reverse: true)),
             Text(afterCursor),
