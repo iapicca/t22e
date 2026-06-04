@@ -33,3 +33,8 @@ lifiecycle package sucks!
 
 ProbePipeline non const
 
+#######
+
+- merge capability, terminal and lifecicle to a single package (possibly terminal)
+- evaluate splitting the original loop based implemented in widget (possibly move to core?)
+- evaluate deleting testing package (I don't remember ever asking for it)

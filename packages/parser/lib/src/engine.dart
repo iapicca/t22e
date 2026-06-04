@@ -7,9 +7,6 @@ part 'engine.freezed.dart';
 
 typedef Parser = Event? Function(SequenceData);
 
-/// TODO move unrelated classes and enum to distinct files
-
-/// States for the VT500 state machine.
 enum VtState {
   ground,
   escape,

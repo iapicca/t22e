@@ -86,9 +86,6 @@ List<GraphemeCluster> graphemeClusters(String text) {
   final runes = text.runes.toList();
   var clusterStart = 0;
 
-  /// TODO: Track column offset for grapheme cluster positioning
-  // ignore: unused_local_variable
-  var colOffset = 0;
   var clusterWidth = 0;
 
   for (var i = 0; i < runes.length; i++) {
@@ -106,7 +103,6 @@ List<GraphemeCluster> graphemeClusters(String text) {
       }
       clusters.add((start: clusterStart, end: i, columnWidth: clusterWidth));
       clusterStart = i;
-      colOffset += clusterWidth;
       clusterWidth = 0;
     }
 

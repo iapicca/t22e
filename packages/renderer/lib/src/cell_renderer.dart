@@ -1,4 +1,4 @@
-import 'package:core/core.dart' show ColorSgr, TextStyle;
+import 'package:core/core.dart' show TextStyle, ColorSgr;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart' show hyperlink;
 import 'frame.dart' show Frame;
@@ -24,10 +24,6 @@ class CellRenderer {
       final curRow = currCells[r];
       final curWidth = curRow.length;
 
-      /// TODO: Track last style to optimize SGR sequence emission
-      // ignore: unused_local_variable
-      TextStyle? lastStyle;
-
       for (var c = 0; c < curWidth; c++) {
         final curr = curRow[c];
         if (curr.wideContinuation) continue;
@@ -41,7 +37,6 @@ class CellRenderer {
         final linkChanged = prev?.hyperlink != curr.hyperlink;
 
         if (prev == null || prev.style != curr.style || linkChanged) {
-          lastStyle = curr.style;
           buf.write(_styleAndLinkToAnsi(curr.style, curr.hyperlink));
         }
 
