@@ -1,0 +1,26 @@
+import 'dart:ffi';
+
+import 'system_io.dart';
+import 'native_io.dart';
+import 'mac_impl.dart';
+import 'linux_impl.dart';
+
+/// Abstract service providing platform-specific DynamicLibrary access.
+abstract class PlatformService {
+  /// The platform's libc DynamicLibrary instance.
+  DynamicLibrary get library;
+
+  /// Returns the appropriate PlatformService for the current OS.
+  factory PlatformService({SystemIo io = const NativeIo()}) {
+    switch (io.operatingSystem) {
+      case MacService.operatingSystem:
+        return MacService();
+      case LinuxService.operatingSystem:
+        return LinuxService();
+      default:
+        throw UnsupportedError(
+          'FFI raw mode is not supported on this platform',
+        );
+    }
+  }
+}

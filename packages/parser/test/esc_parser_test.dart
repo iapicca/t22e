@@ -1,0 +1,52 @@
+import 'package:test/test.dart';
+import 'package:parser/terminal_parser.dart';
+
+void main() {
+  group('SS3 F-keys', () {
+    test('ESC O P is F1', () {
+      final event = parseEsc(
+        SequenceData.esc(intermediates: [0x4F], finalByte: 0x50),
+      );
+      expect(event, isA<KeyEvent>());
+      expect((event as KeyEvent).keyCode, equals(KeyCode.f1));
+    });
+
+    test('ESC O Q is F2', () {
+      final event = parseEsc(
+        SequenceData.esc(intermediates: [0x4F], finalByte: 0x51),
+      );
+      expect((event as KeyEvent).keyCode, equals(KeyCode.f2));
+    });
+
+    test('ESC O R is F3', () {
+      final event = parseEsc(
+        SequenceData.esc(intermediates: [0x4F], finalByte: 0x52),
+      );
+      expect((event as KeyEvent).keyCode, equals(KeyCode.f3));
+    });
+
+    test('ESC O S is F4', () {
+      final event = parseEsc(
+        SequenceData.esc(intermediates: [0x4F], finalByte: 0x53),
+      );
+      expect((event as KeyEvent).keyCode, equals(KeyCode.f4));
+    });
+  });
+
+  group('internal events', () {
+    test('ESC c is reset', () {
+      final event = parseEsc(
+        SequenceData.esc(intermediates: [], finalByte: 0x63),
+      );
+      expect(event, isA<InternalEvent>());
+      expect((event as InternalEvent).kind, equals('reset'));
+    });
+  });
+
+  test('unknown sequence returns null', () {
+    final event = parseEsc(
+      SequenceData.esc(intermediates: [], finalByte: 0x5A),
+    );
+    expect(event, isNull);
+  });
+}

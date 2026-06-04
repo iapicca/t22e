@@ -1,0 +1,9 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'dcs_parser.dart' as parser;
+import 'engine.dart' show Parser;
+
+part 'dcs_parser_provider.g.dart';
+
+@riverpod
+Parser dcsParser(Ref ref) => parser.parseDcs;
