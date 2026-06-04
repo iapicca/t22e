@@ -5,6 +5,8 @@ import 'package:notifier/notifier.dart' show Disposable, VoidCallback;
 import 'terminal_guard.dart' show TerminalGuard;
 
 /// Handles POSIX signals (SIGINT, SIGTERM, SIGTSTP, SIGCONT) for graceful shutdown.
+///
+/// Use [signalHandlerProvider] instead of instantiating directly.
 class SignalHandler with Disposable {
   final TerminalGuard _guard;
   final VoidCallback onInterrupt;

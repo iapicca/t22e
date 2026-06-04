@@ -15,6 +15,7 @@ dependencies:
   terminal:
     path: ../terminal
   freezed_annotation: ^3.1.0
+  meta: ^1.18.2
   notifier:
     path: ../notifier
   riverpod: ^3.2.1

@@ -8,6 +8,8 @@ import 'pointer_extensions.dart';
 import 'termios_bindings.dart';
 
 /// Raw mode backend using libc FFI (tcgetattr/tcsetattr).
+///
+/// Use [ffiRawBackendProvider] instead of instantiating directly.
 final class FfiRawModeBackend with Disposable implements RawModeBackend {
   final TermiosBindings bindings;
   final SystemIo io;

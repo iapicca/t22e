@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:meta/meta.dart';
+
 import 'system_io.dart';
 import 'platform_service.dart';
 import 'symbols_ffi.dart';
@@ -23,6 +25,7 @@ abstract class TermiosBindings {
 }
 
 /// Concrete [TermiosBindings] backed by a [DynamicLibrary].
+@internal
 final class TermiosBindingsImpl implements TermiosBindings {
   final DynamicLibrary _libc;
 

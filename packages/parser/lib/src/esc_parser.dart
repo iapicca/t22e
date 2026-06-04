@@ -16,7 +16,7 @@ Event? parseEsc(SequenceData data) {
       _ => null,
     };
   }
-
+/// TODO hardcoded values should be in a "Default" class 
   return switch (finalByte) {
     Defaults.escFinalReset => InternalEvent('reset'),
     Defaults.escFinalSaveCursor => InternalEvent('screen_save'),

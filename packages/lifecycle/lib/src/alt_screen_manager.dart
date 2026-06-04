@@ -4,6 +4,9 @@ import 'package:ansi/ansi.dart'
 import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
 import 'package:terminal/terminal.dart' show TerminalIoInterface;
 
+/// Manages alternate screen buffer and cursor visibility.
+///
+/// Use [altScreenManagerProvider] instead of instantiating directly.
 class AltScreenManager extends ValueNotifier<bool> with InitMixin {
   final TerminalIoInterface _io;
   late final ValueNotifier<bool> _mouseEnabled;

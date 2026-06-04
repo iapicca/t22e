@@ -6,7 +6,7 @@ import 'events.dart';
 part 'engine.freezed.dart';
 
 typedef Parser = Event? Function(SequenceData);
-
+/// TODO separate the engine from data classes and enum
 enum VtState {
   ground,
   escape,
@@ -45,6 +45,10 @@ sealed class SequenceData with _$SequenceData {
 }
 
 /// VT500-compatible byte-level state machine engine.
+
+/// TODO engine should be implemented using ValueNotifier and "Init" mixin;
+/// _oscExpectSt, _dcsExpectSt have bad naming and should be ValueNotifiers themselves
+/// ideally the engine should work more like a state machine and the private functions be private top-level functions
 class Vt500Engine {
   VtState _state = VtState.ground;
   final _params = <int>[];
@@ -104,6 +108,7 @@ class Vt500Engine {
   }
 
   /// Processes a byte in the ground state.
+  /// TODO evaluate using switch case
   SequenceData? _onGround(int byte) {
     if (byte == Defaults.escapeByte) {
       _state = VtState.escape;
@@ -142,7 +147,8 @@ class Vt500Engine {
     return null;
   }
 
-  /// Processes a byte in the ESC state.
+  /// Processes a byte in the ESC state.\
+  // TODO evaluate using switch case
   SequenceData? _onEscape(int byte) {
     if (byte == Defaults.csiEntryByte) {
       _state = VtState.csiEntry;

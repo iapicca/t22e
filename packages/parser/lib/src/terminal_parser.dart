@@ -1,6 +1,11 @@
 import 'engine.dart';
 import 'events.dart';
 
+/// VT500-compatible terminal input parser.
+///
+/// Use [terminalParserProvider] instead of instantiating directly.
+
+/// TODO `  final _engine = Vt500Engine();` should be injected with riverpod!
 class TerminalParser {
   final _engine = Vt500Engine();
   final Parser csiParser;

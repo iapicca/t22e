@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   freezed_annotation: ^3.1.0
+  meta: ^1.18.2
   notifier:
     path: ../notifier
   protocol:

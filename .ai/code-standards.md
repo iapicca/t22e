@@ -80,6 +80,38 @@
 2. `SequenceData` → semantic parsers (`parseCsi`, `parseEsc`, etc.) → `Event`
 3. `Event` → wrapped as `Msg` → `Model.update()` → `(newModel, Cmd?)`
 
+## Cascade Notation
+
+- Use cascade notation (`..`) when chaining multiple operations on the same object
+- Prefer cascades over repeated variable references for builder-style APIs
+- Example:
+  ```dart
+  final buffer = StringBuffer()
+    ..write('Hello')
+    ..write(' ')
+    ..write('World');
+  ```
+
+## Riverpod Providers
+
+- All lifecycle-managed objects must be exposed as `@riverpod` providers
+- Raw implementation classes that have provider wrappers must be marked `@internal`
+- Consumers **must** read providers via `ProviderContainer` or `ref.watch()` — never instantiate raw classes directly
+- Always import and re-export providers from package barrel files
+- Each package barrel file must export its `providers.dart` (or equivalent)
+- Example:
+  ```dart
+  // Good — read from provider
+  final container = ProviderContainer();
+  final runner = container.read(terminalRunnerProvider);
+
+  // Bad — manual instantiation of a class that has a provider
+  final runner = TerminalRunner(backends: [...]);
+  ```
+- Stateless utilities (`SyncRenderer`, `Vt500Engine`) and widget classes
+  (`Text`, `Box`, `Row`) do not need providers — they are created on-demand
+- Data structures (`Surface`, `Cell`, `TextStyle`, `Color`) do not need providers
+
 ## AI Agent Rules
 
 - After completing any implementation, AI agents **must** run `melos analyze`, `melos format`, and `melos test` (in that order) before considering the task complete

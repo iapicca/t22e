@@ -2,6 +2,9 @@ import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
 import 'package:terminal/terminal.dart' show TerminalRunner;
 import 'alt_screen_manager.dart' show AltScreenManager;
 
+/// Composes runner + alt screen, ensures restoration on exit.
+///
+/// Use [terminalGuardProvider] instead of instantiating directly.
 class TerminalGuard extends ValueNotifier<bool> with InitMixin {
   final TerminalRunner _runner;
   final AltScreenManager _altScreen;

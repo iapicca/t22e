@@ -3,6 +3,8 @@ import 'raw_mode_backend.dart';
 import 'package:notifier/notifier.dart' show Disposable;
 
 /// Orchestrates multiple [RawModeBackend]s with fallback.
+///
+/// Use [terminalRunnerProvider] instead of instantiating directly.
 class TerminalRunner with Disposable {
   final List<RawModeBackend> backends;
   RawModeBackend? _activeBackend;
