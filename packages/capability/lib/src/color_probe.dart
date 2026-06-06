@@ -9,6 +9,7 @@ import 'package:terminal/terminal.dart' show TerminalIoInterface;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
+/// Detect color profile from COLORTERM and TERM environment variables.
 @internal
 ColorProfile detectColorFromEnv() {
   final colorterm = Platform.environment['COLORTERM'];
@@ -27,6 +28,7 @@ ColorProfile detectColorFromEnv() {
   return ColorProfile.ansi16;
 }
 
+/// Detect color profile from DA1 response attributes.
 @internal
 ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
   if (da1Result is Supported<Da1Result>) {
@@ -41,6 +43,7 @@ ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
   return ColorProfile.ansi16;
 }
 
+/// Probe terminal color support via OSC query with env/DA1 fallback.
 @internal
 Future<ColorProfile> probeColor(
   TerminalIoInterface io,

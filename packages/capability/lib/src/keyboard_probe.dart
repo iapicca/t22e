@@ -7,6 +7,7 @@ import 'package:terminal/terminal.dart' show TerminalIoInterface;
 import 'result.dart' show KeyboardProtocol;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
+/// Probe for Kitty keyboard protocol via enable/query/disable sequence.
 @internal
 Future<KeyboardProtocol> probeKeyboard(
   TerminalIoInterface io,

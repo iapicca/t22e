@@ -9,6 +9,7 @@ import 'result.dart' show Capabilities;
 
 part 'capabilities_provider.g.dart';
 
+/// Aggregates all capability probes into a single result.
 @riverpod
 Future<Capabilities> capabilities(Ref ref) async {
   final da1 = await ref.read(da1ProbeProvider)();

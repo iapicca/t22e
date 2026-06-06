@@ -7,6 +7,7 @@ import 'package:terminal/terminal.dart' show TerminalIoInterface;
 import 'result.dart' show QueryResult, Da1Result;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
+/// Probe for primary device attributes (DA1) via CSI c query.
 @internal
 Future<QueryResult<Da1Result>> probeDa1(
   TerminalIoInterface io,

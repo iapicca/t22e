@@ -5,5 +5,6 @@ import 'engine.dart' show Parser;
 
 part 'esc_parser_provider.g.dart';
 
+/// Provider for the ESC sequence parser function.
 @riverpod
 Parser escParser(Ref ref) => parser.parseEsc;

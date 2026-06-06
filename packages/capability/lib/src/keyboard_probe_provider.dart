@@ -8,9 +8,11 @@ import 'result.dart' show KeyboardProtocol;
 
 part 'keyboard_probe_provider.g.dart';
 
+/// Type alias for the keyboard probe function.
 typedef KeyboardProbe = Future<KeyboardProtocol> Function({Duration? timeout});
 
 @riverpod
+/// Probe for Kitty keyboard protocol support.
 KeyboardProbe keyboardProbe(Ref ref) {
   final io = ref.read(terminalIoProvider);
   final parser = ref.read(terminalParserProvider);

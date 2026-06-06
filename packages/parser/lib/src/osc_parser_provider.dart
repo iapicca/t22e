@@ -5,5 +5,6 @@ import 'engine.dart' show Parser;
 
 part 'osc_parser_provider.g.dart';
 
+/// Provider for the OSC sequence parser function.
 @riverpod
 Parser oscParser(Ref ref) => parser.parseOsc;

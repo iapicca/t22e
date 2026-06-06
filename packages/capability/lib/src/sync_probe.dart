@@ -6,6 +6,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show TerminalIoInterface;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
+/// Probe for synchronized update support via DECRPM query.
 @internal
 Future<bool> probeSync(
   TerminalIoInterface io,

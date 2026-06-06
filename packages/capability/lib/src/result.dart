@@ -4,6 +4,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 
 part 'result.freezed.dart';
 
+/// Result of a capability query: supported with value or unavailable.
 @Freezed(genericArgumentFactories: true)
 sealed class QueryResult<T> with _$QueryResult<T> {
   const factory QueryResult.supported(T value) = Supported<T>;
@@ -17,6 +18,7 @@ abstract class Da1Result with _$Da1Result {
 }
 
 /// Supported keyboard protocol types.
+/// Keyboard protocol types: basic or Kitty enhanced protocol.
 enum KeyboardProtocol { basic, kitty }
 
 /// Complete terminal capability information gathered by the pipeline.

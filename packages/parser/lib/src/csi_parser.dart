@@ -2,6 +2,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
+/// Parses CSI sequences into events.
 Event? parseCsi(SequenceData data) {
   final sequenceData = data as CsiSequenceData;
   final params = sequenceData.params;
@@ -43,6 +44,7 @@ Event? parseCsi(SequenceData data) {
   };
 }
 
+/// Parses tilde-terminated key sequences.
 Event? _parseCsiTildeKey(List<int> params) {
   if (params.isEmpty) return null;
   final code = params[0];
@@ -69,6 +71,7 @@ Event? _parseCsiTildeKey(List<int> params) {
   };
 }
 
+/// Parses extended CSI sequences with intermediate bytes.
 Event? _parseCsiExtended(List<int> params, int finalByte) {
   if (finalByte == Defaults.csiFinalMouse && params.length >= 3) {
     return _parseCsiSgrMouseParams(params);
@@ -76,6 +79,7 @@ Event? _parseCsiExtended(List<int> params, int finalByte) {
   return null;
 }
 
+/// Parses Kitty keyboard protocol sequences.
 Event? _parseCsiKittyKeyboard(List<int> params) {
   if (params.isEmpty) return null;
   final code = params[0];

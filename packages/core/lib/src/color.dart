@@ -13,6 +13,7 @@ extension type AnsiColor._(int _code) {
         'ANSI code out of range',
       );
 
+  /// The validated ANSI color code (0–15).
   int get code => _code;
 }
 
@@ -25,6 +26,7 @@ extension type IndexedColor._(int _index) {
         'index out of range',
       );
 
+  /// The validated palette index (0–255).
   int get index => _index;
 }
 
@@ -61,17 +63,24 @@ extension type Color._((int, int, int) _rgb) {
   const Color.brightCyan() : _rgb = (0, 255, 255);
   const Color.brightWhite() : _rgb = (255, 255, 255);
 
+  /// Red component (0–255).
   int get red => _rgb.$1;
+
+  /// Green component (0–255).
   int get green => _rgb.$2;
+
+  /// Blue component (0–255).
   int get blue => _rgb.$3;
 }
 
 // ── Public extensions ──
 
+/// Converts an ANSI color code to its RGB equivalent.
 extension AnsiToColor on AnsiColor {
   Color toColor() => _ansiToRgb[code]!;
 }
 
+/// Converts a 256-color palette index to its RGB equivalent.
 extension IndexedToColor on IndexedColor {
   Color toColor() {
     final (r, g, b) = _indexToRgb(index);
@@ -79,14 +88,17 @@ extension IndexedToColor on IndexedColor {
   }
 }
 
+/// Finds the nearest 256-color palette index for an RGB color.
 extension ColorIndex on Color {
   int get index => _rgbToIndexed(red, green, blue);
 }
 
+/// Converts an RGB color to its nearest ANSI 16-color equivalent.
 extension ColorAnsi on Color {
   AnsiColor get ansi => AnsiColor(_indexedToAnsi(index));
 }
 
+/// Generates SGR escape sequences for this color based on profile.
 extension ColorSgr on Color {
   String sgrSequence({
     bool background = false,
@@ -123,6 +135,7 @@ extension ColorSgr on Color {
 
 // ── Internal conversion helpers ──
 
+/// Lookup table mapping ANSI 16-color codes to RGB values.
 const Map<int, Color> _ansiToRgb = {
   0: Color.black(),
   1: Color.red(),
@@ -142,6 +155,7 @@ const Map<int, Color> _ansiToRgb = {
   15: Color.brightWhite(),
 };
 
+/// Converts a 256-color palette index to RGB components.
 (int, int, int) _indexToRgb(int index) {
   if (index < Defaults.indexedColorCubeStart) {
     final c = _ansiToRgb[index]!;
@@ -159,6 +173,7 @@ const Map<int, Color> _ansiToRgb = {
   return (r, g, b);
 }
 
+/// Finds the nearest 256-color palette index for the given RGB.
 int _rgbToIndexed(int r, int g, int b) {
   var bestDist = double.infinity;
   var bestIdx = 0;
@@ -194,6 +209,7 @@ int _rgbToIndexed(int r, int g, int b) {
   return bestIdx;
 }
 
+/// Converts a 256-color index to its nearest ANSI 16-color code.
 int _indexedToAnsi(int index) {
   if (index < Defaults.indexedColorCubeStart) return index;
   const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
@@ -219,6 +235,7 @@ int _indexedToAnsi(int index) {
   return maxVal >= 5 ? ansi + 8 : ansi;
 }
 
+/// Computes perceptual color distance using red-mean formula.
 double _redmeanDistance(int r1, int g1, int b1, int r2, int g2, int b2) {
   final rBar = (r1 + r2) ~/ 2;
   final dr = r1 - r2;
@@ -229,7 +246,12 @@ double _redmeanDistance(int r1, int g1, int b1, int r2, int g2, int b2) {
       (2 + (255 - rBar) / 256) * db * db;
 }
 
+/// Step size between adjacent values in the 6x6x6 color cube.
 const int _cubeStep =
     Defaults.rgbComponentMax ~/ (Defaults.indexedColorCubeSize - 1);
+
+/// Step size between grayscale ramp entries.
 const int _grayStep = 10;
+
+/// Base brightness for grayscale ramp entries.
 const int _grayBase = 8;

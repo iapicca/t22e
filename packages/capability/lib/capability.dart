@@ -1,3 +1,4 @@
+/// Terminal capability probing: color, sync, keyboard, DA1.
 export 'src/result.dart'
     show
         QueryResult,

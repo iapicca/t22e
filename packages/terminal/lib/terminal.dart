@@ -1,3 +1,4 @@
+/// Terminal I/O: raw mode, FFI backends, terminal runner, and providers.
 export 'src/system_io.dart' show SystemIo;
 export 'src/native_io.dart' show NativeIo;
 export 'src/raw_mode_backend.dart' show RawModeBackend;

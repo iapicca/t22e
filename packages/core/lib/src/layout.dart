@@ -69,6 +69,7 @@ abstract class LayoutItem with _$LayoutItem {
 }
 
 /// Distributes available space among items using a flexbox-like algorithm.
+/// Internal flexbox space distribution algorithm.
 List<int> _splitSpace(int total, List<LayoutItem> items, int gap) {
   if (items.isEmpty) return [];
   if (items.length == 1) {

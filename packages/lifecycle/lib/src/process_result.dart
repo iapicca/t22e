@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'process_result.freezed.dart';
 
+/// Result of a process execution: success with output or timeout.
 @freezed
 sealed class ProcessResult with _$ProcessResult {
   const ProcessResult._();

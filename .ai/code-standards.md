@@ -35,11 +35,14 @@
 
 ## Comment Style
 
-- Doc comments (`///`) for all public APIs
-- Max 3 lines, 80 chars per line
+- Doc comments (`///`) for all classes, functions, and methods
+- **Public APIs** (exported from barrel files): max 3 lines, 80 chars per line
+- **Internal APIs** (not exported, in `lib/src/`): single line, max 80 chars
+- **Private members** (prefixed with `_`): single line, max 80 chars
 - No code samples in comments
 - Describe *what* and *why*, not *how* (code shows how)
 - Inline comments (`//`) for internal notes only
+- TODO comments are allowed but should be resolved before release
 
 ## Error Handling
 
