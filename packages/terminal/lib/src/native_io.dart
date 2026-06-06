@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:meta/meta.dart';
+import 'package:protocol/protocol.dart' show Defaults;
 
 import 'system_io.dart';
 
@@ -20,20 +21,33 @@ final class NativeIo implements SystemIo {
   Future<void> flush() => stdout.flush();
 
   @override
-  int get columns => stdout.terminalColumns;
+  bool get hasTerminal => stdout.hasTerminal;
 
   @override
-  int get rows => stdout.terminalLines;
+  int get columns => stdout.hasTerminal
+      ? stdout.terminalColumns
+      : Defaults.defaultTerminalWidth;
 
   @override
-  bool get echoMode => stdin.echoMode;
-  @override
-  set echoMode(bool value) => stdin.echoMode = value;
+  int get rows => stdout.hasTerminal
+      ? stdout.terminalLines
+      : Defaults.defaultTerminalHeight;
 
   @override
-  bool get lineMode => stdin.lineMode;
+  bool get echoMode => stdout.hasTerminal ? stdin.echoMode : true;
+
   @override
-  set lineMode(bool value) => stdin.lineMode = value;
+  set echoMode(bool value) {
+    if (stdout.hasTerminal) stdin.echoMode = value;
+  }
+
+  @override
+  bool get lineMode => stdout.hasTerminal ? stdin.lineMode : true;
+
+  @override
+  set lineMode(bool value) {
+    if (stdout.hasTerminal) stdin.lineMode = value;
+  }
 
   @override
   String get operatingSystem => Platform.operatingSystem;

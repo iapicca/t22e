@@ -13,6 +13,9 @@ abstract class SystemIo {
   /// Flushes the standard output buffer.
   Future<void> flush();
 
+  /// Whether stdout is connected to a terminal (not piped or redirected).
+  bool get hasTerminal;
+
   /// Terminal width in columns.
   int get columns;
 

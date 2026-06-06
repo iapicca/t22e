@@ -12,6 +12,7 @@ class FakeSystemIo implements SystemIo {
   int _rows = 24;
   bool _echoMode = true;
   bool _lineMode = true;
+  bool _hasTerminal = true;
   String _operatingSystem = 'macos';
 
   @override
@@ -22,6 +23,10 @@ class FakeSystemIo implements SystemIo {
 
   @override
   Future<void> flush() async {}
+
+  @override
+  bool get hasTerminal => _hasTerminal;
+  set hasTerminal(bool value) => _hasTerminal = value;
 
   @override
   int get columns => _columns;

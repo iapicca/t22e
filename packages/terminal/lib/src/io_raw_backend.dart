@@ -15,12 +15,14 @@ final class IoRawModeBackend with Disposable implements RawModeBackend {
   @override
   void enable() {
     check();
+    if (!io.hasTerminal) return;
     io.echoMode = false;
     io.lineMode = false;
   }
 
   @override
   void disable() {
+    if (!io.hasTerminal) return;
     io.echoMode = true;
     io.lineMode = true;
   }
