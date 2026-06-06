@@ -13,6 +13,7 @@ A terminal-based chat application demonstrating the capabilities of the **t22e**
 
 - Dart SDK `^3.12.0`
 - Access to the parent `t22e` workspace
+- A real terminal (TTY) — the app requires interactive terminal input
 
 ## Building
 

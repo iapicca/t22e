@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:lifecycle/lifecycle.dart';
@@ -21,23 +21,32 @@ Future<void> main() async {
     ..init()
     ..arm();
 
-  runner.enterRawMode();
-  altScreen
-    ..init()
-    ..enter();
+  final hasTty = terminalIo.io.hasTerminal;
+  if (hasTty) {
+    runner.enterRawMode();
+    altScreen
+      ..init()
+      ..enter();
+  }
 
   try {
-    await _runApp(container, terminalIo);
+    await _runApp(container, terminalIo, hasTty: hasTty);
   } finally {
-    altScreen.exit();
-    runner.exitRawMode();
+    if (hasTty) {
+      altScreen.exit();
+      runner.exitRawMode();
+    }
   }
 
   guard.restore();
   container.dispose();
 }
 
-Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
+Future<void> _runApp(
+  ProviderContainer container,
+  TerminalIo terminalIo, {
+  required bool hasTty,
+}) async {
   final parser = container.read(terminalParserProvider);
 
   final width = terminalIo.columns;
@@ -47,9 +56,11 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   Frame? previousFrame;
   var running = true;
 
-  terminalIo
-    ..write(hideCursor())
-    ..flush();
+  if (hasTty) {
+    terminalIo
+      ..write(hideCursor())
+      ..flush();
+  }
 
   final blinkCmd = TickCmd(
     const Duration(milliseconds: 500),
@@ -111,13 +122,15 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   });
 
   while (running) {
-    sleep(const Duration(milliseconds: 50));
+    await Future.delayed(const Duration(milliseconds: 50));
   }
 
   await subscription.cancel();
-  terminalIo
-    ..write(showCursor())
-    ..flush();
+  if (hasTty) {
+    terminalIo
+      ..write(showCursor())
+      ..flush();
+  }
 }
 
 Frame _currentFrame(ChatModel model) {

@@ -34,7 +34,7 @@ void main() {
 
       await Future.delayed(const Duration(milliseconds: 500));
 
-      process.stdin.write('q');
+      process.stdin.write('q\n');
       await process.stdin.flush();
 
       final exitCode = await process.exitCode.timeout(
