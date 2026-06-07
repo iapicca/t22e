@@ -1,9 +1,6 @@
-import 'package:meta/meta.dart';
-
 import 'system_io.dart';
 
 /// Interface for terminal I/O operations used by probe extensions.
-@internal
 mixin TerminalInterface {
   Stream<List<int>> get inputStream;
   void write(String data);
@@ -11,7 +8,6 @@ mixin TerminalInterface {
 }
 
 /// Terminal I/O facade for input/output operations.
-@internal
 final class TerminalIo with SystemIo, TerminalInterface {
   final SystemIo io;
 
@@ -50,4 +46,7 @@ final class TerminalIo with SystemIo, TerminalInterface {
 
   @override
   String get operatingSystem => io.operatingSystem;
+
+  @override
+  Map<String, String> get environment => io.environment;
 }

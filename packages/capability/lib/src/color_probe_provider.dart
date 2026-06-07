@@ -2,7 +2,7 @@ import 'package:core/core.dart' show ColorProfile;
 import 'package:parser/terminal_parser.dart' show terminalParserProvider;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:terminal/terminal.dart' show terminalIoProvider;
+import 'package:terminal/terminal.dart' show systemIoProvider;
 
 import 'color_probe.dart' as probe;
 import 'result.dart' show QueryResult, Da1Result;
@@ -19,7 +19,8 @@ typedef ColorProbe =
 @riverpod
 /// Detect color profile from environment variables.
 ColorProfile Function() colorFromEnv(Ref ref) {
-  return probe.detectColorFromEnv;
+  final io = ref.read(systemIoProvider);
+  return () => probe.detectColorFromEnv(io.environment);
 }
 
 @riverpod
@@ -31,7 +32,7 @@ ColorProfile Function(QueryResult<Da1Result>) colorFromDa1(Ref ref) {
 @riverpod
 /// Full color probe: env fallback, then OSC query, then DA1 fallback.
 ColorProbe colorProbe(Ref ref) {
-  final io = ref.read(terminalIoProvider);
+  final io = ref.read(systemIoProvider);
   final parser = ref.read(terminalParserProvider);
   return (da1Result, {timeout}) => probe.probeColor(
     io,

@@ -42,4 +42,7 @@ final class NativeIo with SystemIo {
 
   @override
   String get operatingSystem => Platform.operatingSystem;
+
+  @override
+  Map<String, String> get environment => Platform.environment;
 }

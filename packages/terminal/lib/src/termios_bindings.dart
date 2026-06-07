@@ -25,7 +25,6 @@ abstract class TermiosBindings {
 @internal
 final class TermiosBindingsImpl implements TermiosBindings {
   late final DynamicLibrary _library;
-
   late final TcGetAttr _tcGetAttr;
   late final TcSetAttr _tcSetAttr;
 

@@ -30,4 +30,7 @@ mixin SystemIo {
 
   /// Current platform name (eg 'macos', 'linux', 'windows').
   String get operatingSystem;
+
+  /// Environment variables (like Platform.environment).
+  Map<String, String> get environment;
 }

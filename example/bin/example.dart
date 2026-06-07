@@ -15,36 +15,30 @@ Future<void> main() async {
   final container = ProviderContainer();
 
   final terminalIo = container.read(terminalIoProvider);
-  final runner = container.read(terminalRunnerProvider);
-  final altScreen = container.read(altScreenManagerProvider);
-  final guard = container.read(terminalGuardProvider)
-    ..init()
-    ..arm();
+  final rawMode = container.read(rawModeProvider);
+  final guard = container.read(
+    terminalGuardProvider(
+      onRestore: () {
+        rawMode.dispose();
+        terminalIo.write(showCursor());
+        terminalIo.write(exitAltScreen());
+        terminalIo.flush();
+      },
+    ),
+  )..arm();
 
-  final hasTty = terminalIo.io.hasTerminal;
-  if (hasTty) {
-    runner.enterRawMode();
-    altScreen
-      ..init()
-      ..enter();
-  }
+  rawMode.init();
+  terminalIo.write(hideCursor());
+  terminalIo.write(enterAltScreen());
+  terminalIo.flush();
 
-  await _runApp(container, terminalIo, hasTty: hasTty);
+  await _runApp(container, terminalIo);
 
-  if (hasTty) {
-    altScreen.exit();
-    runner.exitRawMode();
-  }
-  
   guard.restore();
   container.dispose();
 }
 
-Future<void> _runApp(
-  ProviderContainer container,
-  TerminalIo terminalIo, {
-  required bool hasTty,
-}) async {
+Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   final parser = container.read(terminalParserProvider);
 
   final width = terminalIo.columns;
@@ -53,12 +47,6 @@ Future<void> _runApp(
   var model = container.read(modelProvider);
   Frame? previousFrame;
   var running = true;
-
-  if (hasTty) {
-    terminalIo
-      ..write(hideCursor())
-      ..flush();
-  }
 
   final blinkCmd = TickCmd(
     const Duration(milliseconds: 500),
@@ -124,11 +112,8 @@ Future<void> _runApp(
   }
 
   await subscription.cancel();
-  if (hasTty) {
-    terminalIo
-      ..write(showCursor())
-      ..flush();
-  }
+  terminalIo.write(showCursor());
+  terminalIo.flush();
 }
 
 Frame _currentFrame(ChatModel model) {

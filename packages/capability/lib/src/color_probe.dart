@@ -1,23 +1,21 @@
-import 'dart:io';
-
 import 'package:core/core.dart' show ColorProfile;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalInterface;
+import 'package:terminal/terminal.dart' show SystemIo;
 import 'result.dart' show QueryResult, Supported, Da1Result;
-import 'terminal_probe_extension.dart' show TerminalProbeExtension;
+import 'terminal_probe_extension.dart' show probeTerminal;
 
 /// Detect color profile from COLORTERM and TERM environment variables.
 @internal
-ColorProfile detectColorFromEnv() {
-  final colorterm = Platform.environment['COLORTERM'];
+ColorProfile detectColorFromEnv(Map<String, String> env) {
+  final colorterm = env['COLORTERM'];
   if (colorterm == Defaults.envColortermTruecolor ||
       colorterm == Defaults.envColorterm24bit) {
     return ColorProfile.trueColor;
   }
-  final term = Platform.environment['TERM'] ?? '';
+  final term = env['TERM'] ?? '';
   if (term.endsWith(Defaults.envTermSuffix256Color)) {
     return ColorProfile.indexed256;
   }
@@ -46,16 +44,17 @@ ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
 /// Probe terminal color support via OSC query with env/DA1 fallback.
 @internal
 Future<ColorProfile> probeColor(
-  TerminalInterface io,
+  SystemIo io,
   TerminalParser parser,
   QueryResult<Da1Result> da1Result, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {
-  final env = detectColorFromEnv();
+  final env = detectColorFromEnv(io.environment);
   if (env == ColorProfile.trueColor) return env;
 
-  return io.probe<ColorQueryEvent, ColorProfile>(
+  return probeTerminal<ColorQueryEvent, ColorProfile>(
     query: '${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}',
+    io: io,
     parser: parser,
     timeout: timeout,
     where: (event) => event.r != null,
