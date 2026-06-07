@@ -29,15 +29,13 @@ Future<void> main() async {
       ..enter();
   }
 
-  try {
-    await _runApp(container, terminalIo, hasTty: hasTty);
-  } finally {
-    if (hasTty) {
-      altScreen.exit();
-      runner.exitRawMode();
-    }
-  }
+  await _runApp(container, terminalIo, hasTty: hasTty);
 
+  if (hasTty) {
+    altScreen.exit();
+    runner.exitRawMode();
+  }
+  
   guard.restore();
   container.dispose();
 }

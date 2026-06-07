@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-import 'package:protocol/protocol.dart' show Defaults;
-
 import 'system_io.dart';
 
 /// Concrete [SystemIo] backed by native dart:io stdin/stdout/Platform.
-@internal
 final class NativeIo implements SystemIo {
   const NativeIo();
 
@@ -24,30 +20,22 @@ final class NativeIo implements SystemIo {
   bool get hasTerminal => stdout.hasTerminal;
 
   @override
-  int get columns => stdout.hasTerminal
-      ? stdout.terminalColumns
-      : Defaults.defaultTerminalWidth;
+  int get columns => stdout.terminalColumns;
 
   @override
-  int get rows => stdout.hasTerminal
-      ? stdout.terminalLines
-      : Defaults.defaultTerminalHeight;
+  int get rows => stdout.terminalLines;
 
   @override
-  bool get echoMode => stdout.hasTerminal ? stdin.echoMode : true;
+  bool get echoMode => stdin.echoMode;
 
   @override
-  set echoMode(bool value) {
-    if (stdout.hasTerminal) stdin.echoMode = value;
-  }
+  set echoMode(bool value) => stdin.echoMode = value;
 
   @override
-  bool get lineMode => stdout.hasTerminal ? stdin.lineMode : true;
+  bool get lineMode => stdin.lineMode;
 
   @override
-  set lineMode(bool value) {
-    if (stdout.hasTerminal) stdin.lineMode = value;
-  }
+  set lineMode(bool value) => stdin.lineMode = value;
 
   @override
   String get operatingSystem => Platform.operatingSystem;

@@ -2,8 +2,6 @@ import 'dart:ffi';
 
 import 'package:meta/meta.dart';
 
-import 'system_io.dart';
-import 'platform_service.dart';
 import 'symbols_ffi.dart';
 
 typedef GetAttr = int Function(int fd, Pointer<Uint8> buf);
@@ -70,8 +68,4 @@ final class TermiosBindingsImpl implements TermiosBindings {
         >(SymbolsFFI.freeName);
     fn(ptr.cast());
   }
-
-  /// Uses [PlatformService] to open the platform libc.
-  static TermiosBindingsImpl fromPlatformService(SystemIo io) =>
-      TermiosBindingsImpl(PlatformService(io: io).library);
 }

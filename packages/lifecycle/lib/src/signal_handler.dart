@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:notifier/notifier.dart' show Disposable, VoidCallback;
-import 'terminal_guard.dart' show TerminalGuard;
 
 /// Handles POSIX signals (SIGINT, SIGTERM, SIGTSTP, SIGCONT) for graceful shutdown.
 ///
-/// Use [signalHandlerProvider] instead of instantiating directly.
+/// When a TUI app runs in raw mode with alternate screen enabled, the terminal
+/// is in a non-standard state. If the process is killed (SIGTERM), suspended
+/// (SIGTSTP), or interrupted (SIGINT) without restoring the terminal, the
+/// user's shell will be left in a broken state.
+///
+/// SignalHandler ensures terminal restoration on any signal-triggered exit path.
 class SignalHandler with Disposable {
-  final TerminalGuard _guard;
   final VoidCallback onInterrupt;
-  final VoidCallback onTerminate;
+  final VoidCallback onCleanup;
   final Stream<io.ProcessSignal> sigint;
   final Stream<io.ProcessSignal> sigterm;
   final Stream<io.ProcessSignal> sigtstp;
@@ -22,16 +25,13 @@ class SignalHandler with Disposable {
   StreamSubscription<io.ProcessSignal>? _sigcontSub;
 
   SignalHandler({
-    required this._guard,
     required this.onInterrupt,
-    VoidCallback? onTerminate,
+    required this.onCleanup,
     required this.sigint,
     required this.sigterm,
     required this.sigtstp,
     required this.sigcont,
-  }) : onTerminate = onTerminate ?? _defaultTerminate;
-
-  static void _defaultTerminate() => io.exit(0);
+  });
 
   void install() {
     check();
@@ -40,12 +40,12 @@ class SignalHandler with Disposable {
     });
 
     _sigtermSub = sigterm.listen((_) {
-      _guard.restore();
-      onTerminate();
+      onCleanup();
+      io.exit(0);
     });
 
     _sigtstpSub = sigtstp.listen((_) {
-      _guard.restore();
+      onCleanup();
     });
 
     _sigcontSub = sigcont.listen((_) {});
