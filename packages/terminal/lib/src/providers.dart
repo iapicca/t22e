@@ -16,8 +16,9 @@ TerminalIo terminalIo(Ref ref) {
 }
 
 @riverpod
-RawMode rawMode(Ref ref) {
+RawModeInterface rawMode(Ref ref) {
   final mode = RawMode();
-  ref.onDispose(mode.disable);
+  mode.init();
+  ref.onDispose(mode.dispose);
   return mode;
 }

@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:parser/terminal_parser.dart' show TerminalParser;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
+import 'package:terminal/terminal.dart' show TerminalInterface;
 
-/// Extension on [TerminalIoInterface] providing a generic probe helper.
+/// Extension on [TerminalInterface] providing a generic probe helper.
 ///
 /// Sends a query to the terminal and waits for a specific parser event type.
-extension TerminalProbeExtension on TerminalIoInterface {
+extension TerminalProbeExtension on TerminalInterface {
   /// Writes [query] to the terminal and waits for a parser event of type [T].
   ///
   /// When the event occurs, [onEvent] transforms it into the return value [R].

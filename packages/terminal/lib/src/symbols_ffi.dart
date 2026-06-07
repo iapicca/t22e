@@ -5,10 +5,10 @@ final class SymbolsFFI {
   // ── libc function names ──
 
   /// Symbol name for POSIX tcgetattr (read terminal attributes).
-  static const String getAttrName = 'tcgetattr';
+  static const String tcGetAttrName = 'tcgetattr';
 
   /// Symbol name for POSIX tcsetattr (set terminal attributes).
-  static const String setAttrName = 'tcsetattr';
+  static const String tcSetAttrName = 'tcsetattr';
 
   /// Symbol name for C malloc (allocate memory).
   static const String mallocName = 'malloc';

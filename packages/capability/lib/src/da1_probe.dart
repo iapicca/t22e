@@ -3,14 +3,14 @@ import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
+import 'package:terminal/terminal.dart' show TerminalInterface;
 import 'result.dart' show QueryResult, Da1Result;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 /// Probe for primary device attributes (DA1) via CSI c query.
 @internal
 Future<QueryResult<Da1Result>> probeDa1(
-  TerminalIoInterface io,
+  TerminalInterface io,
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {

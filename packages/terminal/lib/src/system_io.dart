@@ -1,9 +1,7 @@
 import 'dart:async';
 
 /// Wraps dart:io stdin/stdout/Platform to enable mocking.
-abstract class SystemIo {
-  const SystemIo();
-
+mixin SystemIo {
   /// Raw input byte stream (like stdin).
   Stream<List<int>> get inputStream;
 

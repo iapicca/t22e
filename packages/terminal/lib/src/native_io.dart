@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:meta/meta.dart';
+
 import 'system_io.dart';
 
 /// Concrete [SystemIo] backed by native dart:io stdin/stdout/Platform.
-final class NativeIo implements SystemIo {
+@internal
+final class NativeIo with SystemIo {
   const NativeIo();
 
   @override

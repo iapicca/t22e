@@ -1,8 +1,10 @@
 import 'dart:ffi';
 
+import 'package:meta/meta.dart';
 import 'package:protocol/protocol.dart' show Defaults;
 
 /// Byte-level read/write helpers for [Pointer<Uint8>].
+@internal
 extension PointerUint8Ops on Pointer<Uint8> {
   /// Read a 32-bit little-endian integer at [offset].
   int read32(int offset) {

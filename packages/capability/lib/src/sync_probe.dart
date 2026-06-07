@@ -3,13 +3,13 @@ import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
+import 'package:terminal/terminal.dart' show TerminalInterface;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 /// Probe for synchronized update support via DECRPM query.
 @internal
 Future<bool> probeSync(
-  TerminalIoInterface io,
+  TerminalInterface io,
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {

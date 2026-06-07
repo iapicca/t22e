@@ -1,8 +1,12 @@
 export 'src/system_io.dart' show SystemIo;
 export 'src/native_io.dart' show NativeIo;
-export 'src/raw_mode.dart' show RawMode;
-export 'src/raw_mode_state.dart' show RawModeState;
-export 'src/terminal_io.dart' show TerminalIo, TerminalIoInterface;
-export 'src/termios_bindings.dart' show TermiosBindings, GetAttr, SetAttr;
+export 'src/raw_mode.dart' show RawModeInterface;
+export 'src/raw_mode_state.dart' show RawModeState, RawModeStateData;
+export 'src/terminal_io.dart' show TerminalIo, TerminalInterface;
+export 'src/termios_bindings.dart' show TermiosBindings;
+export 'src/libc_signatures.dart'
+    show TcGetAttr, TcSetAttr, Malloc, Free;
+export 'src/pointer_extensions.dart' show PointerUint8Ops;
+export 'src/extensions.dart' show DynamicLibraryFfi, openLibc;
 export 'src/symbols_ffi.dart' show SymbolsFFI;
 export 'src/providers.dart';

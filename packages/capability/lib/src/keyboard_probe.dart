@@ -3,14 +3,14 @@ import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
+import 'package:terminal/terminal.dart' show TerminalInterface;
 import 'result.dart' show KeyboardProtocol;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
 /// Probe for Kitty keyboard protocol via enable/query/disable sequence.
 @internal
 Future<KeyboardProtocol> probeKeyboard(
-  TerminalIoInterface io,
+  TerminalInterface io,
   TerminalParser parser, {
   Duration timeout = Defaults.defaultProbeTimeout,
 }) async {

@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
+import 'package:terminal/terminal.dart' show TerminalInterface;
 import 'result.dart' show QueryResult, Supported, Da1Result;
 import 'terminal_probe_extension.dart' show TerminalProbeExtension;
 
@@ -46,7 +46,7 @@ ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
 /// Probe terminal color support via OSC query with env/DA1 fallback.
 @internal
 Future<ColorProfile> probeColor(
-  TerminalIoInterface io,
+  TerminalInterface io,
   TerminalParser parser,
   QueryResult<Da1Result> da1Result, {
   Duration timeout = Defaults.defaultProbeTimeout,

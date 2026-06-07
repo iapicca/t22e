@@ -1,17 +1,18 @@
+import 'package:meta/meta.dart';
+
 import 'system_io.dart';
 
-typedef Write = void Function(String data);
-typedef Flush = Future<void> Function();
-
 /// Interface for terminal I/O operations used by probe extensions.
-abstract interface class TerminalIoInterface {
+@internal
+mixin TerminalInterface {
   Stream<List<int>> get inputStream;
-  Write get write;
-  Flush get flush;
+  void write(String data);
+  Future<void> flush();
 }
 
 /// Terminal I/O facade for input/output operations.
-final class TerminalIo implements TerminalIoInterface {
+@internal
+final class TerminalIo with SystemIo, TerminalInterface {
   final SystemIo io;
 
   /// Creates with injected [io].
@@ -21,14 +22,32 @@ final class TerminalIo implements TerminalIoInterface {
   Stream<List<int>> get inputStream => io.inputStream;
 
   @override
-  Write get write => io.write;
+  void write(String data) => io.write(data);
 
   @override
-  Flush get flush => io.flush;
+  Future<void> flush() => io.flush();
 
-  /// Current terminal width in columns.
+  @override
+  bool get hasTerminal => io.hasTerminal;
+
+  @override
   int get columns => io.columns;
 
-  /// Current terminal height in rows.
+  @override
   int get rows => io.rows;
+
+  @override
+  bool get echoMode => io.echoMode;
+
+  @override
+  set echoMode(bool value) => io.echoMode = value;
+
+  @override
+  bool get lineMode => io.lineMode;
+
+  @override
+  set lineMode(bool value) => io.lineMode = value;
+
+  @override
+  String get operatingSystem => io.operatingSystem;
 }

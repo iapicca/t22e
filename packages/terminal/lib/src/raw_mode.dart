@@ -1,116 +1,100 @@
 import 'dart:ffi';
-import 'dart:io';
 
+import 'package:meta/meta.dart';
+import 'package:notifier/notifier.dart' show Disposable, InitMixin;
 import 'package:protocol/protocol.dart' show Defaults;
 
+import 'extensions.dart';
+import 'libc_signatures.dart';
 import 'raw_mode_state.dart';
 import 'pointer_extensions.dart';
 import 'symbols_ffi.dart';
 
-/// Raw mode management via libc FFI (tcgetattr/tcsetattr).
-final class RawMode {
-  RawModeState? _state;
-  DynamicLibrary? _libc;
+/// Abstract base for raw mode lifecycle management.
+abstract class RawModeInterface with InitMixin, Disposable {
+  RawModeState get state;
+}
 
-  void enable() {
-    if (_state != null) return;
-    final libc = _openLibc();
-    final getAttr = libc
-        .lookupFunction<
-          Int32 Function(Int32, Pointer<Uint8>),
-          int Function(int, Pointer<Uint8>)
-        >(SymbolsFFI.getAttrName);
-    final setAttr = libc
-        .lookupFunction<
-          Int32 Function(Int32, Int32, Pointer<Uint8>),
-          int Function(int, int, Pointer<Uint8>)
-        >(SymbolsFFI.setAttrName);
-    final malloc = libc
-        .lookupFunction<
-          Pointer<Void> Function(IntPtr),
-          Pointer<Void> Function(int)
-        >(SymbolsFFI.mallocName);
-    final free = libc
-        .lookupFunction<
-          Void Function(Pointer<Void>),
-          void Function(Pointer<Void>)
-        >(SymbolsFFI.freeName);
+/// Concrete [RawModeInterface] implementation using libc FFI.
+///
+/// Consumers should read [rawModeProvider] instead of instantiating directly.
+/// This class is exposed under `src/` for advanced use at your own risk.
+@internal
+final class RawMode extends RawModeInterface {
+  late final DynamicLibrary _library = openLibc();
+  late final RawModeState _state = RawModeState(null);
 
-    final buf = malloc(Defaults.termiosStructSize).cast<Uint8>();
-    final result = getAttr(Defaults.stdinFd, buf);
-    if (result != 0) {
-      free(buf.cast());
+  RawMode();
+
+  @override
+  RawModeState get state => _state;
+
+  @override
+  void init({String? message, bool throwIfExists = false}) {
+    super.init(message: message, throwIfExists: throwIfExists);
+    final tcGetAttr = _library.lookupFunction<NativeTcGetAttr, TcGetAttr>(
+      SymbolsFFI.tcGetAttrName,
+    );
+    final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
+      SymbolsFFI.tcSetAttrName,
+    );
+    final malloc = _library.lookupFunction<NativeMalloc, Malloc>(
+      SymbolsFFI.mallocName,
+    );
+
+    final buffer = malloc(Defaults.termiosStructSize).cast<Uint8>();
+    final tcGetAttrResult = tcGetAttr(Defaults.stdinFd, buffer);
+    if (tcGetAttrResult != 0) {
+      _library.freePointer(buffer.cast());
       throw StateError('tcgetattr failed (stdin is not a TTY?)');
     }
 
-    final saved = RawModeState(
-      buf,
-      buf.read32(Defaults.termiosOffsetIFlag),
-      buf.read32(Defaults.termiosOffsetOFlag),
-      buf.read32(Defaults.termiosOffsetCFlag),
-      buf.read32(Defaults.termiosOffsetLFlag),
+    final savedState = RawModeStateData(
+      buffer,
+      buffer.read32(Defaults.termiosOffsetIFlag),
+      buffer.read32(Defaults.termiosOffsetOFlag),
+      buffer.read32(Defaults.termiosOffsetCFlag),
+      buffer.read32(Defaults.termiosOffsetLFlag),
     );
 
-    final clflag =
-        saved.cLflag &
+    final modifiedLFlag =
+        savedState.cLflag &
         ~(Defaults.termiosEcho |
             Defaults.termiosICanon |
             Defaults.termiosISig |
             Defaults.termiosIExten);
-    buf.write32(Defaults.termiosOffsetLFlag, clflag);
-    buf.write8(Defaults.termiosOffsetCCMin, Defaults.termiosVminRaw);
-    buf.write8(Defaults.termiosOffsetCCTime, Defaults.termiosVtimeRaw);
+    buffer.write32(Defaults.termiosOffsetLFlag, modifiedLFlag);
+    buffer.write8(Defaults.termiosOffsetCCMin, Defaults.termiosVminRaw);
+    buffer.write8(Defaults.termiosOffsetCCTime, Defaults.termiosVtimeRaw);
 
-    final setResult = setAttr(Defaults.stdinFd, Defaults.tcsaNow, buf);
-    if (setResult != 0) {
-      free(buf.cast());
+    final tcSetAttrResult = tcSetAttr(
+      Defaults.stdinFd,
+      Defaults.tcsaNow,
+      buffer,
+    );
+    if (tcSetAttrResult != 0) {
+      _library.freePointer(buffer.cast());
       throw StateError('tcsetattr failed');
     }
 
-    _libc = libc;
-    _state = saved;
+    _state.value = savedState;
   }
 
-  void disable() {
-    final state = _state;
-    final libc = _libc;
-    if (state == null || libc == null) return;
-
-    final setAttr = libc
-        .lookupFunction<
-          Int32 Function(Int32, Int32, Pointer<Uint8>),
-          int Function(int, int, Pointer<Uint8>)
-        >(SymbolsFFI.setAttrName);
-    final free = libc
-        .lookupFunction<
-          Void Function(Pointer<Void>),
-          void Function(Pointer<Void>)
-        >(SymbolsFFI.freeName);
-
-    state.buf.write32(Defaults.termiosOffsetIFlag, state.cIflag);
-    state.buf.write32(Defaults.termiosOffsetOFlag, state.cOflag);
-    state.buf.write32(Defaults.termiosOffsetCFlag, state.cCflag);
-    state.buf.write32(Defaults.termiosOffsetLFlag, state.cLflag);
-    setAttr(Defaults.stdinFd, Defaults.tcsaNow, state.buf);
-    free(state.buf.cast());
-    _state = null;
-    _libc = null;
-  }
-
-  DynamicLibrary _openLibc() {
-    final os = Platform.operatingSystem;
-    return switch (os) {
-      'macos' => DynamicLibrary.open(SymbolsFFI.libcMacOS),
-      'linux' => _openLibcLinux(),
-      _ => throw UnsupportedError('FFI raw mode is not supported on $os'),
-    };
-  }
-
-  DynamicLibrary _openLibcLinux() {
-    try {
-      return DynamicLibrary.open(SymbolsFFI.libcLinux6);
-    } catch (_) {
-      return DynamicLibrary.open(SymbolsFFI.libcLinux7);
+  @override
+  void dispose({String? message}) {
+    super.dispose(message: message);
+    final savedState = _state.value;
+    if (savedState != null) {
+      final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
+        SymbolsFFI.tcSetAttrName,
+      );
+      savedState.buf.write32(Defaults.termiosOffsetIFlag, savedState.cIflag);
+      savedState.buf.write32(Defaults.termiosOffsetOFlag, savedState.cOflag);
+      savedState.buf.write32(Defaults.termiosOffsetCFlag, savedState.cCflag);
+      savedState.buf.write32(Defaults.termiosOffsetLFlag, savedState.cLflag);
+      tcSetAttr(Defaults.stdinFd, Defaults.tcsaNow, savedState.buf);
+      _library.freePointer(savedState.buf.cast());
     }
+    _state.dispose();
   }
 }
