@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:terminal/terminal.dart' show systemIoProvider;
 
 import 'keyboard_probe.dart' as probe;
-import 'result.dart' show KeyboardProtocol;
+import 'capabilities.dart' show KeyboardProtocol;
 
 part 'keyboard_probe_provider.g.dart';
 

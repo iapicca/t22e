@@ -4,8 +4,8 @@ import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show SystemIo;
-import 'result.dart' show QueryResult, Supported, Da1Result;
-import 'terminal_probe_extension.dart' show probeTerminal;
+import 'capabilities.dart' show QueryResult, Supported, Da1Result;
+import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
 /// Detect color profile from COLORTERM and TERM environment variables.
 @internal
@@ -52,9 +52,8 @@ Future<ColorProfile> probeColor(
   final env = detectColorFromEnv(io.environment);
   if (env == ColorProfile.trueColor) return env;
 
-  return probeTerminal<ColorQueryEvent, ColorProfile>(
+  return io.probeTerminal<ColorQueryEvent, ColorProfile>(
     query: '${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}',
-    io: io,
     parser: parser,
     timeout: timeout,
     where: (event) => event.r != null,

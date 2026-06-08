@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart' show ColorProfile;
 import 'package:protocol/protocol.dart' show Defaults;
 
-part 'result.freezed.dart';
+part 'capabilities.freezed.dart';
 
 /// Result of a capability query: supported with value or unavailable.
 @Freezed(genericArgumentFactories: true)
@@ -27,7 +27,6 @@ abstract class Capabilities with _$Capabilities {
   const Capabilities._();
 
   const factory Capabilities({
-    @Default(Unavailable<Da1Result>()) QueryResult<Da1Result> da1,
     @Default(ColorProfile.ansi16) ColorProfile colorProfile,
     @Default(false) bool syncSupported,
     @Default(KeyboardProtocol.basic) KeyboardProtocol keyboardProtocol,

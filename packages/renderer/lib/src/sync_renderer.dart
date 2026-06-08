@@ -1,4 +1,4 @@
-import 'package:ansi/ansi.dart' show startSync, endSync;
+import 'package:ansi/ansi.dart' show AnsiDefaults;
 import 'frame.dart';
 import 'line_renderer.dart';
 
@@ -18,6 +18,6 @@ class SyncRenderer {
     final content = _lineRenderer.render(diff, currentFrame);
     if (content.isEmpty) return '';
     if (!syncSupported) return content;
-    return '${startSync()}$content${endSync()}';
+    return '${AnsiDefaults.startSync}$content${AnsiDefaults.endSync}';
   }
 }

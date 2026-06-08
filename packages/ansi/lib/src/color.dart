@@ -31,7 +31,3 @@ String foregroundBrightAnsi(int color) =>
 /// CSI for setting background to a bright ANSI color.
 String backgroundBrightAnsi(int color) =>
     '${Defaults.csi}${Defaults.sgrBgBrightBase + color}m';
-
-/// CSI to reset both foreground and background colors.
-String resetColor() =>
-    '${Defaults.csi}${Defaults.sgrFgReset};${Defaults.sgrBgReset}m';

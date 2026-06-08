@@ -5,49 +5,49 @@ void main() {
   group('alternate screen', () {
     test(
       'enterAltScreen',
-      () => expect(enterAltScreen(), equals('\x1b[?1049h')),
+      () => expect(AnsiDefaults.enterAltScreen, equals('\x1b[?1049h')),
     );
-    test('exitAltScreen', () => expect(exitAltScreen(), equals('\x1b[?1049l')));
+    test('exitAltScreen', () => expect(AnsiDefaults.exitAltScreen, equals('\x1b[?1049l')));
   });
 
   group('mouse modes', () {
     test(
       'enableNormalMouse',
-      () => expect(enableNormalMouse(), equals('\x1b[?1000h')),
+      () => expect(AnsiDefaults.enableNormalMouse, equals('\x1b[?1000h')),
     );
     test('disableMouse', () {
-      expect(disableMouse(), equals('\x1b[?1000l\x1b[?1002l\x1b[?1006l'));
+      expect(AnsiDefaults.disableMouse, equals('\x1b[?1000l\x1b[?1002l\x1b[?1006l'));
     });
     test(
       'enableButtonEvents',
-      () => expect(enableButtonEvents(), equals('\x1b[?1002h')),
+      () => expect(AnsiDefaults.enableButtonEvents, equals('\x1b[?1002h')),
     );
     test(
       'enableSgrMouse',
-      () => expect(enableSgrMouse(), equals('\x1b[?1006h')),
+      () => expect(AnsiDefaults.enableSgrMouse, equals('\x1b[?1006h')),
     );
   });
 
   group('sync updates', () {
-    test('startSync', () => expect(startSync(), equals('\x1b[?2026h')));
-    test('endSync', () => expect(endSync(), equals('\x1b[?2026l')));
+    test('startSync', () => expect(AnsiDefaults.startSync, equals('\x1b[?2026h')));
+    test('endSync', () => expect(AnsiDefaults.endSync, equals('\x1b[?2026l')));
   });
 
   group('bracketed paste', () {
     test('enableBracketedPaste', () {
-      expect(enableBracketedPaste(), equals('\x1b[?2004h'));
+      expect(AnsiDefaults.enableBracketedPaste, equals('\x1b[?2004h'));
     });
     test('disableBracketedPaste', () {
-      expect(disableBracketedPaste(), equals('\x1b[?2004l'));
+      expect(AnsiDefaults.disableBracketedPaste, equals('\x1b[?2004l'));
     });
   });
 
   group('focus tracking', () {
     test('enableFocusTracking', () {
-      expect(enableFocusTracking(), equals('\x1b[?1004h'));
+      expect(AnsiDefaults.enableFocusTracking, equals('\x1b[?1004h'));
     });
     test('disableFocusTracking', () {
-      expect(disableFocusTracking(), equals('\x1b[?1004l'));
+      expect(AnsiDefaults.disableFocusTracking, equals('\x1b[?1004l'));
     });
   });
 
@@ -68,22 +68,22 @@ void main() {
     });
     test(
       'disableKittyKeyboard',
-      () => expect(disableKittyKeyboard(), equals('\x1b[<u')),
+      () => expect(AnsiDefaults.disableKittyKeyboard, equals('\x1b[<u')),
     );
     test(
       'queryKittyKeyboard',
-      () => expect(queryKittyKeyboard(), equals('\x1b[?u')),
+      () => expect(AnsiDefaults.queryKittyKeyboard, equals('\x1b[?u')),
     );
   });
 
   group('color queries', () {
     test('queryForegroundColor', () {
-      expect(queryForegroundColor(), equals('\x1b]10;?\x07'));
+      expect(AnsiDefaults.queryForegroundColor, equals('\x1b]10;?\x07'));
     });
     test('queryBackgroundColor', () {
-      expect(queryBackgroundColor(), equals('\x1b]11;?\x07'));
+      expect(AnsiDefaults.queryBackgroundColor, equals('\x1b]11;?\x07'));
     });
   });
 
-  test('softReset', () => expect(softReset(), equals('\x1b[!p')));
+  test('softReset', () => expect(AnsiDefaults.softReset, equals('\x1b[!p')));
 }

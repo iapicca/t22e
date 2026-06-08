@@ -35,6 +35,6 @@ void main() {
     );
     test('overLine on', () => expect(overLine(true), equals('\x1b[53m')));
     test('overLine off', () => expect(overLine(false), equals('\x1b[55m')));
-    test('resetAll', () => expect(resetAll(), equals('\x1b[0m')));
+    test('resetAll', () => expect(AnsiDefaults.resetAll, equals('\x1b[0m')));
   });
 }

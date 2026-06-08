@@ -43,20 +43,5 @@ String moveLeft(int n) => '${Defaults.csi}${n}D';
 /// Move cursor to a specific column (1-based).
 String moveColumn(int col) => '${Defaults.csi}${col}G';
 
-/// Hide the terminal cursor.
-String hideCursor() => '${Defaults.csi}?${Defaults.decModeCursorVisible}l';
-
-/// Show the terminal cursor.
-String showCursor() => '${Defaults.csi}?${Defaults.decModeCursorVisible}h';
-
-/// Save the current cursor position.
-String saveCursor() => '${Defaults.csi}s';
-
-/// Restore the previously saved cursor position.
-String restoreCursor() => '${Defaults.csi}u';
-
-/// Request the current cursor position from the terminal.
-String requestPosition() => '${Defaults.csi}6n';
-
 /// Set the cursor shape/style.
 String setStyle(CursorStyle style) => '${Defaults.csi}${style.value} q';

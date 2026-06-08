@@ -14,9 +14,8 @@ import 'package:ansi/ansi.dart'
         blink,
         reverse,
         strikethrough,
-        overLine,
-        resetAll;
-import 'package:ansi/ansi.dart' show hyperlink;
+        overLine;
+import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
 
 /// A grid-based terminal surface for painting text and borders.
 class Surface {
@@ -232,7 +231,7 @@ class Surface {
             buf.write(Defaults.st);
           }
           if (lastStyle != null && !lastStyle.isClear) {
-            buf.write(resetAll());
+            buf.write(AnsiDefaults.resetAll);
           }
           return buf.toString();
         })

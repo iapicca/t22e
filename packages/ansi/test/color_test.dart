@@ -36,6 +36,6 @@ void main() {
   });
 
   test('reset color', () {
-    expect(resetColor(), equals('\x1b[39;49m'));
+    expect(AnsiDefaults.resetColor, equals('\x1b[39;49m'));
   });
 }

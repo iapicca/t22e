@@ -12,17 +12,17 @@ void main() {
   });
 
   group('cursor visibility', () {
-    test('hideCursor', () => expect(hideCursor(), equals('\x1b[?25l')));
-    test('showCursor', () => expect(showCursor(), equals('\x1b[?25h')));
+    test('hideCursor', () => expect(AnsiDefaults.hideCursor, equals('\x1b[?25l')));
+    test('showCursor', () => expect(AnsiDefaults.showCursor, equals('\x1b[?25h')));
   });
 
   group('cursor save/restore', () {
-    test('saveCursor', () => expect(saveCursor(), equals('\x1b[s')));
-    test('restoreCursor', () => expect(restoreCursor(), equals('\x1b[u')));
+    test('saveCursor', () => expect(AnsiDefaults.saveCursor, equals('\x1b[s')));
+    test('restoreCursor', () => expect(AnsiDefaults.restoreCursor, equals('\x1b[u')));
   });
 
   test('requestPosition', () {
-    expect(requestPosition(), equals('\x1b[6n'));
+    expect(AnsiDefaults.requestPosition, equals('\x1b[6n'));
   });
 
   group('cursor style', () {

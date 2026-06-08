@@ -20,16 +20,16 @@ Future<void> main() async {
     terminalGuardProvider(
       onRestore: () {
         rawMode.dispose();
-        terminalIo.write(showCursor());
-        terminalIo.write(exitAltScreen());
+        terminalIo.write(AnsiDefaults.showCursor);
+        terminalIo.write(AnsiDefaults.exitAltScreen);
         terminalIo.flush();
       },
     ),
   )..arm();
 
   rawMode.init();
-  terminalIo.write(hideCursor());
-  terminalIo.write(enterAltScreen());
+  terminalIo.write(AnsiDefaults.hideCursor);
+  terminalIo.write(AnsiDefaults.enterAltScreen);
   terminalIo.flush();
 
   await _runApp(container, terminalIo);
@@ -112,7 +112,7 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   }
 
   await subscription.cancel();
-  terminalIo.write(showCursor());
+  terminalIo.write(AnsiDefaults.showCursor);
   terminalIo.flush();
 }
 

@@ -39,6 +39,3 @@ String strikethrough(bool on) => on
 String overLine(bool on) => on
     ? '${Defaults.csi}${Defaults.sgrOverline}m'
     : '${Defaults.csi}${Defaults.sgrNoOverline}m';
-
-/// SGR escape sequence to reset all text attributes.
-String resetAll() => '${Defaults.csi}${Defaults.sgrReset}m';
