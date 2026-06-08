@@ -2,7 +2,6 @@ import 'package:ansi/ansi.dart' show AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show SystemIo;
 
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
@@ -12,13 +11,13 @@ import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 @internal
 Future<bool> probeSync(
   SystemIo io,
-  TerminalParser parser, {
-  Duration timeout = Defaults.defaultProbeTimeout,
-}) async {
+  TerminalParser parser,
+  Duration timeout,
+) async {
   return io.probeTerminal<QuerySyncUpdateEvent, bool>(
     query: AnsiDefaults.querySyncUpdate,
     parser: parser,
-    timeout: timeout,
+timeout: timeout,
     onEvent: (event) => event.supported,
     onTimeout: () => false,
   );

@@ -46,9 +46,9 @@ ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
 Future<ColorProfile> probeColor(
   SystemIo io,
   TerminalParser parser,
-  QueryResult<Da1Result> da1Result, {
-  Duration timeout = Defaults.defaultProbeTimeout,
-}) async {
+  QueryResult<Da1Result> da1Result,
+  Duration timeout 
+) async {
   final env = detectColorFromEnv(io.environment);
   if (env == ColorProfile.trueColor) return env;
 

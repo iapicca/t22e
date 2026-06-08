@@ -12,10 +12,9 @@ part 'capabilities_provider.g.dart';
 @riverpod
 Future<Capabilities> capabilities(Ref ref) async {
   final io = ref.read(systemIoProvider);
-  final color = await ref.read(colorProbeProvider)();
-  final syncSupported = await ref.read(syncProbeProvider)();
-  final keyboard = await ref.read(keyboardProbeProvider)();
-
+  final color = await ref.read(colorProbeProvider);
+  final syncSupported = await ref.read(syncProbeProvider);
+  final keyboard = await ref.read(keyboardProbeProvider);
   return Capabilities(
     colorProfile: color,
     syncSupported: syncSupported,

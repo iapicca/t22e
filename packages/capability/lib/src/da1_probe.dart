@@ -9,14 +9,12 @@ import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
 
 /// Probe for primary device attributes (DA1) via CSI c query.
-/// TODO probeTerminal should be imported via provided, not by direct import!
 @internal
 Future<QueryResult<Da1Result>> probeDa1(
   SystemIo io,
-  TerminalParser parser, {
-  Duration timeout = Defaults.defaultProbeTimeout,
-}) async {
-  return io.probeTerminal<PrimaryDeviceAttributesEvent, QueryResult<Da1Result>>(
+  TerminalParser parser, 
+  Duration timeout ,) =>
+   io.probeTerminal<PrimaryDeviceAttributesEvent, QueryResult<Da1Result>>(
     query: AnsiDefaults.queryDa1,
     parser: parser,
     timeout: timeout,
@@ -30,4 +28,4 @@ Future<QueryResult<Da1Result>> probeDa1(
     },
     onTimeout: () => const QueryResult.unavailable(),
   );
-}
+
