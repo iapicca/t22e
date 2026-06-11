@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:terminal/terminal.dart' show systemIoProvider;
 
 import 'color_probe_provider.dart' show colorProbeProvider;
+import 'da1_probe_provider.dart' show da1ProbeProvider;
 import 'keyboard_probe_provider.dart' show keyboardProbeProvider;
 import 'sync_probe_provider.dart' show syncProbeProvider;
 import 'capabilities.dart' show Capabilities;
@@ -12,10 +13,12 @@ part 'capabilities_provider.g.dart';
 @riverpod
 Future<Capabilities> capabilities(Ref ref) async {
   final io = ref.read(systemIoProvider);
-  final color = await ref.read(colorProbeProvider);
-  final syncSupported = await ref.read(syncProbeProvider);
-  final keyboard = await ref.read(keyboardProbeProvider);
+  final da1 = await ref.read(da1ProbeProvider.future);
+  final color = await ref.read(colorProbeProvider.future);
+  final syncSupported = await ref.read(syncProbeProvider.future);
+  final keyboard = await ref.read(keyboardProbeProvider.future);
   return Capabilities(
+    da1: da1,
     colorProfile: color,
     syncSupported: syncSupported,
     keyboardProtocol: keyboard,

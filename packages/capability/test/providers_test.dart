@@ -71,30 +71,31 @@ void main() {
     });
   });
 
-  group('QueryResult', () {
+  group('Da1Query', () {
     test('supported holds value', () {
-      final result = QueryResult.supported(42);
-      expect(result, isA<Supported<int>>());
-      if (result is Supported<int>) {
-        expect(result.value, 42);
+      final result = Da1Query.supported(65, [22, 28]);
+      expect(result, isA<Da1Value>());
+      if (result is Da1Value) {
+        expect(result.terminalId, 65);
+        expect(result.attributes, [22, 28]);
       }
     });
 
-    test('unavailable has no value', () {
-      const result = QueryResult.unavailable();
-      expect(result, isA<Unavailable>());
+    test('unsupported has no value', () {
+      const result = Da1Query.unsupported();
+      expect(result, isA<Da1QueryUnsupported>());
     });
 
     test('equality', () {
-      expect(QueryResult.supported(1), QueryResult.supported(1));
-      expect(QueryResult.supported(1), isNot(QueryResult.supported(2)));
-      expect(const QueryResult.unavailable(), const QueryResult.unavailable());
+      expect(Da1Query.supported(1, []), Da1Query.supported(1, []));
+      expect(Da1Query.supported(1, []), isNot(Da1Query.supported(2, [])));
+      expect(const Da1Query.unsupported(), const Da1Query.unsupported());
     });
   });
 
-  group('Da1Result', () {
+  group('Da1Value', () {
     test('constructs with terminal id and attributes', () {
-      final result = Da1Result(65, [22, 28]);
+      final result = Da1Value(65, [22, 28]);
       expect(result.terminalId, 65);
       expect(result.attributes, [22, 28]);
     });
@@ -109,8 +110,8 @@ void main() {
 
   group('Capabilities', () {
     test('defaults', () {
-      const caps = Capabilities();
-      expect(caps.da1, isA<Unavailable>());
+      final caps = Capabilities.defaults();
+      expect(caps.da1, isA<Da1QueryUnsupported>());
       expect(caps.colorProfile, ColorProfile.ansi16);
       expect(caps.syncSupported, isFalse);
       expect(caps.keyboardProtocol, KeyboardProtocol.basic);
@@ -119,7 +120,7 @@ void main() {
     });
 
     test('custom values', () {
-      final da1 = QueryResult.supported(Da1Result(65, [22, 28]));
+      final da1 = Da1Query.supported(65, [22, 28]);
       final caps = Capabilities(
         da1: da1,
         colorProfile: ColorProfile.trueColor,

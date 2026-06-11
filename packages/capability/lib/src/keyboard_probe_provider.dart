@@ -1,6 +1,7 @@
 import 'package:parser/terminal_parser.dart' show terminalParserProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:terminal/terminal.dart' show systemIoProvider;
+import 'capabilities.dart' show KeyboardProtocol;
 import 'keyboard_probe.dart' ;
 
 import 'probe_definitions.dart' show KeyboardProbe;

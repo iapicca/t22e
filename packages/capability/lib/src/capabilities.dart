@@ -2,20 +2,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart' show ColorProfile;
 import 'package:protocol/protocol.dart' show Defaults;
 
+import 'da1_query.dart' show Da1Query;
+
 part 'capabilities.freezed.dart';
-
-/// Result of a capability query: supported with value or unavailable.
-@Freezed(genericArgumentFactories: true)
-sealed class QueryResult<T> with _$QueryResult<T> {
-  const factory QueryResult.supported(T value) = Supported<T>;
-  const factory QueryResult.unavailable() = Unavailable<T>;
-}
-
-/// Parsed DA1 response: terminal ID and attribute list.
-@freezed
-abstract class Da1Result with _$Da1Result {
-  const factory Da1Result(int terminalId, List<int> attributes) = _Da1Result;
-}
 
 /// Supported keyboard protocol types.
 /// Keyboard protocol types: basic or Kitty enhanced protocol.
@@ -27,10 +16,21 @@ abstract class Capabilities with _$Capabilities {
   const Capabilities._();
 
   const factory Capabilities({
-    @Default(ColorProfile.ansi16) ColorProfile colorProfile,
-    @Default(false) bool syncSupported,
-    @Default(KeyboardProtocol.basic) KeyboardProtocol keyboardProtocol,
-    @Default(Defaults.defaultTerminalHeight) int rows,
-    @Default(Defaults.defaultTerminalWidth) int cols,
+    required Da1Query da1,
+    required ColorProfile colorProfile,
+    required bool syncSupported,
+    required KeyboardProtocol keyboardProtocol,
+    required int rows,
+    required int cols,
   }) = _Capabilities;
+
+  /// Capabilities with all default values.
+  factory Capabilities.defaults() => Capabilities(
+        da1: const Da1Query.unsupported(),
+        colorProfile: ColorProfile.ansi16,
+        syncSupported: false,
+        keyboardProtocol: KeyboardProtocol.basic,
+        rows: Defaults.defaultTerminalHeight,
+        cols: Defaults.defaultTerminalWidth,
+      );
 }

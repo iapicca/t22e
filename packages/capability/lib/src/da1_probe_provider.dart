@@ -2,8 +2,8 @@ import 'package:parser/terminal_parser.dart' show terminalParserProvider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:terminal/terminal.dart' show systemIoProvider;
 
-
 import 'da1_probe.dart' show probeDa1;
+import 'da1_query.dart' show Da1Query;
 import 'probe_definitions.dart' show Da1Probe;
 import 'probe_timeout_provider.dart' show probeTimeoutProvider;
 

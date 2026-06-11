@@ -4,17 +4,20 @@ import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:terminal/terminal.dart' show SystemIo;
-import 'capabilities.dart' show QueryResult, Supported, Da1Result;
+import 'da1_query.dart' show Da1Query, Da1Value;
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
 /// Detect color profile from COLORTERM and TERM environment variables.
 @internal
 ColorProfile detectColorFromEnv(Map<String, String> env) {
+
+  /// TODO move env values to Defaults.
   final colorterm = env['COLORTERM'];
   if (colorterm == Defaults.envColortermTruecolor ||
       colorterm == Defaults.envColorterm24bit) {
     return ColorProfile.trueColor;
   }
+    /// TODO move env values to Defaults.
   final term = env['TERM'] ?? '';
   if (term.endsWith(Defaults.envTermSuffix256Color)) {
     return ColorProfile.indexed256;
@@ -28,9 +31,9 @@ ColorProfile detectColorFromEnv(Map<String, String> env) {
 
 /// Detect color profile from DA1 response attributes.
 @internal
-ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
-  if (da1Result is Supported<Da1Result>) {
-    final attrs = da1Result.value.attributes;
+ColorProfile detectColorFromDa1(Da1Query da1Result) {
+  if (da1Result is Da1Value) {
+    final attrs = da1Result.attributes;
     if (attrs.contains(Defaults.da1AttrTrueColor)) {
       return ColorProfile.trueColor;
     }
@@ -46,7 +49,7 @@ ColorProfile detectColorFromDa1(QueryResult<Da1Result> da1Result) {
 Future<ColorProfile> probeColor(
   SystemIo io,
   TerminalParser parser,
-  QueryResult<Da1Result> da1Result,
+  Da1Query da1Result,
   Duration timeout 
 ) async {
   final env = detectColorFromEnv(io.environment);
