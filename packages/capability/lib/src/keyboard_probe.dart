@@ -12,9 +12,10 @@ import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 Future<KeyboardProtocol> probeKeyboard(
   SystemIo io,
   TerminalParser parser,
-  Duration timeout,) async {
-  final result =
-      await io.probeTerminal<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
+  Duration timeout,
+) async {
+  final result = await io
+      .probeTerminal<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
         query: enableKittyKeyboard(Defaults.kittyDisambiguate),
         parser: parser,
         timeout: timeout,

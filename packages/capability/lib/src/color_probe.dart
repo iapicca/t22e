@@ -10,14 +10,14 @@ import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 /// Detect color profile from COLORTERM and TERM environment variables.
 @internal
 ColorProfile detectColorFromEnv(Map<String, String> env) {
-
   /// TODO move env values to Defaults.
   final colorterm = env['COLORTERM'];
   if (colorterm == Defaults.envColortermTruecolor ||
       colorterm == Defaults.envColorterm24bit) {
     return ColorProfile.trueColor;
   }
-    /// TODO move env values to Defaults.
+
+  /// TODO move env values to Defaults.
   final term = env['TERM'] ?? '';
   if (term.endsWith(Defaults.envTermSuffix256Color)) {
     return ColorProfile.indexed256;
@@ -50,7 +50,7 @@ Future<ColorProfile> probeColor(
   SystemIo io,
   TerminalParser parser,
   Da1Query da1Result,
-  Duration timeout 
+  Duration timeout,
 ) async {
   final env = detectColorFromEnv(io.environment);
   if (env == ColorProfile.trueColor) return env;

@@ -15,9 +15,5 @@ Da1Probe da1Probe(Ref ref) {
   final io = ref.read(systemIoProvider);
   final parser = ref.read(terminalParserProvider);
   final timeout = ref.read(probeTimeoutProvider);
-  return probeDa1(
-    io,
-    parser,
-    timeout,
-  );
+  return probeDa1(io, parser, timeout);
 }

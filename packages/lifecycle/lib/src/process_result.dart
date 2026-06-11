@@ -16,6 +16,7 @@ sealed class ProcessResult with _$ProcessResult {
   const factory ProcessResult.timeout(Duration duration) = ProcessTimeout;
 }
 
+/// TODO why is this not using freezed?
 class ProcessTimeout extends ProcessResult {
   final Duration duration;
   const ProcessTimeout(this.duration) : super._();

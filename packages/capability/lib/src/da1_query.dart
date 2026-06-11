@@ -11,8 +11,10 @@ sealed class Da1Query {
     required TResult Function() unsupported,
   }) {
     return switch (this) {
-      Da1Value(:final terminalId, :final attributes) =>
-        supported(terminalId, attributes),
+      Da1Value(:final terminalId, :final attributes) => supported(
+        terminalId,
+        attributes,
+      ),
       Da1QueryUnsupported() => unsupported(),
     };
   }

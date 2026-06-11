@@ -10,19 +10,19 @@ import 'probe_timeout_provider.dart' show probeTimeoutProvider;
 
 part 'color_probe_provider.g.dart';
 
-
-
 @riverpod
 /// Full color probe: env fallback, then OSC query, then DA1 fallback.
-ColorProbe colorProbe(Ref ref)  async {
+ColorProbe colorProbe(Ref ref) async {
   final io = ref.read(systemIoProvider);
   final parser = ref.read(terminalParserProvider);
   final da1Result = await ref.read(da1ProbeProvider.future);
   final timeout = ref.read(probeTimeoutProvider);
-  return probeColor(
-    io,
-    parser,
-    da1Result,
-    timeout,
-  );
+  return probeColor(io, parser, da1Result, timeout);
+}
+
+@riverpod
+/// Detect color profile from environment variables.
+ColorProfile colorFromEnv(Ref ref) {
+  final io = ref.read(systemIoProvider);
+  return detectColorFromEnv(io.environment);
 }

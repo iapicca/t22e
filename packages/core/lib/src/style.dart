@@ -45,6 +45,8 @@ abstract class TextStyle with _$TextStyle {
       wordWrap == null;
 
   /// Merges another style on top (non-null fields override).
+  /// TODO this implementation seems to duplicate the work of copyWith.
+  
   TextStyle merge(TextStyle other) {
     if (other.isClear) return this;
     if (isClear) return other;

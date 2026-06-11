@@ -1,4 +1,3 @@
-
 import 'package:parser/terminal_parser.dart' show terminalParserProvider;
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,9 +15,5 @@ SyncProbe syncProbe(Ref ref) {
   final io = ref.read(systemIoProvider);
   final parser = ref.read(terminalParserProvider);
   final timeout = ref.read(probeTimeoutProvider);
-  return probeSync(
-    io,
-    parser,
-    timeout,
-  );
+  return probeSync(io, parser, timeout);
 }

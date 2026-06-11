@@ -6,7 +6,6 @@ import 'package:terminal/terminal.dart' show SystemIo;
 
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
-
 /// Probe for synchronized update support via DECRPM query.
 @internal
 Future<bool> probeSync(
@@ -17,7 +16,7 @@ Future<bool> probeSync(
   return io.probeTerminal<QuerySyncUpdateEvent, bool>(
     query: AnsiDefaults.querySyncUpdate,
     parser: parser,
-timeout: timeout,
+    timeout: timeout,
     onEvent: (event) => event.supported,
     onTimeout: () => false,
   );

@@ -18,6 +18,13 @@ import 'package:ansi/ansi.dart'
 import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
 
 /// A grid-based terminal surface for painting text and borders.
+/// TODO I don't like this implementation: 
+/// 1. it should be freezed!
+/// 2. it should use Init mixin to initialize the grid lazily, and avoid copying rows on every change.
+/// 3. I don't like the mutable `grid` I want it to be a ValueNotifier<List<List<Cell>>> to initialize with Init mixin and dispose with Dispose mixin.
+/// 4. I see hardcoded values (eg: `\u2500`) those should be in a "defaults" class.
+/// 5. instead of width and height fields, I want a Size field inspired by https://api.flutter.dev/flutter/dart-ui/Size-class.html but built with freezed and with utility methods like `constrain` and `multiply` (see layout.dart) and maybe a Rect class too, to avoid passing around separate width and height parameters everywhere.
+/// 6. I want Surface itself to be a ValueNotifier<Size>
 class Surface {
   /// Total width in columns.
   final int width;
@@ -204,6 +211,7 @@ class Surface {
   }
 
   /// Exports the surface as ANSI-escaped lines ready for terminal output.
+  /// TODO this should be an extension
   List<String> toAnsiLines() {
     return grid
         .map((row) {

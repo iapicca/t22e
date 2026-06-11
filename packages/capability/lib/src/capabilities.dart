@@ -26,11 +26,11 @@ abstract class Capabilities with _$Capabilities {
 
   /// Capabilities with all default values.
   factory Capabilities.defaults() => Capabilities(
-        da1: const Da1Query.unsupported(),
-        colorProfile: ColorProfile.ansi16,
-        syncSupported: false,
-        keyboardProtocol: KeyboardProtocol.basic,
-        rows: Defaults.defaultTerminalHeight,
-        cols: Defaults.defaultTerminalWidth,
-      );
+    da1: const Da1Query.unsupported(),
+    colorProfile: ColorProfile.ansi16,
+    syncSupported: false,
+    keyboardProtocol: KeyboardProtocol.basic,
+    rows: Defaults.defaultTerminalHeight,
+    cols: Defaults.defaultTerminalWidth,
+  );
 }

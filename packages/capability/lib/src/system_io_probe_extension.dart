@@ -26,7 +26,7 @@ extension SystemIoProbeExtension on SystemIo {
           .expand((bytes) => parser.advance(bytes))
           .where((event) => event is T)
           .cast<T>()
-          .firstWhere(where ??  (_) => true)
+          .firstWhere(where ?? (_) => true)
           .timeout(timeout);
       return onEvent(matchedEvent);
     } on TimeoutException {
