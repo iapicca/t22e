@@ -1,6 +1,7 @@
 import 'cell.dart';
 import 'color.dart';
 import 'geometry.dart';
+import 'layout.dart';
 import 'style.dart';
 import 'package:unicode/unicode.dart' show graphemeClusters;
 import 'package:unicode/unicode.dart' show charWidth, stringWidth;
@@ -10,26 +11,23 @@ import 'package:ansi/ansi.dart'
 import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
 
 /// A grid-based terminal surface for painting text and borders.
-/// TODO I don't like this implementation:
-/// 1. it should be freezed!
-/// 2. it should use Init mixin to initialize the grid lazily, and avoid copying rows on every change.
-/// 3. I don't like the mutable `grid` I want it to be a ValueNotifier<List<List<Cell>>> to initialize with Init mixin and dispose with Dispose mixin.
-/// 4. I see hardcoded values (eg: `\u2500`) those should be in a "defaults" class.
-/// 5. instead of width and height fields, I want a Size field inspired by https://api.flutter.dev/flutter/dart-ui/Size-class.html but built with freezed and with utility methods like `constrain` and `multiply` (see layout.dart) and maybe a Rect class too, to avoid passing around separate width and height parameters everywhere.
-/// 6. I want Surface itself to be a ValueNotifier<Size>
 class Surface {
+  /// Surface dimensions.
+  final Size size;
+
   /// Total width in columns.
-  final int width;
+  int get width => size.width;
 
   /// Total height in rows.
-  final int height;
+  int get height => size.height;
 
   /// Row-major grid of Cell objects.
   final List<List<Cell>> grid;
 
   /// Creates a blank surface of the given dimensions.
-  Surface(this.width, this.height)
-    : grid = List.generate(
+  Surface(int width, int height)
+    : size = Size(width, height),
+      grid = List.generate(
         height,
         (_) => List.filled(width, const Cell()),
         growable: false,
@@ -37,13 +35,11 @@ class Surface {
 
   /// Creates a surface from an existing grid.
   Surface.fromGrid(this.grid)
-    : width = grid.isEmpty ? 0 : grid[0].length,
-      height = grid.length;
+    : size = Size(grid.isEmpty ? 0 : grid[0].length, grid.length);
 
   /// Creates a resized copy, preserving overlapping region.
   Surface._resized(Surface source, int newWidth, int newHeight)
-    : width = newWidth,
-      height = newHeight,
+    : size = Size(newWidth, newHeight),
       grid = List.generate(
         newHeight,
         (y) => List<Cell>.generate(
@@ -146,24 +142,25 @@ class Surface {
     if (rect.isEmpty || rect.width < 2 || rect.height < 2) return;
     final s = style ?? TextStyle.empty;
 
-    final hChar = borderChars != null && borderChars.length >= 2
-        ? borderChars[1]
-        : '\u2500';
-    final vChar = borderChars != null && borderChars.isNotEmpty
-        ? borderChars[0]
-        : '\u2502';
-    final tl = borderChars != null && borderChars.length >= 4
-        ? borderChars[3]
-        : '\u250C';
-    final tr = borderChars != null && borderChars.length >= 5
-        ? borderChars[4]
-        : '\u2510';
-    final bl = borderChars != null && borderChars.length >= 6
-        ? borderChars[5]
-        : '\u2514';
-    final br = borderChars != null && borderChars.length >= 7
-        ? borderChars[6]
-        : '\u2518';
+    final defaultChars = borderChars ?? Defaults.borderSingle;
+    final vChar = defaultChars.isNotEmpty
+        ? defaultChars[0]
+        : Defaults.borderSingle[0];
+    final hChar = defaultChars.length >= 2
+        ? defaultChars[1]
+        : Defaults.borderSingle[1];
+    final tl = defaultChars.length >= 3
+        ? defaultChars[2]
+        : Defaults.borderSingle[2];
+    final tr = defaultChars.length >= 4
+        ? defaultChars[3]
+        : Defaults.borderSingle[3];
+    final bl = defaultChars.length >= 5
+        ? defaultChars[4]
+        : Defaults.borderSingle[4];
+    final br = defaultChars.length >= 6
+        ? defaultChars[5]
+        : Defaults.borderSingle[5];
 
     final left = rect.left;
     final top = rect.top;
@@ -203,7 +200,6 @@ class Surface {
   }
 
   /// Exports the surface as plain text lines (no escape sequences).
-  /// TODO this should be an extension
   List<String> toPlainLines() {
     return grid
         .map((row) {
@@ -215,7 +211,6 @@ class Surface {
   }
 
   /// Converts a TextStyle to ANSI SGR escape sequences.
-  /// TODO this should be an helper function and probably moved to the ansi package. 
   static String _styleToAnsi(TextStyle s) {
     final buf = StringBuffer();
     if (s.bold == true) buf.write(bold(true));

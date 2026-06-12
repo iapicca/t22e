@@ -53,7 +53,25 @@ abstract class Constraints with _$Constraints {
 /// A simple width × height size.
 @freezed
 abstract class Size with _$Size {
+  const Size._();
+
   const factory Size(int width, int height) = _Size;
+
+  /// True if either dimension is zero.
+  bool get isEmpty => width == 0 || height == 0;
+
+  /// Clamps this size to fit within the given constraints.
+  Size constrain(Constraints constraints) {
+    return Size(
+      width.clamp(constraints.minWidth, constraints.maxWidth),
+      height.clamp(constraints.minHeight, constraints.maxHeight),
+    );
+  }
+
+  /// Scales both dimensions by the given factor.
+  Size multiply(double factor) {
+    return Size((width * factor).round(), (height * factor).round());
+  }
 }
 
 /// Describes a flex item with optional fixed size and flex factor.

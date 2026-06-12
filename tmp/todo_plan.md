@@ -22,7 +22,7 @@
 
 | # | File:Line | TODO | Category | Status |
 |---|-----------|------|----------|--------|
-| 8 | `surface.dart:21` | Surface should be: freezed, use Init mixin for lazy grid, use ValueNotifier for grid, move hardcoded chars to Defaults, use Size/Rect classes, Surface as ValueNotifier<Size> | Major refactor | |
+| 8 | `surface.dart:21` | Surface should be: freezed, use Init mixin for lazy grid, use ValueNotifier for grid, move hardcoded chars to Defaults, use Size/Rect classes, Surface as ValueNotifier<Size> | Major refactor | :white_check_mark: Done |
 | 9 | `surface.dart:214` | `toAnsiLines()` should be an extension | Refactor | :white_check_mark: Done |
 | 10 | `style.dart:48` | `merge()` duplicates `copyWith` work | Optimization | |
 | 11 | `cell.dart:18` | Remove `mergeStyle()`, use `copyWith` directly | Cleanup | :white_check_mark: Done |
@@ -71,7 +71,7 @@ Move hardcoded strings to `Defaults`, remove dead methods, convert to extension.
 - [#2] Refactor `Vt500Engine` to use ValueNotifier + Init mixin, rename state flags, extract handlers to top-level functions
 - [#3] Evaluate using switch case in `_onGround`
 
-### Phase 5: Surface Major Refactor
+### Phase 5: Surface Major Refactor :white_check_mark:
 
 - [#8] Create `Size` and `Rect` utility classes with `constrain`/`multiply` methods; convert `Surface` to use freezed, Init/Dispose mixins, ValueNotifier<Size>, ValueNotifier for grid; move hardcoded border chars to Defaults
 
