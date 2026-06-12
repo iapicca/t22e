@@ -6,6 +6,7 @@ void main() {
 
   setUp(() {
     parser = TerminalParser(
+      engine: Vt500Engine(),
       csiParser: parseCsi,
       escParser: parseEsc,
       oscParser: parseOsc,

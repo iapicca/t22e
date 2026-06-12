@@ -32,6 +32,7 @@
 - **Constants**: camelCase in `Defaults` class (`escapeByte`, `csiFinalSgr`)
 - **Files**: snake_case (`terminal_parser.dart`, `color_profile.dart`)
 - **Enums**: PascalCase with camelCase values (`KeyCode.none`, `MouseAction.press`)
+- **Private named parameters**: Use `this._field` for initializing formals with private backing fields (Dart 3.12+). The constructor parameter and call site use the public name `field:` (without underscore). See https://dart.dev/blog/announcing-dart-3-12#private-named-parameters
 
 ## Comment Style
 

@@ -19,4 +19,5 @@ export 'src/csi_parser_provider.dart';
 export 'src/esc_parser_provider.dart';
 export 'src/osc_parser_provider.dart';
 export 'src/dcs_parser_provider.dart';
+export 'src/engine_provider.dart';
 export 'src/terminal_parser_provider.dart';
