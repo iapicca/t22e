@@ -13,13 +13,20 @@ class VirtualTerminal {
   int _cursorY = 0;
   TextStyle _currentStyle = TextStyle.empty;
 
-  /// TODO: Track alternate screen state for buffer switching
-  // ignore: unused_field
+  /// Whether the alternate screen buffer is currently active.
   bool _altScreen = false;
 
-  /// TODO: Store the normal screen buffer when switching to alt screen
-  // ignore: unused_field
+  /// Saved normal screen buffer for restoration after alt screen.
   List<List<Cell>>? _normalScreenBuffer;
+
+  /// Saved cursor X position from before entering alt screen.
+  int _normalCursorX = 0;
+
+  /// Saved cursor Y position from before entering alt screen.
+  int _normalCursorY = 0;
+
+  /// Saved text style from before entering alt screen.
+  TextStyle _normalStyle = TextStyle.empty;
 
   VirtualTerminal({
     this.width = Defaults.defaultTerminalWidth,
@@ -152,14 +159,14 @@ class VirtualTerminal {
         _applySgr(params);
       case Defaults.csiFinalDecset
           when params.contains(Defaults.decModeAltScreen):
-        _altScreen = true;
+        _enterAltScreen();
       case Defaults.csiFinalDecrst
           when params.contains(Defaults.decModeAltScreen):
-        _altScreen = false;
+        _exitAltScreen();
       case Defaults.csiFinalDecset when params[0] == Defaults.decModeAltScreen:
-        _altScreen = true;
+        _enterAltScreen();
       case Defaults.csiFinalDecrst when params[0] == Defaults.decModeAltScreen:
-        _altScreen = false;
+        _exitAltScreen();
     }
   }
 
@@ -308,6 +315,33 @@ class VirtualTerminal {
         _grid[r][c] = const Cell();
       }
     }
+  }
+
+  /// Saves the current grid and switches to the alternate screen buffer.
+  void _enterAltScreen() {
+    if (_altScreen) return;
+    _normalScreenBuffer = _grid;
+    _normalCursorX = _cursorX;
+    _normalCursorY = _cursorY;
+    _normalStyle = _currentStyle;
+    _altScreen = true;
+    _resetGrid();
+    _cursorX = 0;
+    _cursorY = 0;
+    _currentStyle = TextStyle.empty;
+  }
+
+  /// Restores the normal screen buffer saved by [_enterAltScreen].
+  void _exitAltScreen() {
+    if (!_altScreen) return;
+    if (_normalScreenBuffer != null) {
+      _grid = _normalScreenBuffer!;
+      _normalScreenBuffer = null;
+      _cursorX = _normalCursorX;
+      _cursorY = _normalCursorY;
+      _currentStyle = _normalStyle;
+    }
+    _altScreen = false;
   }
 
   /// Places a character at the current cursor position.

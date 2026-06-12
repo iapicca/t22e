@@ -72,5 +72,51 @@ void main() {
       expect(vt.cellAt(0, 20).char, equals(' '));
       expect(vt.cellAt(10, 0).char, equals(' '));
     });
+
+    group('alt screen', () {
+      test('entering alt screen saves and clears normal buffer', () {
+        vt.write('Hello');
+        vt.write('\x1b[?1049h');
+        // Alt screen should be blank
+        expect(vt.cellAt(0, 0).char, equals(' '));
+        expect(vt.cellAt(0, 1).char, equals(' '));
+      });
+
+      test('exiting alt screen restores normal buffer', () {
+        vt.write('Hello');
+        vt.write('\x1b[?1049h');
+        vt.write('\x1b[?1049l');
+        // Normal buffer content restored
+        expect(vt.cellAt(0, 0).char, equals('H'));
+        expect(vt.cellAt(0, 4).char, equals('o'));
+      });
+
+      test('writes to alt screen do not affect normal buffer', () {
+        vt.write('Normal');
+        vt.write('\x1b[?1049h');
+        vt.write('Alt');
+        vt.write('\x1b[?1049l');
+        expect(vt.cellAt(0, 0).char, equals('N'));
+        expect(vt.plainText().startsWith('Normal'), isTrue);
+      });
+
+      test('entering alt screen twice is idempotent', () {
+        vt.write('Hello');
+        vt.write('\x1b[?1049h');
+        vt.write('Alt');
+        vt.write('\x1b[?1049h'); // second enter is ignored
+        vt.write('\x1b[?1049l');
+        expect(vt.cellAt(0, 0).char, equals('H'));
+      });
+
+      test('restores cursor position on alt screen exit', () {
+        vt.write('\x1b[2;3H');
+        vt.write('\x1b[?1049h');
+        vt.write('\x1b[?1049l');
+        // Just verify we can still write at a position
+        vt.write('X');
+        expect(vt.cellAt(1, 2).char, equals('X'));
+      });
+    });
   });
 }
