@@ -1,4 +1,5 @@
 import 'engine.dart';
+import 'sequence_data.dart';
 import 'events.dart';
 
 /// VT500-compatible terminal input parser.
@@ -19,7 +20,7 @@ class TerminalParser {
     required this.dcsParser,
   });
 
-/// TODO I want to manually rework this!
+  /// TODO I want to manually rework this!
   List<Event> advance(List<int> bytes) {
     final events = <Event>[];
     for (final seq in _engine.advanceAll(bytes)) {

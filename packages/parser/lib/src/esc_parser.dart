@@ -1,5 +1,5 @@
 import 'package:protocol/protocol.dart' show Defaults;
-import 'engine.dart';
+import 'sequence_data.dart';
 import 'events.dart';
 
 /// Parses ESC sequences into events (SS3 keys, reset, screen save/restore, scroll).
