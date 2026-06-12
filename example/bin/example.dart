@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
+import 'package:core/core.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:parser/terminal_parser.dart';
 import 'package:renderer/renderer.dart';

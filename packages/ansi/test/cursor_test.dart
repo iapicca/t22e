@@ -12,13 +12,22 @@ void main() {
   });
 
   group('cursor visibility', () {
-    test('hideCursor', () => expect(AnsiDefaults.hideCursor, equals('\x1b[?25l')));
-    test('showCursor', () => expect(AnsiDefaults.showCursor, equals('\x1b[?25h')));
+    test(
+      'hideCursor',
+      () => expect(AnsiDefaults.hideCursor, equals('\x1b[?25l')),
+    );
+    test(
+      'showCursor',
+      () => expect(AnsiDefaults.showCursor, equals('\x1b[?25h')),
+    );
   });
 
   group('cursor save/restore', () {
     test('saveCursor', () => expect(AnsiDefaults.saveCursor, equals('\x1b[s')));
-    test('restoreCursor', () => expect(AnsiDefaults.restoreCursor, equals('\x1b[u')));
+    test(
+      'restoreCursor',
+      () => expect(AnsiDefaults.restoreCursor, equals('\x1b[u')),
+    );
   });
 
   test('requestPosition', () {

@@ -7,7 +7,10 @@ void main() {
       'enterAltScreen',
       () => expect(AnsiDefaults.enterAltScreen, equals('\x1b[?1049h')),
     );
-    test('exitAltScreen', () => expect(AnsiDefaults.exitAltScreen, equals('\x1b[?1049l')));
+    test(
+      'exitAltScreen',
+      () => expect(AnsiDefaults.exitAltScreen, equals('\x1b[?1049l')),
+    );
   });
 
   group('mouse modes', () {
@@ -16,7 +19,10 @@ void main() {
       () => expect(AnsiDefaults.enableNormalMouse, equals('\x1b[?1000h')),
     );
     test('disableMouse', () {
-      expect(AnsiDefaults.disableMouse, equals('\x1b[?1000l\x1b[?1002l\x1b[?1006l'));
+      expect(
+        AnsiDefaults.disableMouse,
+        equals('\x1b[?1000l\x1b[?1002l\x1b[?1006l'),
+      );
     });
     test(
       'enableButtonEvents',
@@ -29,7 +35,10 @@ void main() {
   });
 
   group('sync updates', () {
-    test('startSync', () => expect(AnsiDefaults.startSync, equals('\x1b[?2026h')));
+    test(
+      'startSync',
+      () => expect(AnsiDefaults.startSync, equals('\x1b[?2026h')),
+    );
     test('endSync', () => expect(AnsiDefaults.endSync, equals('\x1b[?2026l')));
   });
 

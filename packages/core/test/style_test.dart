@@ -11,23 +11,21 @@ void main() {
       expect(s.isClear, isTrue);
     });
 
-    test('merge overrides non-null fields', () {
+    test('copyWith overrides field', () {
       const base = TextStyle(bold: true, italic: true);
-      const override = TextStyle(bold: false);
-      final merged = base.merge(override);
-      expect(merged.bold, isFalse);
-      expect(merged.italic, isTrue);
+      final result = base.copyWith(bold: false);
+      expect(result.bold, isFalse);
+      expect(result.italic, isTrue);
     });
 
-    test('merge with empty returns self', () {
+    test('copyWith with empty unchanged returns equal style', () {
       const s = TextStyle(bold: true);
-      expect(identical(s.merge(TextStyle.empty), s), isTrue);
+      expect(s.copyWith(), equals(s));
     });
 
-    test('merge empty with non-empty returns non-empty', () {
-      const s = TextStyle(bold: true);
-      final merged = TextStyle.empty.merge(s);
-      expect(merged.bold, isTrue);
+    test('copyWith from empty sets field', () {
+      final result = TextStyle.empty.copyWith(bold: true);
+      expect(result.bold, isTrue);
     });
 
     test('resolveColor noColor clears colors', () {

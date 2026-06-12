@@ -2,6 +2,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
+/// Parses ESC sequences into events (SS3 keys, reset, screen save/restore, scroll).
 Event? parseEsc(SequenceData data) {
   final sequenceData = data as EscSequenceData;
   final intermediates = sequenceData.intermediates;
@@ -17,12 +18,17 @@ Event? parseEsc(SequenceData data) {
     };
   }
 
-  /// TODO hardcoded values should be in a "Default" class
   return switch (finalByte) {
-    Defaults.escFinalReset => InternalEvent('reset'),
-    Defaults.escFinalSaveCursor => InternalEvent('screen_save'),
-    Defaults.escFinalRestoreCursor => InternalEvent('screen_restore'),
-    Defaults.escFinalScrollReverse => InternalEvent('scroll_reverse'),
+    Defaults.escFinalReset => InternalEvent(Defaults.internalEventReset),
+    Defaults.escFinalSaveCursor => InternalEvent(
+      Defaults.internalEventScreenSave,
+    ),
+    Defaults.escFinalRestoreCursor => InternalEvent(
+      Defaults.internalEventScreenRestore,
+    ),
+    Defaults.escFinalScrollReverse => InternalEvent(
+      Defaults.internalEventScrollReverse,
+    ),
     _ => null,
   };
 }

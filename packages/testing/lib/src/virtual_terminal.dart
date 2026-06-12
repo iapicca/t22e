@@ -176,34 +176,31 @@ class VirtualTerminal {
         case Defaults.sgrReset:
           _currentStyle = TextStyle.empty;
         case Defaults.sgrBold:
-          _currentStyle = TextStyle(bold: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(bold: true);
         case Defaults.sgrFaint:
-          _currentStyle = TextStyle(dim: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(dim: true);
         case Defaults.sgrItalic:
-          _currentStyle = TextStyle(italic: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(italic: true);
         case Defaults.sgrUnderline:
-          _currentStyle = TextStyle(underline: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(underline: true);
         case Defaults.sgrBlink:
-          _currentStyle = TextStyle(blink: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(blink: true);
         case Defaults.sgrReverse:
-          _currentStyle = TextStyle(reverse: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(reverse: true);
         case Defaults.sgrStrikethrough:
-          _currentStyle = TextStyle(strikethrough: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(strikethrough: true);
         case Defaults.sgrNoBoldFaint:
-          _currentStyle = TextStyle(
-            bold: false,
-            dim: false,
-          ).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(bold: false, dim: false);
         case Defaults.sgrNoItalic:
-          _currentStyle = TextStyle(italic: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(italic: false);
         case Defaults.sgrNoUnderline:
-          _currentStyle = TextStyle(underline: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(underline: false);
         case Defaults.sgrNoBlink:
-          _currentStyle = TextStyle(blink: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(blink: false);
         case Defaults.sgrNoReverse:
-          _currentStyle = TextStyle(reverse: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(reverse: false);
         case Defaults.sgrNoStrikethrough:
-          _currentStyle = TextStyle(strikethrough: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(strikethrough: false);
         case Defaults.sgrFgAnsiBase:
         case Defaults.sgrFgAnsiBase + 1:
         case Defaults.sgrFgAnsiBase + 2:
@@ -212,31 +209,31 @@ class VirtualTerminal {
         case Defaults.sgrFgAnsiBase + 5:
         case Defaults.sgrFgAnsiBase + 6:
         case Defaults.sgrFgAnsiBase + 7:
-          _currentStyle = TextStyle(
+          _currentStyle = _currentStyle.copyWith(
             foreground: AnsiColor(p - Defaults.sgrFgAnsiBase).toColor(),
-          ).merge(_currentStyle);
+          );
         case Defaults.sgrFgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
-              _currentStyle = TextStyle(
+              _currentStyle = _currentStyle.copyWith(
                 foreground: IndexedColor(params[i + 2]).toColor(),
-              ).merge(_currentStyle);
+              );
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&
                 i + 4 < params.length) {
-              _currentStyle = TextStyle(
+              _currentStyle = _currentStyle.copyWith(
                 foreground: Color(
                   red: params[i + 2],
                   green: params[i + 3],
                   blue: params[i + 4],
                 ),
-              ).merge(_currentStyle);
+              );
               i += 4;
             }
           }
         case Defaults.sgrFgReset:
-          _currentStyle = TextStyle(foreground: null).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(foreground: null);
         case Defaults.sgrBgAnsiBase:
         case Defaults.sgrBgAnsiBase + 1:
         case Defaults.sgrBgAnsiBase + 2:
@@ -245,35 +242,35 @@ class VirtualTerminal {
         case Defaults.sgrBgAnsiBase + 5:
         case Defaults.sgrBgAnsiBase + 6:
         case Defaults.sgrBgAnsiBase + 7:
-          _currentStyle = TextStyle(
+          _currentStyle = _currentStyle.copyWith(
             background: AnsiColor(p - Defaults.sgrBgAnsiBase).toColor(),
-          ).merge(_currentStyle);
+          );
         case Defaults.sgrBgExtended:
           if (i + 1 < params.length) {
             if (params[i + 1] == Defaults.sgrColor256 &&
                 i + 2 < params.length) {
-              _currentStyle = TextStyle(
+              _currentStyle = _currentStyle.copyWith(
                 background: IndexedColor(params[i + 2]).toColor(),
-              ).merge(_currentStyle);
+              );
               i += 2;
             } else if (params[i + 1] == Defaults.sgrColorRgb &&
                 i + 4 < params.length) {
-              _currentStyle = TextStyle(
+              _currentStyle = _currentStyle.copyWith(
                 background: Color(
                   red: params[i + 2],
                   green: params[i + 3],
                   blue: params[i + 4],
                 ),
-              ).merge(_currentStyle);
+              );
               i += 4;
             }
           }
         case Defaults.sgrBgReset:
-          _currentStyle = TextStyle(background: null).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(background: null);
         case Defaults.sgrOverline:
-          _currentStyle = TextStyle(overline: true).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(overline: true);
         case Defaults.sgrNoOverline:
-          _currentStyle = TextStyle(overline: false).merge(_currentStyle);
+          _currentStyle = _currentStyle.copyWith(overline: false);
       }
       i++;
     }

@@ -114,7 +114,7 @@ class Text extends Widget {
   void paint(PaintingContext context) {
     if (_lines == null || _lines!.isEmpty) return;
 
-    final resolvedStyle = context.inheritedStyle.merge(style);
+    final resolvedStyle = style.inherit(context.inheritedStyle);
 
     for (var i = 0; i < _lines!.length; i++) {
       final line = _lines![i];

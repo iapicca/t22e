@@ -2,54 +2,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'events.freezed.dart';
+part 'key_event.dart';
+part 'mouse_event.dart';
 
 sealed class Event {
   const Event();
-}
-
-/// Identifies logical keys (arrows, function keys, home, end, etc.).
-enum KeyCode {
-  none,
-  tab,
-  enter,
-  escape,
-  backspace,
-  space,
-  up,
-  down,
-  left,
-  right,
-  home,
-  end,
-  pageUp,
-  pageDown,
-  insert,
-  delete,
-  f1,
-  f2,
-  f3,
-  f4,
-  f5,
-  f6,
-  f7,
-  f8,
-  f9,
-  f10,
-  f11,
-  f12,
-  f13,
-  f14,
-  f15,
-  f16,
-  f17,
-  f18,
-  f19,
-  f20,
-  f21,
-  f22,
-  f23,
-  f24,
-  char,
 }
 
 /// Keyboard modifier flags for key events.
@@ -63,89 +20,17 @@ abstract class KeyModifiers with _$KeyModifiers {
   }) = _KeyModifiers;
 }
 
-/// Key event type: press, release, or repeat.
-enum KeyEventType { down, up, repeat }
-
-/// A keyboard input event.
-final class KeyEvent extends Event {
-  /// Which logical key was pressed.
-  final KeyCode keyCode;
-
-  /// Modifier keys held at the time.
-  final KeyModifiers modifiers;
-
-  /// Event type (down/up/repeat).
-  final KeyEventType type;
-
-  /// Unicode codepoint for char events, null otherwise.
-  final int? codepoint;
-
-  const KeyEvent({
-    required this.keyCode,
-    this.modifiers = const KeyModifiers(),
-    this.type = KeyEventType.down,
-    this.codepoint,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      other is KeyEvent &&
-      keyCode == other.keyCode &&
-      modifiers == other.modifiers &&
-      type == other.type &&
-      codepoint == other.codepoint;
-
-  @override
-  int get hashCode => Object.hash(keyCode, modifiers, type, codepoint);
-
-  @override
-  String toString() =>
-      'KeyEvent($keyCode, $modifiers, $type${codepoint != null ? ', U+${codepoint!.toRadixString(16).padLeft(4, '0')}' : ''})';
-}
-
-/// Mouse button identifiers.
-enum MouseButton { left, middle, right, none, wheelUp, wheelDown }
-
-/// Mouse action type.
-enum MouseAction { press, release, move, drag }
-
 /// A mouse input event.
+@freezed
+abstract class MouseEvent extends Event with _$MouseEvent {
+  const MouseEvent._();
 
-/// TODO why is this not using freezed?
-/// events should be split in separate files!
-final class MouseEvent extends Event {
-  /// Which mouse button was involved.
-  final MouseButton button;
-
-  /// Press, release, move, or drag.
-  final MouseAction action;
-
-  /// Column position (0-based).
-  final int x;
-
-  /// Row position (0-based).
-  final int y;
-
-  const MouseEvent({
-    required this.button,
-    required this.action,
-    required this.x,
-    required this.y,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      other is MouseEvent &&
-      button == other.button &&
-      action == other.action &&
-      x == other.x &&
-      y == other.y;
-
-  @override
-  int get hashCode => Object.hash(button, action, x, y);
-
-  @override
-  String toString() => 'MouseEvent($button, $action, $x, $y)';
+  const factory MouseEvent({
+    required MouseButton button,
+    required MouseAction action,
+    required int x,
+    required int y,
+  }) = _MouseEvent;
 }
 
 /// A bracketed paste event.

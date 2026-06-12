@@ -143,7 +143,7 @@ class _DialogOverlay extends Widget {
             x,
             y,
             cell.char,
-            cell.style.merge(const TextStyle(dim: true)),
+            cell.style.copyWith(dim: true),
           );
         }
       }

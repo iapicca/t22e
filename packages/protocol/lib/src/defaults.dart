@@ -699,6 +699,12 @@ final class Defaults {
   /// TERM suffix indicating direct color terminal.
   static const String envTermSuffixDirect = '-direct';
 
+  /// COLORTERM environment variable key.
+  static const String envKeyColorterm = 'COLORTERM';
+
+  /// TERM environment variable key.
+  static const String envKeyTerm = 'TERM';
+
   // ── timing / duration defaults ──
 
   /// Delay before processing an ESC as standalone.
@@ -1029,6 +1035,23 @@ final class Defaults {
 
   /// Width in columns for zero-width characters.
   static const int zeroCharWidth = 0;
+
+  // ── internal event kind strings ──
+
+  /// Internal event kind for terminal reset.
+  static const String internalEventReset = 'reset';
+
+  /// Internal event kind for screen save.
+  static const String internalEventScreenSave = 'screen_save';
+
+  /// Internal event kind for screen restore.
+  static const String internalEventScreenRestore = 'screen_restore';
+
+  /// Internal event kind for scroll reverse.
+  static const String internalEventScrollReverse = 'scroll_reverse';
+
+  /// Internal event kind for Kitty graphics.
+  static const String internalEventKittyGraphics = 'kitty_graphics';
 
   // ── signal handler ──
 

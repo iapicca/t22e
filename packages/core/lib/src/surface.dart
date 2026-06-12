@@ -6,19 +6,11 @@ import 'package:unicode/unicode.dart' show graphemeClusters;
 import 'package:unicode/unicode.dart' show charWidth, stringWidth;
 import 'package:protocol/protocol.dart' show Defaults;
 import 'package:ansi/ansi.dart'
-    show
-        bold,
-        dim,
-        italic,
-        underline,
-        blink,
-        reverse,
-        strikethrough,
-        overLine;
+    show bold, dim, italic, underline, blink, reverse, strikethrough, overLine;
 import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
 
 /// A grid-based terminal surface for painting text and borders.
-/// TODO I don't like this implementation: 
+/// TODO I don't like this implementation:
 /// 1. it should be freezed!
 /// 2. it should use Init mixin to initialize the grid lazily, and avoid copying rows on every change.
 /// 3. I don't like the mutable `grid` I want it to be a ValueNotifier<List<List<Cell>>> to initialize with Init mixin and dispose with Dispose mixin.
@@ -210,43 +202,8 @@ class Surface {
     }
   }
 
-  /// Exports the surface as ANSI-escaped lines ready for terminal output.
-  /// TODO this should be an extension
-  List<String> toAnsiLines() {
-    return grid
-        .map((row) {
-          final buf = StringBuffer();
-          TextStyle? lastStyle;
-          String? lastHyperlink;
-          for (final cell in row) {
-            if (cell.wideContinuation) continue;
-            if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
-              if (lastHyperlink != null && cell.hyperlink == null) {
-                buf.write(Defaults.st);
-              }
-              buf.write(_styleToAnsi(cell.style));
-              lastStyle = cell.style;
-              if (cell.hyperlink != null && cell.hyperlink != lastHyperlink) {
-                buf.write(hyperlink(cell.hyperlink!, ''));
-                lastHyperlink = cell.hyperlink;
-              } else if (cell.hyperlink == null) {
-                lastHyperlink = null;
-              }
-            }
-            buf.write(cell.char);
-          }
-          if (lastHyperlink != null) {
-            buf.write(Defaults.st);
-          }
-          if (lastStyle != null && !lastStyle.isClear) {
-            buf.write(AnsiDefaults.resetAll);
-          }
-          return buf.toString();
-        })
-        .toList(growable: false);
-  }
-
   /// Exports the surface as plain text lines (no escape sequences).
+  /// TODO this should be an extension
   List<String> toPlainLines() {
     return grid
         .map((row) {
@@ -258,6 +215,7 @@ class Surface {
   }
 
   /// Converts a TextStyle to ANSI SGR escape sequences.
+  /// TODO this should be an helper function and probably moved to the ansi package. 
   static String _styleToAnsi(TextStyle s) {
     final buf = StringBuffer();
     if (s.bold == true) buf.write(bold(true));
@@ -285,4 +243,41 @@ class Surface {
 
   /// Re-wraps a string through rune conversion for safety.
   static String _s(String ch) => String.fromCharCodes(ch.runes);
+}
+
+extension SurfaceAnsiExport on Surface {
+  /// Exports the surface as ANSI-escaped lines ready for terminal output.
+  List<String> toAnsiLines() {
+    return grid
+        .map((row) {
+          final buf = StringBuffer();
+          TextStyle? lastStyle;
+          String? lastHyperlink;
+          for (final cell in row) {
+            if (cell.wideContinuation) continue;
+            if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
+              if (lastHyperlink != null && cell.hyperlink == null) {
+                buf.write(Defaults.st);
+              }
+              buf.write(Surface._styleToAnsi(cell.style));
+              lastStyle = cell.style;
+              if (cell.hyperlink != null && cell.hyperlink != lastHyperlink) {
+                buf.write(hyperlink(cell.hyperlink!, ''));
+                lastHyperlink = cell.hyperlink;
+              } else if (cell.hyperlink == null) {
+                lastHyperlink = null;
+              }
+            }
+            buf.write(cell.char);
+          }
+          if (lastHyperlink != null) {
+            buf.write(Defaults.st);
+          }
+          if (lastStyle != null && !lastStyle.isClear) {
+            buf.write(AnsiDefaults.resetAll);
+          }
+          return buf.toString();
+        })
+        .toList(growable: false);
+  }
 }

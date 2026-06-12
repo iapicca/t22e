@@ -44,29 +44,6 @@ abstract class TextStyle with _$TextStyle {
       height == null &&
       wordWrap == null;
 
-  /// Merges another style on top (non-null fields override).
-  /// TODO this implementation seems to duplicate the work of copyWith.
-  
-  TextStyle merge(TextStyle other) {
-    if (other.isClear) return this;
-    if (isClear) return other;
-    return copyWith(
-      foreground: other.foreground ?? foreground,
-      background: other.background ?? background,
-      bold: other.bold ?? bold,
-      dim: other.dim ?? dim,
-      italic: other.italic ?? italic,
-      underline: other.underline ?? underline,
-      blink: other.blink ?? blink,
-      reverse: other.reverse ?? reverse,
-      strikethrough: other.strikethrough ?? strikethrough,
-      overline: other.overline ?? overline,
-      width: other.width ?? width,
-      height: other.height ?? height,
-      wordWrap: other.wordWrap ?? wordWrap,
-    );
-  }
-
   /// Downgrades colors to match the given color profile.
   TextStyle resolveColor(ColorProfile profile) {
     if (profile == ColorProfile.noColor) {
@@ -77,6 +54,7 @@ abstract class TextStyle with _$TextStyle {
   }
 
   /// Inherits style from a parent (non-null fields in this take priority).
+  /// TODO this is just a "wrapper" around copyWith, we can just use copyWith
   TextStyle inherit(TextStyle parent) {
     if (parent.isClear) return this;
     return copyWith(

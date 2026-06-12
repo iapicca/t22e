@@ -2,7 +2,7 @@ import 'package:protocol/protocol.dart' show Defaults;
 import 'engine.dart';
 import 'events.dart';
 
-/// TODO hardcoded values should be in a "Default" class
+/// Parses DCS sequences into events (Kitty graphics).
 Event? parseDcs(SequenceData data) {
   final sequenceData = data as DcsSequenceData;
   final finalByte = sequenceData.finalByte;
@@ -10,12 +10,12 @@ Event? parseDcs(SequenceData data) {
 
   if (finalByte == Defaults.dcsKittyGraphicsP &&
       intermediates.contains(Defaults.dcsKittyIntermediate)) {
-    return InternalEvent('kitty_graphics');
+    return InternalEvent(Defaults.internalEventKittyGraphics);
   }
 
   if (finalByte == Defaults.dcsKittyGraphicsQ &&
       intermediates.contains(Defaults.dcsKittyIntermediate)) {
-    return InternalEvent('kitty_graphics');
+    return InternalEvent(Defaults.internalEventKittyGraphics);
   }
 
   return null;
