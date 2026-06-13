@@ -17,6 +17,9 @@ Future<void> main() async {
 
   final io = container.read(systemIoProvider);
   final rawMode = container.read(rawModeProvider);
+
+  final exitCompleter = Completer<void>();
+
   final guard = container.read(
     terminalGuardProvider(
       onRestore: () {
@@ -28,18 +31,36 @@ Future<void> main() async {
     ),
   )..arm();
 
+  final signalHandler = container.read(
+    signalHandlerProvider(
+      onInterrupt: () {
+        if (!exitCompleter.isCompleted) exitCompleter.complete();
+        guard.restore();
+      },
+      onCleanup: () {
+        if (!exitCompleter.isCompleted) exitCompleter.complete();
+        guard.restore();
+      },
+    ),
+  );
+  signalHandler.install();
+
   rawMode.init();
   io.write(AnsiDefaults.hideCursor);
   io.write(AnsiDefaults.enterAltScreen);
   io.flush();
 
-  await _runApp(container, io);
+  await _runApp(container, io, exitCompleter.future);
 
   guard.restore();
   container.dispose();
 }
 
-Future<void> _runApp(ProviderContainer container, SystemIo io) async {
+Future<void> _runApp(
+  ProviderContainer container,
+  SystemIo io,
+  Future<void> exitSignal,
+) async {
   final parser = container.read(terminalParserProvider);
 
   final width = io.columns;
@@ -108,13 +129,8 @@ Future<void> _runApp(ProviderContainer container, SystemIo io) async {
     previousFrame = _currentFrame(model);
   });
 
-  while (running) {
-    await Future.delayed(const Duration(milliseconds: 50));
-  }
-
+  await exitSignal;
   await subscription.cancel();
-  io.write(AnsiDefaults.showCursor);
-  io.flush();
 }
 
 Frame _currentFrame(ChatModel model) {
