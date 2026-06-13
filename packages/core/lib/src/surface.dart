@@ -26,9 +26,11 @@ class Surface {
   /// Row-major grid of Cell objects.
   final CellGrid grid;
 
-  Surface({required this. size, required this. grid});
+  Surface({required this.size, required this.grid});
+
   /// Creates a blank surface of the given dimensions.
-  factory Surface.genetate(Size size) => Surface(size: size, grid: CellGrid.generate(size));
+  factory Surface.genetate(Size size) =>
+      Surface(size: size, grid: CellGrid.generate(size));
 
   /// Creates a surface from an existing grid.
   Surface.fromGrid(this.grid)
@@ -37,17 +39,19 @@ class Surface {
   /// Creates a resized copy, preserving overlapping region.
   Surface._resized(Surface source, int newWidth, int newHeight)
     : size = Size(newWidth, newHeight),
-      grid = CellGrid(List.generate(
-        newHeight,
-        (y) => List<Cell>.generate(
-          newWidth,
-          (x) => y < source.height && x < source.width
-              ? source.grid[y][x]
-              : const Cell(),
+      grid = CellGrid(
+        List.generate(
+          newHeight,
+          (y) => List<Cell>.generate(
+            newWidth,
+            (x) => y < source.height && x < source.width
+                ? source.grid[y][x]
+                : const Cell(),
+            growable: false,
+          ),
           growable: false,
         ),
-        growable: false,
-      ));
+      );
 
   /// Returns a new surface with the given dimensions.
   Surface resize(int newWidth, int newHeight) =>

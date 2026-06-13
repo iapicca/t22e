@@ -18,7 +18,7 @@ void main() {
     });
 
     test('paint draws border corners', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(child: Text('Hi'), padding: Insets.all(1));
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('paint draws title in top border', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(
         child: Text('Hello Wide World'),
         title: 'Title',
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('double border style uses double chars', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.double,
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('rounded border style uses rounded chars', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.rounded,
@@ -67,7 +67,7 @@ void main() {
     });
 
     test('thick border style uses thick chars', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(
         child: Text('Hi'),
         borderStyle: BorderStyle.thick,
@@ -80,7 +80,7 @@ void main() {
     });
 
     test('child content area is inset by border + padding', () {
-      final surface = Surface(20, 10);
+      final surface = Surface.genetate(const Size(20, 10));
       final box = Box(child: Text('Hi'), padding: Insets.all(1));
       box.layout(Constraints(maxWidth: 20, maxHeight: 10));
       box.paint(PaintingContext(surface: surface));

@@ -13,7 +13,7 @@ void main() {
     });
 
     test('paint does not modify surface', () {
-      final surface = Surface(10, 5);
+      final surface = Surface.genetate(const Size(10, 5));
       const spacer = Spacer();
       spacer.layout(const Constraints(maxWidth: 10, maxHeight: 5));
       spacer.paint(PaintingContext(surface: surface));
