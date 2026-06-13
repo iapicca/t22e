@@ -54,10 +54,10 @@
 
 ## Testing
 
-- Virtual terminal interprets ANSI output for headless assertions
-- `WidgetTester` drives widgets with simulated input events
-- Tests assert on `expectCell()` and `expectPlainText()`
-- No real terminal required for test execution
+- Standard `package:test` for all unit and widget tests
+- Widget tests assert on rendered output via `Surface`/`Frame` snapshots
+- Terminal-dependent tests use `script -q /dev/null` to fake a TTY
+- No real terminal required for most test execution
 
 ## Code Generation
 
