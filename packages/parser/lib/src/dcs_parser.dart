@@ -3,6 +3,7 @@ import 'sequence_data.dart';
 import 'events.dart';
 
 /// Parses DCS sequences into events (Kitty graphics).
+/// TODO, where is the provider?
 Event? parseDcs(SequenceData data) {
   final sequenceData = data as DcsSequenceData;
   final finalByte = sequenceData.finalByte;

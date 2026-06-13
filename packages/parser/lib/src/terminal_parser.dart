@@ -32,7 +32,7 @@ class TerminalParser {
 
     /// TODO (wrote by hand) I want this style to be analyzed and added to code-standards.md
     List<Event> advance(List<int> bytes) => [
-for (final seq in _engine.advanceAll(bytes)) ?_interpret(seq)
+      for (final seq in _engine.advanceAll(bytes)) ?_interpret(seq)
     ];
   
   
