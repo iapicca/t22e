@@ -15,35 +15,35 @@ import 'package:example/src/providers.dart';
 Future<void> main() async {
   final container = ProviderContainer();
 
-  final terminalIo = container.read(terminalIoProvider);
+  final io = container.read(systemIoProvider);
   final rawMode = container.read(rawModeProvider);
   final guard = container.read(
     terminalGuardProvider(
       onRestore: () {
         rawMode.dispose();
-        terminalIo.write(AnsiDefaults.showCursor);
-        terminalIo.write(AnsiDefaults.exitAltScreen);
-        terminalIo.flush();
+        io.write(AnsiDefaults.showCursor);
+        io.write(AnsiDefaults.exitAltScreen);
+        io.flush();
       },
     ),
   )..arm();
 
   rawMode.init();
-  terminalIo.write(AnsiDefaults.hideCursor);
-  terminalIo.write(AnsiDefaults.enterAltScreen);
-  terminalIo.flush();
+  io.write(AnsiDefaults.hideCursor);
+  io.write(AnsiDefaults.enterAltScreen);
+  io.flush();
 
-  await _runApp(container, terminalIo);
+  await _runApp(container, io);
 
   guard.restore();
   container.dispose();
 }
 
-Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
+Future<void> _runApp(ProviderContainer container, SystemIo io) async {
   final parser = container.read(terminalParserProvider);
 
-  final width = terminalIo.columns;
-  final height = terminalIo.rows;
+  final width = io.columns;
+  final height = io.rows;
   final modelProvider = chatModelStateProvider(width: width, height: height);
   var model = container.read(modelProvider);
   Frame? previousFrame;
@@ -58,14 +58,14 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
     final result = model.update(msg);
     model = result.$1;
     container.read(modelProvider.notifier).updateModel(model);
-    _render(model, terminalIo, ref: previousFrame);
+    _render(model, io, ref: previousFrame);
     previousFrame = _currentFrame(model);
   });
 
-  _render(model, terminalIo, ref: previousFrame);
+  _render(model, io, ref: previousFrame);
   previousFrame = _currentFrame(model);
 
-  final subscription = terminalIo.inputStream.listen((bytes) {
+  final subscription = io.inputStream.listen((bytes) {
     if (!running) return;
 
     final events = parser.advance(bytes);
@@ -98,13 +98,13 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
             final r = model.update(m);
             model = r.$1;
             container.read(modelProvider.notifier).updateModel(model);
-            _render(model, terminalIo, ref: previousFrame);
+            _render(model, io, ref: previousFrame);
             previousFrame = _currentFrame(model);
           });
         }
       }
     }
-    _render(model, terminalIo, ref: previousFrame);
+    _render(model, io, ref: previousFrame);
     previousFrame = _currentFrame(model);
   });
 
@@ -113,8 +113,8 @@ Future<void> _runApp(ProviderContainer container, TerminalIo terminalIo) async {
   }
 
   await subscription.cancel();
-  terminalIo.write(AnsiDefaults.showCursor);
-  terminalIo.flush();
+  io.write(AnsiDefaults.showCursor);
+  io.flush();
 }
 
 Frame _currentFrame(ChatModel model) {
@@ -127,7 +127,7 @@ Frame _currentFrame(ChatModel model) {
   );
 }
 
-void _render(ChatModel model, TerminalIo terminalIo, {required Frame? ref}) {
+void _render(ChatModel model, SystemIo io, {required Frame? ref}) {
   final surface = WidgetRenderer.render(
     model.view(),
     model.terminalWidth,
@@ -141,14 +141,14 @@ void _render(ChatModel model, TerminalIo terminalIo, {required Frame? ref}) {
     final renderer = const SyncRenderer();
     final output = renderer.render(diffResult, currentFrame);
     if (output.isNotEmpty) {
-      terminalIo.write(output);
+      io.write(output);
     }
   } else {
     final lines = surface.toAnsiLines();
-    terminalIo
+    io
       ..write(lines.join('\n'))
       ..write(moveTo(model.terminalHeight, 1));
   }
 
-  terminalIo.flush();
+  io.flush();
 }

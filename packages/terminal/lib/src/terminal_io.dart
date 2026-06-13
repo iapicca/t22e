@@ -1,52 +1,44 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'system_io.dart';
 
-/// Interface for terminal I/O operations used by probe extensions.
-mixin TerminalInterface {
-  Stream<List<int>> get inputStream;
-  void write(String data);
-  Future<void> flush();
-}
-
-/// Terminal I/O facade for input/output operations.
-final class TerminalIo with SystemIo, TerminalInterface {
-  final SystemIo io;
-
-  /// Creates with injected [io].
-  const TerminalIo({required this.io});
+final class TerminalIo with SystemIo {
+  const TerminalIo();
 
   @override
-  Stream<List<int>> get inputStream => io.inputStream;
+  Stream<List<int>> get inputStream => stdin;
 
   @override
-  void write(String data) => io.write(data);
+  void write(String data) => stdout.write(data);
 
   @override
-  Future<void> flush() => io.flush();
+  Future<void> flush() => stdout.flush();
 
   @override
-  bool get hasTerminal => io.hasTerminal;
+  bool get hasTerminal => stdout.hasTerminal;
 
   @override
-  int get columns => io.columns;
+  int get columns => stdout.terminalColumns;
 
   @override
-  int get rows => io.rows;
+  int get rows => stdout.terminalLines;
 
   @override
-  bool get echoMode => io.echoMode;
+  bool get echoMode => stdin.echoMode;
 
   @override
-  set echoMode(bool value) => io.echoMode = value;
+  set echoMode(bool value) => stdin.echoMode = value;
 
   @override
-  bool get lineMode => io.lineMode;
+  bool get lineMode => stdin.lineMode;
 
   @override
-  set lineMode(bool value) => io.lineMode = value;
+  set lineMode(bool value) => stdin.lineMode = value;
 
   @override
-  String get operatingSystem => io.operatingSystem;
+  String get operatingSystem => Platform.operatingSystem;
 
   @override
-  Map<String, String> get environment => io.environment;
+  Map<String, String> get environment => Platform.environment;
 }

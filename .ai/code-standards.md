@@ -113,7 +113,10 @@
 - Raw implementation classes that have provider wrappers must be marked `@internal`
 - Consumers **must** read providers via `ProviderContainer` or `ref.watch()` — never instantiate raw classes directly
 - Always import and re-export providers from package barrel files
-- Each package barrel file must export its `providers.dart` (or equivalent)
+- When a class or function is exposed through a provider, that provider must
+  be defined in a dedicated file following the naming scheme:
+  `my_class.dart` → `my_class_provider.dart`
+- Each package barrel file must export all its provider files
 - Example:
   ```dart
   // Good — read from provider
