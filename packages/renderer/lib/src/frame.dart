@@ -1,6 +1,6 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:core/core.dart' show Cell, Surface, SurfaceAnsiExport;
+import 'package:core/core.dart' show  CellGrid, Surface, SurfaceAnsiExport;
 
 
 part 'frame.freezed.dart';
@@ -13,17 +13,17 @@ abstract class Frame with _$Frame {
   factory Frame(
     List<String> plainLines,
     List<String> styledLines, {
-    List<List<Cell>>? cells,
+    @Default(CellGrid.empty()) CellGrid cells,
   }) = _Frame;
 
   /// Creates a Frame from a Surface, optionally including the cell grid.
-  factory Frame.fromSurface(Surface surface, {bool includeCells = false}) {
-    return Frame(
+  factory Frame.fromSurface(Surface surface, {bool includeCells = false}) =>
+     Frame(
       surface.toPlainLines(),
       surface.toAnsiLines(),
-      cells: includeCells ? surface.grid : null,
+      cells: includeCells ? surface.grid : const CellGrid.empty(),
     );
-  }
+  
 
   /// Number of rows in this frame.
   int get height => plainLines.length;

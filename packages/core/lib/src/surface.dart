@@ -1,4 +1,5 @@
 import 'cell.dart';
+import 'cell_grid.dart' show CellGrid;
 import 'color.dart';
 import 'geometry.dart';
 import 'layout.dart';
@@ -15,6 +16,7 @@ class Surface {
   /// Surface dimensions.
   final Size size;
 
+  /// TODO there is no reason to expose size and width direcly can just access Surface.size.width!
   /// Total width in columns.
   int get width => size.width;
 
@@ -22,16 +24,11 @@ class Surface {
   int get height => size.height;
 
   /// Row-major grid of Cell objects.
-  final List<List<Cell>> grid;
+  final CellGrid grid;
 
+  Surface({required this. size, required this. grid});
   /// Creates a blank surface of the given dimensions.
-  Surface(int width, int height)
-    : size = Size(width, height),
-      grid = List.generate(
-        height,
-        (_) => List.filled(width, const Cell()),
-        growable: false,
-      );
+  factory Surface.genetate(Size size) => Surface(size: size, grid: CellGrid.generate(size));
 
   /// Creates a surface from an existing grid.
   Surface.fromGrid(this.grid)
@@ -40,7 +37,7 @@ class Surface {
   /// Creates a resized copy, preserving overlapping region.
   Surface._resized(Surface source, int newWidth, int newHeight)
     : size = Size(newWidth, newHeight),
-      grid = List.generate(
+      grid = CellGrid(List.generate(
         newHeight,
         (y) => List<Cell>.generate(
           newWidth,
@@ -50,7 +47,7 @@ class Surface {
           growable: false,
         ),
         growable: false,
-      );
+      ));
 
   /// Returns a new surface with the given dimensions.
   Surface resize(int newWidth, int newHeight) =>
