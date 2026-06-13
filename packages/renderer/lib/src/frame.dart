@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart';
+
+import 'diff_result.dart';
 
 part 'frame.freezed.dart';
 
@@ -27,23 +31,10 @@ abstract class Frame with _$Frame {
   int get height => plainLines.length;
 }
 
-/// The result of diffing two frames: a list of changed row indices.
-@freezed
-abstract class DiffResult with _$DiffResult {
-  const DiffResult._();
-
-  const factory DiffResult(List<int> changedRows) = _DiffResult;
-
-  /// True if at least one row changed.
-  bool get hasChanges => changedRows.isNotEmpty;
-}
-
 /// Compares two frames and returns rows that changed (by plain text or style).
 DiffResult diff(Frame previous, Frame current) {
   final changedRows = <int>[];
-  final maxRows = previous.height > current.height
-      ? previous.height
-      : current.height;
+  final maxRows = max(previous.height, current.height);
 
   for (var r = 0; r < maxRows; r++) {
     final prevPlain = r < previous.height ? previous.plainLines[r] : '';

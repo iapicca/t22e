@@ -40,15 +40,9 @@ class Vt500Engine extends ValueNotifier<VtState> with InitMixin {
   }
 
   /// Feeds a list of bytes and collects all parsed sequence data.
-  /// TODO This style is bad, look TerminalParser.advance for the style I want to move towards and analyze it for code-standard.
-  List<SequenceData> advanceAll(List<int> bytes) {
-    final results = <SequenceData>[];
-    for (final byte in bytes) {
-      final result = advance(byte);
-      if (result != null) results.add(result);
-    }
-    return results;
-  }
+  List<SequenceData> advanceAll(List<int> bytes) => [
+    for (final byte in bytes) ?advance(byte),
+  ];
 
   /// Resets the engine to its initial state.
   void reset() {

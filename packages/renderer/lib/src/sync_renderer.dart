@@ -1,4 +1,5 @@
 import 'package:ansi/ansi.dart' show AnsiDefaults;
+import 'diff_result.dart';
 import 'frame.dart';
 import 'line_renderer.dart';
 

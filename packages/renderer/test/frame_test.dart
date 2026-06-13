@@ -21,7 +21,7 @@ void main() {
       final curr = Frame.fromSurface(s);
       final result = diff(prev, curr);
       expect(result.hasChanges, isFalse);
-      expect(result.changedRows, isEmpty);
+      expect(result, isEmpty);
     });
 
     test('content change detects changed row', () {
@@ -33,7 +33,7 @@ void main() {
 
       final result = diff(prev, curr);
       expect(result.hasChanges, isTrue);
-      expect(result.changedRows, [1]);
+      expect(result, [1]);
     });
 
     test('style-only change is detected', () {
@@ -53,14 +53,14 @@ void main() {
       final prev = Frame.fromSurface(Surface(5, 2));
       final curr = Frame.fromSurface(Surface(5, 5));
       final result = diff(prev, curr);
-      expect(result.changedRows, [2, 3, 4]);
+      expect(result, [2, 3, 4]);
     });
 
     test('resize smaller detects removed rows', () {
       final prev = Frame.fromSurface(Surface(5, 5));
       final curr = Frame.fromSurface(Surface(5, 2));
       final result = diff(prev, curr);
-      expect(result.changedRows, [2, 3, 4]);
+      expect(result, [2, 3, 4]);
     });
 
     test('multiple changes detected', () {
@@ -71,7 +71,7 @@ void main() {
       final curr = Frame.fromSurface(currSurface);
 
       final result = diff(prev, curr);
-      expect(result.changedRows, [0, 4]);
+      expect(result, [0, 4]);
     });
   });
 }

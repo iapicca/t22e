@@ -20,22 +20,9 @@ class TerminalParser {
     required this.dcsParser,
   });
 
-  /// TODO I want to manually rework this!
-  // List<Event> advance(List<int> bytes) {
-  //   final events = <Event>[];
-  //   for (final seq in _engine.advanceAll(bytes)) {
-  //     final event = _interpret(seq);
-  //     if (event != null) events.add(event);
-  //   }
-  //   return events;
-  // }
-
-    /// TODO (wrote by hand) I want this style to be analyzed and added to code-standards.md
-    List<Event> advance(List<int> bytes) => [
-      for (final seq in _engine.advanceAll(bytes)) ?_interpret(seq)
-    ];
-  
-  
+  List<Event> advance(List<int> bytes) => [
+    for (final seq in _engine.advanceAll(bytes)) ?_interpret(seq),
+  ];
 
   Event? _interpret(SequenceData seq) {
     return switch (seq) {
