@@ -153,7 +153,7 @@ void _render(ChatModel model, SystemIo io, {required Frame? ref}) {
   final currentFrame = Frame.fromSurface(surface);
 
   if (ref != null) {
-    final diffResult = diff(ref, currentFrame);
+    final diffResult = DiffResult.fromFrames(ref, currentFrame);
     final renderer = const SyncRenderer();
     final output = renderer.render(diffResult, currentFrame);
     if (output.isNotEmpty) {

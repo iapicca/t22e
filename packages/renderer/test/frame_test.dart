@@ -14,12 +14,12 @@ void main() {
     });
   });
 
-  group('diff', () {
+  group('DiffResult.fromFrames', () {
     test('no change returns empty diff', () {
       final s = Surface(5, 3);
       final prev = Frame.fromSurface(s);
       final curr = Frame.fromSurface(s);
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result.hasChanges, isFalse);
       expect(result, isEmpty);
     });
@@ -31,7 +31,7 @@ void main() {
       currSurface.putChar(2, 1, 'X', TextStyle.empty);
       final curr = Frame.fromSurface(currSurface);
 
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result.hasChanges, isTrue);
       expect(result, [1]);
     });
@@ -45,21 +45,21 @@ void main() {
       currSurface.putChar(0, 0, 'A', TextStyle(bold: true));
       final curr = Frame.fromSurface(currSurface);
 
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result.hasChanges, isTrue);
     });
 
     test('resize larger detects new rows', () {
       final prev = Frame.fromSurface(Surface(5, 2));
       final curr = Frame.fromSurface(Surface(5, 5));
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result, [2, 3, 4]);
     });
 
     test('resize smaller detects removed rows', () {
       final prev = Frame.fromSurface(Surface(5, 5));
       final curr = Frame.fromSurface(Surface(5, 2));
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result, [2, 3, 4]);
     });
 
@@ -70,7 +70,7 @@ void main() {
       currSurface.putChar(0, 4, 'Y', TextStyle.empty);
       final curr = Frame.fromSurface(currSurface);
 
-      final result = diff(prev, curr);
+      final result = DiffResult.fromFrames(prev, curr);
       expect(result, [0, 4]);
     });
   });

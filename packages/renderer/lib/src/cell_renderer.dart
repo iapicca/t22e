@@ -41,6 +41,7 @@ class CellRenderer {
         }
 
         if (prev == null || prev.char != curr.char || linkChanged) {
+          /// TODO this doesn't belong here!
           buf.write('\x1b[${r + 1};${c + 1}H');
           if (prev?.hyperlink != null && curr.hyperlink == null) {
             buf.write(Defaults.st);

@@ -1,9 +1,7 @@
-import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:core/core.dart';
+import 'package:core/core.dart' show Cell, Surface, SurfaceAnsiExport;
 
-import 'diff_result.dart';
 
 part 'frame.freezed.dart';
 
@@ -31,21 +29,14 @@ abstract class Frame with _$Frame {
   int get height => plainLines.length;
 }
 
-/// Compares two frames and returns rows that changed (by plain text or style).
-DiffResult diff(Frame previous, Frame current) {
-  final changedRows = <int>[];
-  final maxRows = max(previous.height, current.height);
-
-  for (var r = 0; r < maxRows; r++) {
-    final prevPlain = r < previous.height ? previous.plainLines[r] : '';
-    final currPlain = r < current.height ? current.plainLines[r] : '';
-    final prevStyled = r < previous.height ? previous.styledLines[r] : '';
-    final currStyled = r < current.height ? current.styledLines[r] : '';
-
-    if (prevPlain != currPlain || prevStyled != currStyled) {
-      changedRows.add(r);
-    }
-  }
-
-  return DiffResult(changedRows);
+extension type FrameLine(({String plain, String styled}) _) {
+  String get plain => _.plain;
+  String get styled => _.styled;
 }
+
+extension FrameLineFromRow on Frame {
+    FrameLine frameLine(int row) => FrameLine((plain: row < height ? plainLines[row] : '', styled: row < height ? styledLines[row] : '',
+  )
+  );
+}
+
