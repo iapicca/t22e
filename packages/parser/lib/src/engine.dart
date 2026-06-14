@@ -1,5 +1,6 @@
 import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ControlBytes, ByteRanges, UnicodeCodepoints;
 
 import 'sequence_data.dart';
 import 'vt_state.dart';
@@ -59,15 +60,16 @@ class Vt500Engine extends ValueNotifier<VtState> with InitMixin {
 
 SequenceData? _onGround(int byte, Vt500Engine e) {
   return switch (byte) {
-    Defaults.escapeByte => _transition(e, VtState.escape),
-    Defaults.csiIntroducerByte => _csiEntryTransition(e),
-    Defaults.oscIntroducerByte => _oscEntryTransition(e),
-    Defaults.dcsIntroducerByte => _dcsEntryTransition(e),
-    >= Defaults.byteRangePrintableLow && <= Defaults.byteRangePrintableHigh =>
+    ControlBytes.escapeByte => _transition(e, VtState.escape),
+    ControlBytes.csiIntroducerByte => _csiEntryTransition(e),
+    ControlBytes.oscIntroducerByte => _oscEntryTransition(e),
+    ControlBytes.dcsIntroducerByte => _dcsEntryTransition(e),
+    >= ByteRanges.byteRangePrintableLow &&
+        <= ByteRanges.byteRangePrintableHigh =>
       SequenceData.char(byte),
-    >= Defaults.byteRangeC1Low && <= Defaults.byteRangeC1High => null,
-    >= Defaults.byteRangeLowest && <= Defaults.byteRangeControlHigh2
-        when byte != Defaults.escapeByte =>
+    >= ByteRanges.byteRangeC1Low && <= ByteRanges.byteRangeC1High => null,
+    >= ByteRanges.byteRangeLowest && <= ByteRanges.byteRangeControlHigh2
+        when byte != ControlBytes.escapeByte =>
       null,
     _ => null,
   };
@@ -75,31 +77,32 @@ SequenceData? _onGround(int byte, Vt500Engine e) {
 
 SequenceData? _onEscape(int byte, Vt500Engine e) {
   return switch (byte) {
-    Defaults.csiEntryByte => _csiEntryTransition(e),
-    Defaults.oscEntryByte => _oscEntryTransition(e),
-    Defaults.dcsEntryByte => _dcsEntryTransition(e),
-    Defaults.ss3Byte ||
-    >= Defaults.byteRangeGraphicLow && <= Defaults.byteRangeGraphicHigh =>
+    ControlBytes.csiEntryByte => _csiEntryTransition(e),
+    ControlBytes.oscEntryByte => _oscEntryTransition(e),
+    ControlBytes.dcsEntryByte => _dcsEntryTransition(e),
+    ControlBytes.ss3Byte ||
+    >= ByteRanges.byteRangeGraphicLow && <= ByteRanges.byteRangeGraphicHigh =>
       _addIntermediateAndTransition(e, byte, VtState.escapeIntermediate),
-    >= Defaults.byteRangeParamLow && <= Defaults.byteRangeUpperHigh =>
+    >= ByteRanges.byteRangeParamLow && <= ByteRanges.byteRangeUpperHigh =>
       _emitEscAndGround(e, byte),
-    Defaults.escapeByte => _clearIntermediates(e),
-    Defaults.bellByte || Defaults.stringTerminatorByte => _resetToGround(e),
+    ControlBytes.escapeByte => _clearIntermediates(e),
+    ControlBytes.bellByte ||
+    ControlBytes.stringTerminatorByte => _resetToGround(e),
     _ => _resetToGround(e),
   };
 }
 
 SequenceData? _onEscapeIntermediate(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._intermediates.add(byte);
     return null;
   }
-  if (byte >= Defaults.byteRangeParamLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeParamLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     return _emitEscAndGround(e, byte);
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e.value = VtState.escape;
     e._intermediates.clear();
     return null;
@@ -110,36 +113,36 @@ SequenceData? _onEscapeIntermediate(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onCsiEntry(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeParamLow &&
-      byte <= Defaults.byteRangeParamHigh) {
-    if (byte >= Defaults.byteRangeDigitLow &&
-        byte <= Defaults.byteRangeDigitHigh) {
-      e._params.add(byte - Defaults.byteRangeDigitLow);
-    } else if (byte == Defaults.semicolonByte) {
+  if (byte >= ByteRanges.byteRangeParamLow &&
+      byte <= ByteRanges.byteRangeParamHigh) {
+    if (byte >= ByteRanges.byteRangeDigitLow &&
+        byte <= ByteRanges.byteRangeDigitHigh) {
+      e._params.add(byte - ByteRanges.byteRangeDigitLow);
+    } else if (byte == ControlBytes.semicolonByte) {
       e._params.add(0);
-    } else if (byte >= Defaults.intermediatePrefixByte &&
-        byte <= Defaults.byteRangeParamHigh) {
+    } else if (byte >= ControlBytes.intermediatePrefixByte &&
+        byte <= ByteRanges.byteRangeParamHigh) {
       e._intermediates.add(byte);
     }
     e.value = VtState.csiParam;
     return null;
   }
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._intermediates.add(byte);
     e.value = VtState.csiIntermediate;
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     return _emitCsiAndGround(e, byte);
   }
-  if (byte >= Defaults.byteRangeLowest &&
-      byte <= Defaults.byteRangeControlHigh2 &&
-      byte != Defaults.escapeByte) {
+  if (byte >= ByteRanges.byteRangeLowest &&
+      byte <= ByteRanges.byteRangeControlHigh2 &&
+      byte != ControlBytes.escapeByte) {
     return null;
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e.value = VtState.escape;
     e._params.clear();
     e._intermediates.clear();
@@ -152,33 +155,33 @@ SequenceData? _onCsiEntry(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onCsiParam(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeDigitLow &&
-      byte <= Defaults.byteRangeDigitHigh) {
+  if (byte >= ByteRanges.byteRangeDigitLow &&
+      byte <= ByteRanges.byteRangeDigitHigh) {
     final last = e._params.isEmpty ? 0 : e._params.removeLast();
-    e._params.add(last * 10 + (byte - Defaults.byteRangeDigitLow));
+    e._params.add(last * 10 + (byte - ByteRanges.byteRangeDigitLow));
     return null;
   }
-  if (byte == Defaults.semicolonByte) {
+  if (byte == ControlBytes.semicolonByte) {
     e._params.add(0);
     return null;
   }
-  if (byte >= Defaults.intermediatePrefixByte &&
-      byte <= Defaults.byteRangeParamHigh) {
+  if (byte >= ControlBytes.intermediatePrefixByte &&
+      byte <= ByteRanges.byteRangeParamHigh) {
     e._intermediates.add(byte);
     e.value = VtState.csiParam;
     return null;
   }
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._intermediates.add(byte);
     e.value = VtState.csiIntermediate;
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     return _emitCsiAndGround(e, byte);
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e.value = VtState.escape;
     e._params.clear();
     e._intermediates.clear();
@@ -191,16 +194,16 @@ SequenceData? _onCsiParam(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onCsiIntermediate(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._intermediates.add(byte);
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     return _emitCsiAndGround(e, byte);
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e.value = VtState.escape;
     e._params.clear();
     e._intermediates.clear();
@@ -213,12 +216,12 @@ SequenceData? _onCsiIntermediate(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onCsiIgnore(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     e.value = VtState.ground;
     return null;
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e.value = VtState.escape;
     return null;
   }
@@ -228,30 +231,32 @@ SequenceData? _onCsiIgnore(int byte, Vt500Engine e) {
 SequenceData? _onOscString(int byte, Vt500Engine e) {
   if (e._oscWaitingSt) {
     e._oscWaitingSt = false;
-    if (byte == Defaults.dcsStByte) {
+    if (byte == ControlBytes.dcsStByte) {
       e.value = VtState.ground;
       final content = e._oscBuffer.toString();
       e._oscBuffer.clear();
       return SequenceData.osc(content);
     }
-    e._oscBuffer.writeCharCode(Defaults.escapeByte);
-    if (byte >= Defaults.byteRangePrintableLow &&
-        byte <= Defaults.codepointDel) {
+    e._oscBuffer.writeCharCode(ControlBytes.escapeByte);
+    if (byte >= ByteRanges.byteRangePrintableLow &&
+        byte <= UnicodeCodepoints.codepointDel) {
       e._oscBuffer.writeCharCode(byte);
     }
     return null;
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e._oscWaitingSt = true;
     return null;
   }
-  if (byte == Defaults.bellByte || byte == Defaults.stringTerminatorByte) {
+  if (byte == ControlBytes.bellByte ||
+      byte == ControlBytes.stringTerminatorByte) {
     e.value = VtState.ground;
     final content = e._oscBuffer.toString();
     e._oscBuffer.clear();
     return SequenceData.osc(content);
   }
-  if (byte >= Defaults.byteRangePrintableLow && byte <= Defaults.codepointDel) {
+  if (byte >= ByteRanges.byteRangePrintableLow &&
+      byte <= UnicodeCodepoints.codepointDel) {
     e._oscBuffer.writeCharCode(byte);
     return null;
   }
@@ -259,23 +264,23 @@ SequenceData? _onOscString(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onDcsEntry(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeParamLow &&
-      byte <= Defaults.byteRangeParamHigh) {
-    if (byte >= Defaults.byteRangeDigitLow &&
-        byte <= Defaults.byteRangeDigitHigh) {
-      e._dcsParams.add(byte - Defaults.byteRangeDigitLow);
+  if (byte >= ByteRanges.byteRangeParamLow &&
+      byte <= ByteRanges.byteRangeParamHigh) {
+    if (byte >= ByteRanges.byteRangeDigitLow &&
+        byte <= ByteRanges.byteRangeDigitHigh) {
+      e._dcsParams.add(byte - ByteRanges.byteRangeDigitLow);
     }
     e.value = VtState.dcsParam;
     return null;
   }
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._dcsIntermediates.add(byte);
     e.value = VtState.dcsIntermediate;
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     e._dcsFinalByte = byte;
     e.value = VtState.dcsPassthrough;
     return null;
@@ -285,24 +290,24 @@ SequenceData? _onDcsEntry(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onDcsParam(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeDigitLow &&
-      byte <= Defaults.byteRangeDigitHigh) {
+  if (byte >= ByteRanges.byteRangeDigitLow &&
+      byte <= ByteRanges.byteRangeDigitHigh) {
     final last = e._dcsParams.isEmpty ? 0 : e._dcsParams.removeLast();
-    e._dcsParams.add(last * 10 + (byte - Defaults.byteRangeDigitLow));
+    e._dcsParams.add(last * 10 + (byte - ByteRanges.byteRangeDigitLow));
     return null;
   }
-  if (byte == Defaults.semicolonByte) {
+  if (byte == ControlBytes.semicolonByte) {
     e._dcsParams.add(0);
     return null;
   }
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._dcsIntermediates.add(byte);
     e.value = VtState.dcsIntermediate;
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     e._dcsFinalByte = byte;
     e.value = VtState.dcsPassthrough;
     return null;
@@ -312,13 +317,13 @@ SequenceData? _onDcsParam(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onDcsIntermediate(int byte, Vt500Engine e) {
-  if (byte >= Defaults.byteRangeGraphicLow &&
-      byte <= Defaults.byteRangeGraphicHigh) {
+  if (byte >= ByteRanges.byteRangeGraphicLow &&
+      byte <= ByteRanges.byteRangeGraphicHigh) {
     e._dcsIntermediates.add(byte);
     return null;
   }
-  if (byte >= Defaults.byteRangeUpperLow &&
-      byte <= Defaults.byteRangeUpperHigh) {
+  if (byte >= ByteRanges.byteRangeUpperLow &&
+      byte <= ByteRanges.byteRangeUpperHigh) {
     e._dcsFinalByte = byte;
     e.value = VtState.dcsPassthrough;
     return null;
@@ -328,11 +333,12 @@ SequenceData? _onDcsIntermediate(int byte, Vt500Engine e) {
 }
 
 SequenceData? _onDcsIgnore(int byte, Vt500Engine e) {
-  if (byte == Defaults.bellByte || byte == Defaults.stringTerminatorByte) {
+  if (byte == ControlBytes.bellByte ||
+      byte == ControlBytes.stringTerminatorByte) {
     e.value = VtState.ground;
     return null;
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     return _onGround(byte, e);
   }
   return null;
@@ -341,7 +347,7 @@ SequenceData? _onDcsIgnore(int byte, Vt500Engine e) {
 SequenceData? _onDcsPassthrough(int byte, Vt500Engine e) {
   if (e._dcsWaitingSt) {
     e._dcsWaitingSt = false;
-    if (byte == Defaults.dcsStByte) {
+    if (byte == ControlBytes.dcsStByte) {
       e.value = VtState.ground;
       final data = e._dcsBuffer.toString();
       e._dcsBuffer.clear();
@@ -355,7 +361,8 @@ SequenceData? _onDcsPassthrough(int byte, Vt500Engine e) {
     }
     return null;
   }
-  if (byte == Defaults.bellByte || byte == Defaults.stringTerminatorByte) {
+  if (byte == ControlBytes.bellByte ||
+      byte == ControlBytes.stringTerminatorByte) {
     e.value = VtState.ground;
     final data = e._dcsBuffer.toString();
     e._dcsBuffer.clear();
@@ -367,7 +374,7 @@ SequenceData? _onDcsPassthrough(int byte, Vt500Engine e) {
       data: data,
     );
   }
-  if (byte == Defaults.escapeByte) {
+  if (byte == ControlBytes.escapeByte) {
     e._dcsWaitingSt = true;
     return null;
   }

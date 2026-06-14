@@ -1,7 +1,8 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, KeyMsg, CursorBlinkMsg;
 import '../cmd.dart' show Cmd, TickCmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show TextInputDefaults, TimingDefaults, UnicodeCodepoints, WidgetChars;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
@@ -39,11 +40,11 @@ class TextInput extends Model<TextInput> {
     this.value = '',
     this.cursorPosition = 0,
     this.selectionStart,
-    this.maxLength = Defaults.textInputNoMaxLength,
+    this.maxLength = TextInputDefaults.textInputNoMaxLength,
     this.echoMode = EchoMode.normal,
     this.validator,
     this.cursorVisible = true,
-    this.blinkInterval = Defaults.cursorBlinkInterval,
+    this.blinkInterval = TimingDefaults.cursorBlinkInterval,
   });
 
   @override
@@ -143,7 +144,8 @@ class TextInput extends Model<TextInput> {
   /// True if the character is a printable codepoint.
   bool _isPrintable(String char) {
     final cp = char.runes.first;
-    return cp >= Defaults.codepointSpace && cp != Defaults.codepointDel;
+    return cp >= UnicodeCodepoints.codepointSpace &&
+        cp != UnicodeCodepoints.codepointDel;
   }
 
   /// Inserts a character at the cursor position.
@@ -191,7 +193,7 @@ class TextInput extends Model<TextInput> {
   String get _displayValue {
     return switch (echoMode) {
       EchoMode.normal => value,
-      EchoMode.password => Defaults.charBullet * value.length,
+      EchoMode.password => WidgetChars.charBullet * value.length,
       EchoMode.noEcho => '',
     };
   }
@@ -226,7 +228,7 @@ class TextInput extends Model<TextInput> {
     final beforeCursor = display.substring(0, cursorPos);
     final afterCursor = display.substring(cursorPos);
 
-    final cursorChar = cursorVisible ? Defaults.charFullBlock : ' ';
+    final cursorChar = cursorVisible ? WidgetChars.charFullBlock : ' ';
 
     return Row(
       children: [

@@ -2,7 +2,7 @@ import 'package:ansi/ansi.dart' show AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show Da1Codes;
 import 'package:terminal/terminal.dart' show SystemIo;
 import 'da1_query.dart' show Da1Query;
 import 'probe_definitions.dart' show Da1Probe;
@@ -17,7 +17,7 @@ Da1Probe probeDa1(SystemIo io, TerminalParser parser, Duration timeout) =>
       timeout: timeout,
       onEvent: (event) {
         final id = event.params.isNotEmpty
-            ? event.params[Defaults.da1TerminalIdDefault]
+            ? event.params[Da1Codes.da1TerminalIdDefault]
             : 0;
         return Da1Query.supported(id, [...event.params.skip(1)]);
       },

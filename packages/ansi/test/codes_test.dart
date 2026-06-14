@@ -1,15 +1,15 @@
 import 'package:test/test.dart';
 import 'package:ansi/ansi.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ControlBytes;
 
 void main() {
   group('ANSI constants', () {
-    test('esc is \\x1b', () => expect(Defaults.esc, equals('\x1b')));
-    test('csi is \\x1b[', () => expect(Defaults.csi, equals('\x1b[')));
-    test('osc is \\x1b]', () => expect(Defaults.osc, equals('\x1b]')));
-    test('dcs is \\x1bP', () => expect(Defaults.dcs, equals('\x1bP')));
-    test('st is \\x1b\\', () => expect(Defaults.st, equals('\x1b\\')));
-    test('bel is \\x07', () => expect(Defaults.bel, equals('\x07')));
+    test('esc is \\x1b', () => expect(ControlBytes.esc, equals('\x1b')));
+    test('csi is \\x1b[', () => expect(ControlBytes.csi, equals('\x1b[')));
+    test('osc is \\x1b]', () => expect(ControlBytes.osc, equals('\x1b]')));
+    test('dcs is \\x1bP', () => expect(ControlBytes.dcs, equals('\x1bP')));
+    test('st is \\x1b\\', () => expect(ControlBytes.st, equals('\x1b\\')));
+    test('bel is \\x07', () => expect(ControlBytes.bel, equals('\x07')));
   });
 
   group('text attributes', () {

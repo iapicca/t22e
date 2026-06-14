@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:core/core.dart' show ColorProfile;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults;
 
 import 'da1_query.dart' show Da1Query;
 
@@ -30,7 +30,7 @@ abstract class Capabilities with _$Capabilities {
     colorProfile: ColorProfile.ansi16,
     syncSupported: false,
     keyboardProtocol: KeyboardProtocol.basic,
-    rows: Defaults.defaultTerminalHeight,
-    cols: Defaults.defaultTerminalWidth,
+    rows: SizeDefaults.defaultTerminalHeight,
+    cols: SizeDefaults.defaultTerminalWidth,
   );
 }

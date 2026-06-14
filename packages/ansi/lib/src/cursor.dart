@@ -1,24 +1,24 @@
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ControlBytes, DecModes;
 
 /// Cursor shape styles for block, underline, and bar cursors.
 enum CursorStyle {
   /// Blinking block cursor.
-  blinkingBlock(Defaults.cursorStyleBlinkingBlock),
+  blinkingBlock(DecModes.cursorStyleBlinkingBlock),
 
   /// Steady block cursor.
-  steadyBlock(Defaults.cursorStyleSteadyBlock),
+  steadyBlock(DecModes.cursorStyleSteadyBlock),
 
   /// Blinking underline cursor.
-  blinkingUnderline(Defaults.cursorStyleBlinkingUnderline),
+  blinkingUnderline(DecModes.cursorStyleBlinkingUnderline),
 
   /// Steady underline cursor.
-  steadyUnderline(Defaults.cursorStyleSteadyUnderline),
+  steadyUnderline(DecModes.cursorStyleSteadyUnderline),
 
   /// Blinking bar (I-beam) cursor.
-  blinkingBar(Defaults.cursorStyleBlinkingBar),
+  blinkingBar(DecModes.cursorStyleBlinkingBar),
 
   /// Steady bar (I-beam) cursor.
-  steadyBar(Defaults.cursorStyleSteadyBar);
+  steadyBar(DecModes.cursorStyleSteadyBar);
 
   /// The numeric cursor style code.
   final int value;
@@ -26,22 +26,22 @@ enum CursorStyle {
 }
 
 /// Move cursor to the given row and column (1-based).
-String moveTo(int row, int col) => '${Defaults.csi}$row;${col}H';
+String moveTo(int row, int col) => '${ControlBytes.csi}$row;${col}H';
 
 /// Move cursor up by n lines.
-String moveUp(int n) => '${Defaults.csi}${n}A';
+String moveUp(int n) => '${ControlBytes.csi}${n}A';
 
 /// Move cursor down by n lines.
-String moveDown(int n) => '${Defaults.csi}${n}B';
+String moveDown(int n) => '${ControlBytes.csi}${n}B';
 
 /// Move cursor right by n columns.
-String moveRight(int n) => '${Defaults.csi}${n}C';
+String moveRight(int n) => '${ControlBytes.csi}${n}C';
 
 /// Move cursor left by n columns.
-String moveLeft(int n) => '${Defaults.csi}${n}D';
+String moveLeft(int n) => '${ControlBytes.csi}${n}D';
 
 /// Move cursor to a specific column (1-based).
-String moveColumn(int col) => '${Defaults.csi}${col}G';
+String moveColumn(int col) => '${ControlBytes.csi}${col}G';
 
 /// Set the cursor shape/style.
-String setStyle(CursorStyle style) => '${Defaults.csi}${style.value} q';
+String setStyle(CursorStyle style) => '${ControlBytes.csi}${style.value} q';

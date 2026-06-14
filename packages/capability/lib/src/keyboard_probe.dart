@@ -2,7 +2,7 @@ import 'package:ansi/ansi.dart' show enableKittyKeyboard, AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show KittyCodes;
 import 'package:terminal/terminal.dart' show SystemIo;
 import 'capabilities.dart' show KeyboardProtocol;
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
@@ -16,7 +16,7 @@ Future<KeyboardProtocol> probeKeyboard(
 ) async {
   final result = await io
       .probeTerminal<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
-        query: enableKittyKeyboard(Defaults.kittyDisambiguate),
+        query: enableKittyKeyboard(KittyCodes.kittyDisambiguate),
         parser: parser,
         timeout: timeout,
         onEvent: (event) => KeyboardProtocol.kitty,

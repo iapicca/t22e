@@ -6,7 +6,8 @@ import 'layout.dart';
 import 'style.dart';
 import 'package:unicode/unicode.dart' show graphemeClusters;
 import 'package:unicode/unicode.dart' show charWidth, stringWidth;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ControlBytes, GraphemeProperties, WidgetChars;
 import 'package:ansi/ansi.dart'
     show bold, dim, italic, underline, blink, reverse, strikethrough, overLine;
 import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
@@ -66,7 +67,7 @@ class Surface {
     final cw = ch.runes.isEmpty ? 1 : charWidth(ch.runes.first);
     grid[y][x] = Cell(char: ch, style: style);
 
-    if (cw == Defaults.wideCharWidth && x + 1 < width) {
+    if (cw == GraphemeProperties.wideCharWidth && x + 1 < width) {
       grid[y][x + 1] = const Cell(char: '', wideContinuation: true);
     }
   }
@@ -85,7 +86,7 @@ class Surface {
 
       final sub = _substringByCodeUnits(text, cluster.start, cluster.end);
 
-      if (cluster.columnWidth == Defaults.wideCharWidth) {
+      if (cluster.columnWidth == GraphemeProperties.wideCharWidth) {
         if (col + 1 < width) {
           grid[y][col] = Cell(char: sub, style: style);
           grid[y][col + 1] = const Cell(char: '', wideContinuation: true);
@@ -112,7 +113,7 @@ class Surface {
       grid[row] = List<Cell>.of(grid[row]);
       for (var col = rect.left; col < rect.right; col++) {
         grid[row][col] = Cell(char: ch, style: style);
-        if (cw == Defaults.wideCharWidth && col + 1 < rect.right) {
+        if (cw == GraphemeProperties.wideCharWidth && col + 1 < rect.right) {
           grid[row][col + 1] = const Cell(char: '', wideContinuation: true);
           col++;
         }
@@ -143,25 +144,25 @@ class Surface {
     if (rect.isEmpty || rect.width < 2 || rect.height < 2) return;
     final s = style ?? TextStyle.empty;
 
-    final defaultChars = borderChars ?? Defaults.borderSingle;
+    final defaultChars = borderChars ?? WidgetChars.borderSingle;
     final vChar = defaultChars.isNotEmpty
         ? defaultChars[0]
-        : Defaults.borderSingle[0];
+        : WidgetChars.borderSingle[0];
     final hChar = defaultChars.length >= 2
         ? defaultChars[1]
-        : Defaults.borderSingle[1];
+        : WidgetChars.borderSingle[1];
     final tl = defaultChars.length >= 3
         ? defaultChars[2]
-        : Defaults.borderSingle[2];
+        : WidgetChars.borderSingle[2];
     final tr = defaultChars.length >= 4
         ? defaultChars[3]
-        : Defaults.borderSingle[3];
+        : WidgetChars.borderSingle[3];
     final bl = defaultChars.length >= 5
         ? defaultChars[4]
-        : Defaults.borderSingle[4];
+        : WidgetChars.borderSingle[4];
     final br = defaultChars.length >= 6
         ? defaultChars[5]
-        : Defaults.borderSingle[5];
+        : WidgetChars.borderSingle[5];
 
     final left = rect.left;
     final top = rect.top;
@@ -253,7 +254,7 @@ extension SurfaceAnsiExport on Surface {
             if (cell.wideContinuation) continue;
             if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
               if (lastHyperlink != null && cell.hyperlink == null) {
-                buf.write(Defaults.st);
+                buf.write(ControlBytes.st);
               }
               buf.write(Surface._styleToAnsi(cell.style));
               lastStyle = cell.style;
@@ -267,7 +268,7 @@ extension SurfaceAnsiExport on Surface {
             buf.write(cell.char);
           }
           if (lastHyperlink != null) {
-            buf.write(Defaults.st);
+            buf.write(ControlBytes.st);
           }
           if (lastStyle != null && !lastStyle.isClear) {
             buf.write(AnsiDefaults.resetAll);

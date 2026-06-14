@@ -2,7 +2,8 @@ import 'package:core/core.dart' show ColorProfile;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ControlBytes, Environment, Da1Codes, OscCodes;
 import 'package:terminal/terminal.dart' show SystemIo;
 import 'da1_query.dart' show Da1Query, Da1Value;
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
@@ -10,18 +11,18 @@ import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 /// Detect color profile from COLORTERM and TERM environment variables.
 @internal
 ColorProfile detectColorFromEnv(Map<String, String> env) {
-  final colorterm = env[Defaults.envKeyColorterm];
-  if (colorterm == Defaults.envColortermTruecolor ||
-      colorterm == Defaults.envColorterm24bit) {
+  final colorterm = env[Environment.envKeyColorterm];
+  if (colorterm == Environment.envColortermTruecolor ||
+      colorterm == Environment.envColorterm24bit) {
     return ColorProfile.trueColor;
   }
 
-  final term = env[Defaults.envKeyTerm] ?? '';
-  if (term.endsWith(Defaults.envTermSuffix256Color)) {
+  final term = env[Environment.envKeyTerm] ?? '';
+  if (term.endsWith(Environment.envTermSuffix256Color)) {
     return ColorProfile.indexed256;
   }
-  if (term.endsWith(Defaults.envTermSuffixTrueColor) ||
-      term.endsWith(Defaults.envTermSuffixDirect)) {
+  if (term.endsWith(Environment.envTermSuffixTrueColor) ||
+      term.endsWith(Environment.envTermSuffixDirect)) {
     return ColorProfile.trueColor;
   }
   return ColorProfile.ansi16;
@@ -32,10 +33,10 @@ ColorProfile detectColorFromEnv(Map<String, String> env) {
 ColorProfile detectColorFromDa1(Da1Query da1Result) {
   if (da1Result is Da1Value) {
     final attrs = da1Result.attributes;
-    if (attrs.contains(Defaults.da1AttrTrueColor)) {
+    if (attrs.contains(Da1Codes.da1AttrTrueColor)) {
       return ColorProfile.trueColor;
     }
-    if (attrs.contains(Defaults.da1AttrIndexed256)) {
+    if (attrs.contains(Da1Codes.da1AttrIndexed256)) {
       return ColorProfile.indexed256;
     }
   }
@@ -54,7 +55,7 @@ Future<ColorProfile> probeColor(
   if (env == ColorProfile.trueColor) return env;
 
   return io.probeTerminal<ColorQueryEvent, ColorProfile>(
-    query: '${Defaults.osc}${Defaults.oscFgQuery};?${Defaults.bel}',
+    query: '${ControlBytes.osc}${OscCodes.oscFgQuery};?${ControlBytes.bel}',
     parser: parser,
     timeout: timeout,
     where: (event) => event.r != null,

@@ -1,7 +1,7 @@
 import 'package:widgets/widgets.dart';
 import 'package:core/core.dart';
 import 'package:parser/terminal_parser.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show UnicodeCodepoints, WidgetChars;
 import 'chat_message.dart';
 import 'chat_view.dart';
 
@@ -64,8 +64,8 @@ class ChatModel extends Model<ChatModel> {
     if (keyCode == KeyCode.char) {
       final cp = event.codepoint;
       if (cp != null &&
-          cp >= Defaults.codepointSpace &&
-          cp != Defaults.codepointDel) {
+          cp >= UnicodeCodepoints.codepointSpace &&
+          cp != UnicodeCodepoints.codepointDel) {
         return _insertChar(String.fromCharCode(cp));
       }
       return (this, null);
@@ -225,7 +225,7 @@ class ChatModel extends Model<ChatModel> {
     final cursorPos = cursorPosition.clamp(0, display.length);
     final beforeCursor = display.substring(0, cursorPos);
     final afterCursor = display.substring(cursorPos);
-    final cursorChar = cursorVisible ? Defaults.charFullBlock : ' ';
+    final cursorChar = cursorVisible ? WidgetChars.charFullBlock : ' ';
 
     return Column(
       children: [

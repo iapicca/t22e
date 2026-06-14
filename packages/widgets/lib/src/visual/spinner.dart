@@ -1,7 +1,7 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, SpinnerTickMsg;
 import '../cmd.dart' show Cmd, TickCmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SpinnerFrames, TimingDefaults;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
@@ -21,12 +21,12 @@ class Spinner extends Model<Spinner> {
   final String? label;
 
   /// Default spinner frames (braille patterns).
-  static const List<String> defaultFrames = Defaults.spinnerFrames;
+  static const List<String> defaultFrames = SpinnerFrames.spinnerFrames;
 
   const Spinner({
     this.frame = 0,
     this.frames = defaultFrames,
-    this.interval = Defaults.spinnerAnimInterval,
+    this.interval = TimingDefaults.spinnerAnimInterval,
     this.label,
   });
 

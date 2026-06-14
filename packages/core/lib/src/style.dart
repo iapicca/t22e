@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'color.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ColorConstants;
 
 part 'style.freezed.dart';
 
@@ -78,9 +78,9 @@ abstract class TextStyle with _$TextStyle {
   static TextStyle link({String? uri}) {
     return TextStyle(
       foreground: Color(
-        red: Defaults.linkColorRed,
-        green: Defaults.linkColorGreen,
-        blue: Defaults.linkColorBlue,
+        red: ColorConstants.linkColorRed,
+        green: ColorConstants.linkColorGreen,
+        blue: ColorConstants.linkColorBlue,
       ),
       underline: true,
     );

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults;
 
 part 'layout.freezed.dart';
 
@@ -10,9 +10,9 @@ abstract class Constraints with _$Constraints {
 
   const factory Constraints({
     @Default(0) int minWidth,
-    @Default(Defaults.unbounded) int maxWidth,
+    @Default(SizeDefaults.unbounded) int maxWidth,
     @Default(0) int minHeight,
-    @Default(Defaults.unbounded) int maxHeight,
+    @Default(SizeDefaults.unbounded) int maxHeight,
   }) = _Constraints;
 
   factory Constraints.tight(int width, int height) {
@@ -29,7 +29,7 @@ abstract class Constraints with _$Constraints {
 
   /// True if either maxWidth or maxHeight is unbounded.
   bool get isUnbounded =>
-      maxWidth == Defaults.unbounded || maxHeight == Defaults.unbounded;
+      maxWidth == SizeDefaults.unbounded || maxHeight == SizeDefaults.unbounded;
 
   /// Clamps a size to fit within these constraints.
   Size constrain(Size size) {

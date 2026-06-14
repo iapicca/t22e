@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:core/core.dart' show TextStyle, ColorSgr;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ControlBytes, SgrCodes;
 import 'package:ansi/ansi.dart' show hyperlink;
 import 'frame.dart' show Frame;
 
@@ -42,7 +42,7 @@ String cellRrender(Frame previous, Frame current) {
         /// TODO this doesn't belong here!
         buf.write('\x1b[${i + 1};${j + 1}H');
         if (previousCell?.hyperlink != null && currentCell.hyperlink == null) {
-          buf.write(Defaults.st);
+          buf.write(ControlBytes.st);
         }
         buf.write(currentCell.char);
       }
@@ -55,19 +55,20 @@ String cellRrender(Frame previous, Frame current) {
 /// Converts a TextStyle and optional hyperlink URI to SGR escape sequences.
 String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
   final buf = StringBuffer();
-  if (s.bold == true) buf.write('${Defaults.csi}${Defaults.sgrBold}m');
-  if (s.dim == true) buf.write('${Defaults.csi}${Defaults.sgrFaint}m');
-  if (s.italic == true) buf.write('${Defaults.csi}${Defaults.sgrItalic}m');
+  if (s.bold == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrBold}m');
+  if (s.dim == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrFaint}m');
+  if (s.italic == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrItalic}m');
   if (s.underline == true) {
-    buf.write('${Defaults.csi}${Defaults.sgrUnderline}m');
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrUnderline}m');
   }
-  if (s.blink == true) buf.write('${Defaults.csi}${Defaults.sgrBlink}m');
-  if (s.reverse == true) buf.write('${Defaults.csi}${Defaults.sgrReverse}m');
+  if (s.blink == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrBlink}m');
+  if (s.reverse == true)
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrReverse}m');
   if (s.strikethrough == true) {
-    buf.write('${Defaults.csi}${Defaults.sgrStrikethrough}m');
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrStrikethrough}m');
   }
   if (s.overline == true) {
-    buf.write('${Defaults.csi}${Defaults.sgrOverline}m');
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrOverline}m');
   }
   if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
   if (s.background != null) {

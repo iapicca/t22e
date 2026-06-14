@@ -1,4 +1,5 @@
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ControlBytes, EscFinals, InternalEvents;
 import 'sequence_data.dart';
 import 'events.dart';
 
@@ -8,26 +9,26 @@ Event? parseEsc(SequenceData data) {
   final intermediates = sequenceData.intermediates;
   final finalByte = sequenceData.finalByte;
 
-  if (intermediates.contains(Defaults.ss3Byte)) {
+  if (intermediates.contains(ControlBytes.ss3Byte)) {
     return switch (finalByte) {
-      Defaults.escSs3F1 => KeyEvent(keyCode: KeyCode.f1),
-      Defaults.escSs3F2 => KeyEvent(keyCode: KeyCode.f2),
-      Defaults.escSs3F3 => KeyEvent(keyCode: KeyCode.f3),
-      Defaults.escSs3F4 => KeyEvent(keyCode: KeyCode.f4),
+      EscFinals.escSs3F1 => KeyEvent(keyCode: KeyCode.f1),
+      EscFinals.escSs3F2 => KeyEvent(keyCode: KeyCode.f2),
+      EscFinals.escSs3F3 => KeyEvent(keyCode: KeyCode.f3),
+      EscFinals.escSs3F4 => KeyEvent(keyCode: KeyCode.f4),
       _ => null,
     };
   }
 
   return switch (finalByte) {
-    Defaults.escFinalReset => InternalEvent(Defaults.internalEventReset),
-    Defaults.escFinalSaveCursor => InternalEvent(
-      Defaults.internalEventScreenSave,
+    EscFinals.escFinalReset => InternalEvent(InternalEvents.internalEventReset),
+    EscFinals.escFinalSaveCursor => InternalEvent(
+      InternalEvents.internalEventScreenSave,
     ),
-    Defaults.escFinalRestoreCursor => InternalEvent(
-      Defaults.internalEventScreenRestore,
+    EscFinals.escFinalRestoreCursor => InternalEvent(
+      InternalEvents.internalEventScreenRestore,
     ),
-    Defaults.escFinalScrollReverse => InternalEvent(
-      Defaults.internalEventScrollReverse,
+    EscFinals.escFinalScrollReverse => InternalEvent(
+      InternalEvents.internalEventScrollReverse,
     ),
     _ => null,
   };

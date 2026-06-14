@@ -1,7 +1,7 @@
 import 'package:widgets/widgets.dart';
 import 'package:core/core.dart';
 import 'package:unicode/unicode.dart' show stringWidth, charWidth;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show UnicodeCodepoints;
 
 class ChatBubble extends Widget {
   final String text;
@@ -91,8 +91,8 @@ class ChatBubble extends Widget {
           }
           break;
         }
-        if (runeList[i] == Defaults.codepointSpace ||
-            runeList[i] == Defaults.codepointIdeographicSpace) {
+        if (runeList[i] == UnicodeCodepoints.codepointSpace ||
+            runeList[i] == UnicodeCodepoints.codepointIdeographicSpace) {
           lastBreak = i;
           lastBreakWidth = lineWidth;
         }
@@ -102,7 +102,8 @@ class ChatBubble extends Widget {
 
       result.add(String.fromCharCodes(runeList.sublist(lineStart, lineEnd)));
       lineStart = lineEnd;
-      if (lineStart < total && runeList[lineStart] == Defaults.codepointSpace) {
+      if (lineStart < total &&
+          runeList[lineStart] == UnicodeCodepoints.codepointSpace) {
         lineStart++;
       }
     }

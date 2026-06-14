@@ -1,4 +1,5 @@
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ByteRanges, CsiFinals, KittyCodes, Modifiers, MouseCodes;
 import 'sequence_data.dart';
 import 'events.dart';
 
@@ -9,34 +10,34 @@ Event? parseCsi(SequenceData data) {
   final intermediates = sequenceData.intermediates;
   final finalByte = sequenceData.finalByte;
 
-  if (intermediates.contains(Defaults.csiExtendedIntermediate)) {
+  if (intermediates.contains(CsiFinals.csiExtendedIntermediate)) {
     return _parseCsiExtended(params, finalByte);
   }
 
-  if (intermediates.contains(Defaults.csiKittyQueryIntermediate) &&
-      finalByte == Defaults.csiFinalKittyKey) {
+  if (intermediates.contains(CsiFinals.csiKittyQueryIntermediate) &&
+      finalByte == KittyCodes.csiFinalKittyKey) {
     return _parseCsiKittyKeyboard(params);
   }
 
   return switch (finalByte) {
-    Defaults.csiFinalUp => _createCsiKeyEvent(KeyCode.up, params),
-    Defaults.csiFinalDown => _createCsiKeyEvent(KeyCode.down, params),
-    Defaults.csiFinalRight => _createCsiKeyEvent(KeyCode.right, params),
-    Defaults.csiFinalLeft => _createCsiKeyEvent(KeyCode.left, params),
-    Defaults.csiFinalHome => _createCsiKeyEvent(KeyCode.home, params),
-    Defaults.csiFinalEnd => _createCsiKeyEvent(KeyCode.end, params),
-    Defaults.csiFinalF1 => _createCsiFKeyEvent(1, params),
-    Defaults.csiFinalF2 => _createCsiFKeyEvent(2, params),
-    Defaults.csiFinalCursorPos when params.length >= 2 => CursorPositionEvent(
+    CsiFinals.csiFinalUp => _createCsiKeyEvent(KeyCode.up, params),
+    CsiFinals.csiFinalDown => _createCsiKeyEvent(KeyCode.down, params),
+    CsiFinals.csiFinalRight => _createCsiKeyEvent(KeyCode.right, params),
+    CsiFinals.csiFinalLeft => _createCsiKeyEvent(KeyCode.left, params),
+    CsiFinals.csiFinalHome => _createCsiKeyEvent(KeyCode.home, params),
+    CsiFinals.csiFinalEnd => _createCsiKeyEvent(KeyCode.end, params),
+    CsiFinals.csiFinalF1 => _createCsiFKeyEvent(1, params),
+    CsiFinals.csiFinalF2 => _createCsiFKeyEvent(2, params),
+    CsiFinals.csiFinalCursorPos when params.length >= 2 => CursorPositionEvent(
       params[0],
       params[1],
     ),
-    Defaults.csiFinalCursorPos => _createCsiFKeyEvent(3, params),
-    Defaults.csiFinalF4 => _createCsiFKeyEvent(4, params),
-    Defaults.csiFinalTilde => _parseCsiTildeKey(params),
-    Defaults.csiFinalMouse => _parseCsiSgrMouse(params),
-    Defaults.csiFinalDA
-        when intermediates.contains(Defaults.csiKittyQueryIntermediate) =>
+    CsiFinals.csiFinalCursorPos => _createCsiFKeyEvent(3, params),
+    CsiFinals.csiFinalF4 => _createCsiFKeyEvent(4, params),
+    CsiFinals.csiFinalTilde => _parseCsiTildeKey(params),
+    CsiFinals.csiFinalMouse => _parseCsiSgrMouse(params),
+    CsiFinals.csiFinalDA
+        when intermediates.contains(CsiFinals.csiKittyQueryIntermediate) =>
       PrimaryDeviceAttributesEvent(
         List.unmodifiable(params.length >= 2 ? params.sublist(1) : params),
       ),
@@ -73,7 +74,7 @@ Event? _parseCsiTildeKey(List<int> params) {
 
 /// Parses extended CSI sequences with intermediate bytes.
 Event? _parseCsiExtended(List<int> params, int finalByte) {
-  if (finalByte == Defaults.csiFinalMouse && params.length >= 3) {
+  if (finalByte == CsiFinals.csiFinalMouse && params.length >= 3) {
     return _parseCsiSgrMouseParams(params);
   }
   return null;
@@ -91,8 +92,8 @@ Event? _parseCsiKittyKeyboard(List<int> params) {
       ? KeyEventType.up
       : (eventType == 3 ? KeyEventType.repeat : KeyEventType.down);
 
-  if (code >= Defaults.byteRangePrintableLow &&
-      code <= Defaults.byteRangePrintableHigh) {
+  if (code >= ByteRanges.byteRangePrintableLow &&
+      code <= ByteRanges.byteRangePrintableHigh) {
     return KeyEvent(
       keyCode: KeyCode.char,
       modifiers: keyModifiers,
@@ -114,26 +115,26 @@ Event? _parseCsiKittyKeyboard(List<int> params) {
 }
 
 const _kittyKeyCodeMap = <int, KeyCode>{
-  Defaults.kittyKeyEscape: KeyCode.escape,
-  Defaults.kittyKeyTab: KeyCode.tab,
-  Defaults.kittyKeyEnter: KeyCode.enter,
-  Defaults.kittyKeyBackspace: KeyCode.backspace,
-  Defaults.kittyKeyBackspaceAlt: KeyCode.backspace,
-  Defaults.kittyKeyHome: KeyCode.home,
-  Defaults.kittyKeyEnd: KeyCode.end,
-  Defaults.kittyKeyPageUp: KeyCode.pageUp,
-  Defaults.kittyKeyPageDown: KeyCode.pageDown,
-  Defaults.kittyKeyInsert: KeyCode.insert,
-  Defaults.kittyKeyDelete: KeyCode.delete,
-  Defaults.kittyKeyDeleteAlt: KeyCode.delete,
+  KittyCodes.kittyKeyEscape: KeyCode.escape,
+  KittyCodes.kittyKeyTab: KeyCode.tab,
+  KittyCodes.kittyKeyEnter: KeyCode.enter,
+  KittyCodes.kittyKeyBackspace: KeyCode.backspace,
+  KittyCodes.kittyKeyBackspaceAlt: KeyCode.backspace,
+  KittyCodes.kittyKeyHome: KeyCode.home,
+  KittyCodes.kittyKeyEnd: KeyCode.end,
+  KittyCodes.kittyKeyPageUp: KeyCode.pageUp,
+  KittyCodes.kittyKeyPageDown: KeyCode.pageDown,
+  KittyCodes.kittyKeyInsert: KeyCode.insert,
+  KittyCodes.kittyKeyDelete: KeyCode.delete,
+  KittyCodes.kittyKeyDeleteAlt: KeyCode.delete,
 };
 
 KeyModifiers _kittyModifiersFromBits(int mod) {
   return KeyModifiers(
-    shift: (mod & Defaults.modShift) != 0,
-    alt: (mod & Defaults.modAlt) != 0,
-    ctrl: (mod & Defaults.modCtrl) != 0,
-    meta: (mod & Defaults.modMeta) != 0,
+    shift: (mod & Modifiers.modShift) != 0,
+    alt: (mod & Modifiers.modAlt) != 0,
+    ctrl: (mod & Modifiers.modCtrl) != 0,
+    meta: (mod & Modifiers.modMeta) != 0,
   );
 }
 
@@ -147,7 +148,7 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
   final column = params[1] - 1;
   final row = params[2] - 1;
 
-  if (buttonCode == Defaults.mouseWheelUpCode) {
+  if (buttonCode == MouseCodes.mouseWheelUpCode) {
     return MouseEvent(
       button: MouseButton.wheelUp,
       action: MouseAction.press,
@@ -155,7 +156,7 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
       y: row,
     );
   }
-  if (buttonCode == Defaults.mouseWheelDownCode) {
+  if (buttonCode == MouseCodes.mouseWheelDownCode) {
     return MouseEvent(
       button: MouseButton.wheelDown,
       action: MouseAction.press,
@@ -164,9 +165,11 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
     );
   }
 
-  if ((buttonCode & Defaults.mouseDragBit) != 0 &&
-      (buttonCode & Defaults.mouseButtonMask) != 3) {
-    final button = _mouseButtonFromCode(buttonCode & Defaults.mouseButtonMask);
+  if ((buttonCode & MouseCodes.mouseDragBit) != 0 &&
+      (buttonCode & MouseCodes.mouseButtonMask) != 3) {
+    final button = _mouseButtonFromCode(
+      buttonCode & MouseCodes.mouseButtonMask,
+    );
     return MouseEvent(
       button: button,
       action: MouseAction.drag,
@@ -175,7 +178,7 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
     );
   }
 
-  if ((buttonCode & Defaults.mouseDragBit) != 0) {
+  if ((buttonCode & MouseCodes.mouseDragBit) != 0) {
     return MouseEvent(
       button: MouseButton.none,
       action: MouseAction.release,
@@ -184,7 +187,7 @@ Event? _parseCsiSgrMouseParams(List<int> params) {
     );
   }
 
-  final button = _mouseButtonFromCode(buttonCode & Defaults.mouseButtonMask);
+  final button = _mouseButtonFromCode(buttonCode & MouseCodes.mouseButtonMask);
   return MouseEvent(
     button: button,
     action: MouseAction.press,
@@ -220,9 +223,9 @@ KeyEvent _createCsiFKeyEvent(int number, List<int> params) {
 
 KeyModifiers _csiModifiersFromParam(int param) {
   return KeyModifiers(
-    shift: (param & Defaults.modShift) != 0,
-    alt: (param & Defaults.modAlt) != 0,
-    ctrl: (param & Defaults.modCtrl) != 0,
-    meta: (param & Defaults.modMeta) != 0,
+    shift: (param & Modifiers.modShift) != 0,
+    alt: (param & Modifiers.modAlt) != 0,
+    ctrl: (param & Modifiers.modCtrl) != 0,
+    meta: (param & Modifiers.modMeta) != 0,
   );
 }

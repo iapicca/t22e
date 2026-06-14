@@ -3,7 +3,7 @@ import '../msg.dart' show Msg, KeyMsg;
 import '../cmd.dart' show Cmd;
 import 'package:core/core.dart' show Constraints, Size;
 import 'package:core/core.dart' show TextStyle;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults, WidgetChars;
 import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show Axis;
 import 'package:parser/terminal_parser.dart' show KeyEvent;
@@ -36,9 +36,9 @@ class Scrollable extends Model<Scrollable> {
     this.scrollY = 0,
     required this.child,
     this.axis = Axis.vertical,
-    this.scrollStep = Defaults.defaultScrollStep,
-    this.viewportWidth = Defaults.defaultTerminalWidth,
-    this.viewportHeight = Defaults.defaultTerminalHeight,
+    this.scrollStep = SizeDefaults.defaultScrollStep,
+    this.viewportWidth = SizeDefaults.defaultTerminalWidth,
+    this.viewportHeight = SizeDefaults.defaultTerminalHeight,
   });
 
   @override
@@ -98,8 +98,8 @@ class _ScrollView extends Widget {
     required this.child,
     this.scrollX = 0,
     this.scrollY = 0,
-    this.viewportWidth = Defaults.defaultTerminalWidth,
-    this.viewportHeight = Defaults.defaultTerminalHeight,
+    this.viewportWidth = SizeDefaults.defaultTerminalWidth,
+    this.viewportHeight = SizeDefaults.defaultTerminalHeight,
   });
 
   @override
@@ -114,7 +114,7 @@ class _ScrollView extends Widget {
   void paint(PaintingContext context) {
     child.paint(context.child(-scrollX, -scrollY));
 
-    if (viewportHeight > Defaults.scrollbarMinViewportHeight) {
+    if (viewportHeight > SizeDefaults.scrollbarMinViewportHeight) {
       final sbX = context.offsetX + viewportWidth - 1;
       final sbTop = context.offsetY;
       final sbBottom = context.offsetY + viewportHeight - 1;
@@ -123,7 +123,7 @@ class _ScrollView extends Widget {
         context.surface.putChar(
           sbX,
           r,
-          Defaults.charLightShade,
+          WidgetChars.charLightShade,
           TextStyle.empty,
         );
       }

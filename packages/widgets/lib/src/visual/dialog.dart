@@ -1,7 +1,7 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, KeyMsg;
 import '../cmd.dart' show Cmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show DialogLayout;
 import '../widget.dart' show Widget, PaintingContext;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -149,21 +149,21 @@ class _DialogOverlay extends Widget {
       }
     }
 
-    final dialogW = (w * Defaults.dialogWidthRatio).round().clamp(
-      Defaults.dialogMinWidth,
-      w - Defaults.dialogHMargin,
+    final dialogW = (w * DialogLayout.dialogWidthRatio).round().clamp(
+      DialogLayout.dialogMinWidth,
+      w - DialogLayout.dialogHMargin,
     );
-    final dialogH = (h * Defaults.dialogHeightRatio).round().clamp(
-      Defaults.dialogMinHeight,
-      h - Defaults.dialogHMargin,
+    final dialogH = (h * DialogLayout.dialogHeightRatio).round().clamp(
+      DialogLayout.dialogMinHeight,
+      h - DialogLayout.dialogHMargin,
     );
     final dialogX = (w - dialogW) ~/ 2;
     final dialogY = h ~/ 3;
 
     final contentHeight =
         dialogH -
-        Defaults.dialogHMargin -
-        (buttons.isNotEmpty ? Defaults.dialogButtonBarHeight : 0);
+        DialogLayout.dialogHMargin -
+        (buttons.isNotEmpty ? DialogLayout.dialogButtonBarHeight : 0);
 
     final buttonBar = _buildButtonBar();
 
@@ -174,11 +174,14 @@ class _DialogOverlay extends Widget {
       child: Column(
         children: [
           SizedBox(
-            height: contentHeight.clamp(1, Defaults.dialogContentClampHigh),
+            height: contentHeight.clamp(1, DialogLayout.dialogContentClampHigh),
             child: content,
           ),
           if (buttons.isNotEmpty)
-            SizedBox(height: Defaults.dialogButtonBarHeight, child: buttonBar),
+            SizedBox(
+              height: DialogLayout.dialogButtonBarHeight,
+              child: buttonBar,
+            ),
         ],
       ),
     );

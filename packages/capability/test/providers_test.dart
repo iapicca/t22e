@@ -1,6 +1,6 @@
 import 'package:capability/capability.dart';
 import 'package:core/core.dart' show ColorProfile;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show Da1Codes, Environment;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 
@@ -254,14 +254,14 @@ void main() {
   group('detectColorFromEnv', () {
     test('COLORTERM=truecolor returns trueColor', () {
       expect(
-        detectColorFromEnv({'COLORTERM': Defaults.envColortermTruecolor}),
+        detectColorFromEnv({'COLORTERM': Environment.envColortermTruecolor}),
         ColorProfile.trueColor,
       );
     });
 
     test('COLORTERM=24bit returns trueColor', () {
       expect(
-        detectColorFromEnv({'COLORTERM': Defaults.envColorterm24bit}),
+        detectColorFromEnv({'COLORTERM': Environment.envColorterm24bit}),
         ColorProfile.trueColor,
       );
     });
@@ -298,12 +298,12 @@ void main() {
 
   group('detectColorFromDa1', () {
     test('trueColor attribute returns trueColor', () {
-      final da1 = Da1Query.supported(65, [Defaults.da1AttrTrueColor]);
+      final da1 = Da1Query.supported(65, [Da1Codes.da1AttrTrueColor]);
       expect(detectColorFromDa1(da1), ColorProfile.trueColor);
     });
 
     test('256 color attribute returns indexed256', () {
-      final da1 = Da1Query.supported(65, [Defaults.da1AttrIndexed256]);
+      final da1 = Da1Query.supported(65, [Da1Codes.da1AttrIndexed256]);
       expect(detectColorFromDa1(da1), ColorProfile.indexed256);
     });
 

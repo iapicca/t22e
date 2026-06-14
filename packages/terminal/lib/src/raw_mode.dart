@@ -2,7 +2,7 @@ import 'dart:ffi';
 
 import 'package:meta/meta.dart';
 import 'package:notifier/notifier.dart' show Disposable, InitMixin;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show Termios;
 
 import 'extensions.dart';
 import 'libc_signatures.dart';
@@ -42,8 +42,8 @@ final class RawMode extends RawModeInterface {
       SymbolsFFI.mallocName,
     );
 
-    final buffer = malloc(Defaults.termiosStructSize).cast<Uint8>();
-    final tcGetAttrResult = tcGetAttr(Defaults.stdinFd, buffer);
+    final buffer = malloc(Termios.termiosStructSize).cast<Uint8>();
+    final tcGetAttrResult = tcGetAttr(Termios.stdinFd, buffer);
     if (tcGetAttrResult != 0) {
       _library.freePointer(buffer.cast());
       throw StateError('tcgetattr failed (stdin is not a TTY?)');
@@ -51,27 +51,23 @@ final class RawMode extends RawModeInterface {
 
     final savedState = RawModeStateData(
       buffer,
-      buffer.read32(Defaults.termiosOffsetIFlag),
-      buffer.read32(Defaults.termiosOffsetOFlag),
-      buffer.read32(Defaults.termiosOffsetCFlag),
-      buffer.read32(Defaults.termiosOffsetLFlag),
+      buffer.read32(Termios.termiosOffsetIFlag),
+      buffer.read32(Termios.termiosOffsetOFlag),
+      buffer.read32(Termios.termiosOffsetCFlag),
+      buffer.read32(Termios.termiosOffsetLFlag),
     );
 
     final modifiedLFlag =
         savedState.cLflag &
-        ~(Defaults.termiosEcho |
-            Defaults.termiosICanon |
-            Defaults.termiosISig |
-            Defaults.termiosIExten);
-    buffer.write32(Defaults.termiosOffsetLFlag, modifiedLFlag);
-    buffer.write8(Defaults.termiosOffsetCCMin, Defaults.termiosVminRaw);
-    buffer.write8(Defaults.termiosOffsetCCTime, Defaults.termiosVtimeRaw);
+        ~(Termios.termiosEcho |
+            Termios.termiosICanon |
+            Termios.termiosISig |
+            Termios.termiosIExten);
+    buffer.write32(Termios.termiosOffsetLFlag, modifiedLFlag);
+    buffer.write8(Termios.termiosOffsetCCMin, Termios.termiosVminRaw);
+    buffer.write8(Termios.termiosOffsetCCTime, Termios.termiosVtimeRaw);
 
-    final tcSetAttrResult = tcSetAttr(
-      Defaults.stdinFd,
-      Defaults.tcsaNow,
-      buffer,
-    );
+    final tcSetAttrResult = tcSetAttr(Termios.stdinFd, Termios.tcsaNow, buffer);
     if (tcSetAttrResult != 0) {
       _library.freePointer(buffer.cast());
       throw StateError('tcsetattr failed');
@@ -88,11 +84,11 @@ final class RawMode extends RawModeInterface {
       final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
         SymbolsFFI.tcSetAttrName,
       );
-      savedState.buf.write32(Defaults.termiosOffsetIFlag, savedState.cIflag);
-      savedState.buf.write32(Defaults.termiosOffsetOFlag, savedState.cOflag);
-      savedState.buf.write32(Defaults.termiosOffsetCFlag, savedState.cCflag);
-      savedState.buf.write32(Defaults.termiosOffsetLFlag, savedState.cLflag);
-      tcSetAttr(Defaults.stdinFd, Defaults.tcsaNow, savedState.buf);
+      savedState.buf.write32(Termios.termiosOffsetIFlag, savedState.cIflag);
+      savedState.buf.write32(Termios.termiosOffsetOFlag, savedState.cOflag);
+      savedState.buf.write32(Termios.termiosOffsetCFlag, savedState.cCflag);
+      savedState.buf.write32(Termios.termiosOffsetLFlag, savedState.cLflag);
+      tcSetAttr(Termios.stdinFd, Termios.tcsaNow, savedState.buf);
       _library.freePointer(savedState.buf.cast());
     }
     _state.dispose();

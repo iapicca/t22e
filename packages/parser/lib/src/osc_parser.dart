@@ -1,4 +1,4 @@
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show OscCodes;
 import 'sequence_data.dart';
 import 'events.dart';
 
@@ -15,13 +15,13 @@ Event? parseOsc(SequenceData data) {
   final value = content.substring(semicolonIndex + 1);
 
   return switch (parameterNumber) {
-    Defaults.oscTitle ||
+    OscCodes.oscTitle ||
     1 ||
     2 => InternalEvent('title_changed', {'title': value}),
-    Defaults.oscHyperlink => _parseOscHyperlink(value),
-    Defaults.oscFgQuery => _parseOscColorResponse(value, Defaults.oscFgQuery),
-    Defaults.oscBgQuery => _parseOscColorResponse(value, Defaults.oscBgQuery),
-    Defaults.oscClipboard => _parseOscClipboard(value),
+    OscCodes.oscHyperlink => _parseOscHyperlink(value),
+    OscCodes.oscFgQuery => _parseOscColorResponse(value, OscCodes.oscFgQuery),
+    OscCodes.oscBgQuery => _parseOscColorResponse(value, OscCodes.oscBgQuery),
+    OscCodes.oscClipboard => _parseOscClipboard(value),
     _ => null,
   };
 }
