@@ -1,16 +1,5 @@
 # macOS / Linux Cross-Platform Incompatibilities
 
-## 1. SIGTSTP/SIGCONT unsupported on macOS
-
-- **File**: `packages/lifecycle/lib/src/signal_providers.dart:17`
-- `ProcessSignal.sigtstp.watch()` throws `SignalException` on macOS
-- These signals serve no function in raw mode anyway (Ctrl+Z is captured as byte `0x1A`)
-- **Impact**: Crash on startup — the current bug
-
-### Plan
-- Option A: Wrap each `.watch()` in try-catch, fall back to `const Stream.empty()` on `SignalException`. Keeps the code portable across platforms.
-- Option B: Remove `sigtstpStreamProvider` and `sigcontStreamProvider` entirely, along with their usage in `signal_handler.dart` and `providers.dart`, since they serve no function in raw mode. Regenerate `providers.g.dart`.
-
 ---
 
 ## 2. termios struct layout differs between macOS and Linux
@@ -74,3 +63,70 @@
 ### Plan
 - Detect platform and use `-q` only on Linux, or use the BSD-compatible flags on macOS
 - Or use `unbuffer` / `socat` / other PTY-wrapping approach
+
+---
+
+## 6. Signal handler events won't fire from keyboard in raw mode
+
+- **File**: `packages/lifecycle/lib/src/signal_handler.dart:1-62`
+- **File**: `packages/lifecycle/lib/src/signal_providers.dart:1-23`
+- Raw mode clears `ISIG` flag — Ctrl+C emits byte `0x03` instead of SIGINT, Ctrl+Z emits `0x1A` instead of SIGTSTP
+- `dart:io.ProcessSignal.watch()` streams will never fire for keyboard-generated signals
+- `SignalHandler` is used in `example/bin/example.dart:34-46` as the primary Ctrl+C quit mechanism
+- SIGTERM from external `kill` command still works (doesn't involve terminal)
+- **Impact**: Ctrl+C doesn't quit the app in raw mode
+
+### Plan
+- Add byte-level detection of `0x03` (Ctrl+C) in the input stream
+- Keep SIGTERM handling for external process termination
+- Remove or repurpose `InterruptMsg`/`SuspendMsg`/`ResumeMsg` in `packages/widgets/lib/src/msg.dart:14-24` (defined but never dispatched)
+
+---
+
+## 7. WindowResizeEvent never emitted by parser
+
+- **File**: `packages/parser/lib/src/events.dart:143-176`
+- `WindowResizeEvent` class is defined but never instantiated or returned by `TerminalParser.advance()`
+- `example/bin/example.dart:94` checks for `WindowResizeEvent` — dead branch, never executes
+- **Impact**: Terminal resize does nothing (no relay-out on window size change)
+
+### Plan
+- Add resize detection mechanism (poll `io.columns`/`io.rows` on a timer, or handle SIGWINCH)
+- Move `WindowResizeEvent` out of parser or make parser emit it when it detects a size change
+
+---
+
+## 8. echoMode/lineMode on SystemIo dangerous in raw mode
+
+- **File**: `packages/terminal/lib/src/system_io.dart:23-29`
+- **File**: `packages/terminal/lib/src/terminal_io.dart:28-37`
+- `echoMode` and `lineMode` getter/setter wrappers around `dart:io.stdin.echoMode`/`stdin.lineMode`
+- In raw mode, calling these could re-enable echo or canonical processing, undoing raw mode
+- These are exposed via `SystemIo` interface and implemented in `TerminalIo`
+- **Impact**: Potential to accidentally exit raw mode if these are called
+
+### Plan
+- Guard behind a check, remove, or document as "do not call in raw mode"
+- Evaluate whether they're used anywhere (appears they are not called in the example app)
+
+---
+
+## 9. EchoMode in widgets is correct and distinct
+
+- **File**: `packages/widgets/lib/src/enums.dart:14` — `EchoMode` enum (normal, password, noEcho)
+- **File**: `packages/widgets/lib/src/interactive/text_input.dart` — `echoMode` field and `_displayValue`
+- This is display-layer logic (password masking), NOT terminal echo control
+- Does not conflict with raw mode — no change needed
+- **Verdict**: Keep as-is
+
+---
+
+## 10. Unnecessary `\n` bytes in test input
+
+- **File**: `example/test/e2e_smoke_test.dart:37` — sends `q\n` instead of just `q`
+- **File**: `example/test/compile_smoke_test.dart:51` — same pattern
+- In raw mode, `\n` is a harmless extra byte but reveals the test author assumed line-buffered input
+- **Impact**: Cosmetic — no functional difference
+
+### Plan
+- Replace `q\n` with just `q` in both test files

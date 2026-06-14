@@ -26,8 +26,6 @@ SignalHandler signalHandler(
     onCleanup: onCleanup,
     sigint: ref.watch(sigintStreamProvider),
     sigterm: ref.watch(sigtermStreamProvider),
-    sigtstp: ref.watch(sigtstpStreamProvider),
-    sigcont: ref.watch(sigcontStreamProvider),
   );
   ref.onDispose(handler.dispose);
   return handler;

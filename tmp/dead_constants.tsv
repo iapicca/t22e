@@ -1,0 +1,31 @@
+constant	line	value	in_test_only	action
+sosIntroducerByte	34	0x98	false	delete
+pmIntroducerByte	37	0x9E	false	delete
+apcIntroducerByte	40	0x9F	false	delete
+carriageReturnByte	15	0x0D	true	keep (used in defaults_test)
+lineFeedByte	18	0x0A	true	keep (used in defaults_test)
+csiFinalSgr	240	0x6D	false	delete (callers use string literal 'm')
+csiFinalDecset	275	0x68	false	delete (callers use string literal 'h')
+csiFinalDecrst	278	0x6C	false	delete (callers use string literal 'l')
+csiFinalSaveCursor	281	0x73	false	delete (callers use string literal 's')
+csiFinalRestoreCursor	284	0x75	false	delete (callers use string literal 'u')
+csiFinalDsr	288	0x6E	false	delete (callers use string literal 'n')
+csiDecDollar	321	0x24	false	delete
+kittyEventUp	429	2	false	delete
+kittyEventRepeat	432	3	false	delete
+kittyAllEvents	425	3	false	delete
+mouseButtonLeft	412	0	false	delete
+mouseButtonMiddle	415	1	false	delete
+mouseButtonRight	418	2	false	delete
+colorProfileAnsiCount	556	16	false	delete
+rgbRedShift	600	16	false	delete
+rgbGreenShift	603	8	false	delete
+rgbBlueMask	606	0xFF	false	delete
+libcMacOS	678	'libSystem.dylib'	false	delete (duplicated in terminal SymbolsFFI)
+libcLinux6	681	'libc.so.6'	false	delete (duplicated in terminal SymbolsFFI)
+libcLinux7	684	'libc.so.7'	false	delete (duplicated in terminal SymbolsFFI)
+defaultFps	731	60	false	delete
+microsecondsPerSecond	734	1000000	false	delete
+escDisambiguationDelay	711	Duration(milliseconds: 10)	false	delete
+eventLoopSleep	714	Duration(milliseconds: 1)	false	delete
+exitCodeOk	1059	0	false	delete
