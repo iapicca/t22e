@@ -1,13 +1,13 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, KeyMsg;
 import '../cmd.dart' show Cmd;
-import 'package:protocol/protocol.dart' show DialogLayout;
 import '../widget.dart' show Widget, PaintingContext;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
 import '../container/row.dart' show Row;
 import '../container/column.dart' show Column;
 import '../enums.dart' show BorderStyle;
+import '../dialog_layout.dart';
 import 'package:core/core.dart' show TextStyle;
 import 'package:core/core.dart' show Constraints, Size;
 import 'package:core/core.dart' show Insets;

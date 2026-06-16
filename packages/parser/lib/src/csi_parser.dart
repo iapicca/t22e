@@ -1,5 +1,8 @@
-import 'package:protocol/protocol.dart'
-    show ByteRanges, CsiFinals, KittyCodes, Modifiers, MouseCodes;
+import 'package:protocol/protocol.dart' show KittyCodes;
+import 'byte_ranges.dart';
+import 'csi_finals.dart';
+import 'modifiers.dart';
+import 'mouse_codes.dart';
 import 'sequence_data.dart';
 import 'events.dart';
 

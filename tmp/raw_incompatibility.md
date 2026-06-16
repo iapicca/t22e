@@ -4,7 +4,7 @@
 
 ## 2. termios struct layout differs between macOS and Linux
 
-- **File**: `packages/protocol/lib/src/defaults.dart:638-656`
+- **File**: `packages/terminal/lib/src/termios.dart:17-35`
 - `tcflag_t` is 4 bytes on Linux (`unsigned int`), 8 bytes on macOS 64-bit (`unsigned long`)
 - Struct size: 60 bytes (Linux) vs 72 bytes (macOS)
 
@@ -28,7 +28,7 @@
 
 ## 3. VMIN/VTIME offsets wrong on both OSes
 
-- **File**: `packages/protocol/lib/src/defaults.dart:652-656`
+- **File**: `packages/terminal/lib/src/termios.dart:32-36`
 - Even on Linux, `termiosOffsetCCMin = 17` and `termiosOffsetCCTime = 18` are wrong
 - On Linux: `c_cc` starts at offset 17, VMIN is at `c_cc[6]` → offset 23, VTIME at `c_cc[5]` → offset 22
 - On macOS: VMIN at `c_cc[16]` → offset 48, VTIME at `c_cc[17]` → offset 49

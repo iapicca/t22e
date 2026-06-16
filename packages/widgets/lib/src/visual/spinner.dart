@@ -1,10 +1,11 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, SpinnerTickMsg;
 import '../cmd.dart' show Cmd, TickCmd;
-import 'package:protocol/protocol.dart' show SpinnerFrames, TimingDefaults;
+import 'package:protocol/protocol.dart' show TimingDefaults;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
+import '../spinner_frames.dart';
 
 /// A braille-based animated spinner widget with optional label.
 class Spinner extends Model<Spinner> {

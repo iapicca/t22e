@@ -16,8 +16,12 @@ extension DynamicLibraryFfi on DynamicLibrary {
   }
 }
 
+/// TODO DynamicLibrary SHOULD BE ABSTRACTED!
+
 /// Opens the appropriate libc library for the current platform.
+/// TODO this isn't an extension, why it's here!
 @internal
+/// TODO this shoul be dependency injected with riverpod
 DynamicLibrary openLibc() {
   final operatingSystem = Platform.operatingSystem;
   return switch (operatingSystem) {

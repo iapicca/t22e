@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'color.dart';
-import 'package:protocol/protocol.dart' show ColorConstants;
+import 'color_constants.dart';
 
 part 'style.freezed.dart';
 

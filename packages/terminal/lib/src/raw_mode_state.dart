@@ -6,6 +6,7 @@ import 'package:notifier/notifier.dart' show ValueNotifier;
 part 'raw_mode_state.freezed.dart';
 
 /// Saved termios state captured before entering raw mode.
+/// TODO RawModeStateData shoulf become RawModeState, current RawModeState be deleted and RawModeInterface be a ValueNotifier<RawModeStat>
 @freezed
 abstract class RawModeStateData with _$RawModeStateData {
   /// Captures termios buffer and flag field snapshots.

@@ -1,6 +1,7 @@
 import 'package:protocol/protocol.dart'
-    show ControlBytes, SgrCodes, ColorConstants;
+    show ControlBytes, SgrCodes;
 
+import 'color_constants.dart';
 import 'color_profile.dart';
 
 export 'color_profile.dart';

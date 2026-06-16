@@ -1,6 +1,5 @@
 import 'package:capability/capability.dart';
 import 'package:core/core.dart' show ColorProfile;
-import 'package:protocol/protocol.dart' show Da1Codes, Environment;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
 

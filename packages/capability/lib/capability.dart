@@ -1,6 +1,8 @@
 /// Terminal capability probing: color, sync, keyboard, DA1.
 export 'src/capabilities.dart' show Capabilities, KeyboardProtocol;
+export 'src/da1_codes.dart';
 export 'src/da1_query.dart' show Da1Query, Da1Value, Da1QueryUnsupported;
+export 'src/environment.dart';
 export 'src/system_io_probe_extension.dart' show SystemIoProbeExtension;
 export 'src/da1_probe_provider.dart';
 export 'src/color_probe.dart' show detectColorFromEnv, detectColorFromDa1;

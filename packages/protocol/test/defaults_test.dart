@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:protocol/protocol.dart';
 
 void main() {
-  group('Defaults', () {
+  group('Protocol', () {
     test('escape strings', () {
       expect(ControlBytes.esc, '\x1b');
       expect(ControlBytes.csi, '\x1b[');
@@ -39,16 +39,6 @@ void main() {
       expect(SgrCodes.sgrBgExtended, 48);
     });
 
-    test('CSI final bytes', () {
-      expect(CsiFinals.csiFinalUp, 0x41);
-      expect(CsiFinals.csiFinalDown, 0x42);
-      expect(CsiFinals.csiFinalRight, 0x43);
-      expect(CsiFinals.csiFinalLeft, 0x44);
-      expect(CsiFinals.csiFinalCup, 0x48);
-      expect(CsiFinals.csiFinalEd, 0x4A);
-      expect(CsiFinals.csiFinalEl, 0x4B);
-    });
-
     test('DEC private modes', () {
       expect(DecModes.decModeMouseNormal, 1000);
       expect(DecModes.decModeMouseSgr, 1006);
@@ -57,33 +47,9 @@ void main() {
       expect(DecModes.decModeAltScreen, 1049);
     });
 
-    test('DA1 attributes', () {
-      expect(Da1Codes.da1AttrIndexed256, 22);
-      expect(Da1Codes.da1AttrTrueColor, 28);
-    });
-
-    test('modifier bit masks', () {
-      expect(Modifiers.modShift, 1);
-      expect(Modifiers.modAlt, 2);
-      expect(Modifiers.modCtrl, 4);
-      expect(Modifiers.modMeta, 8);
-    });
-
-    test('termios constants', () {
-      expect(Termios.termiosEcho, 0x00000008);
-      expect(Termios.termiosICanon, 0x00000002);
-      expect(Termios.termiosISig, 0x00000001);
-      expect(Termios.termiosIExten, 0x00008000);
-    });
-
     test('default sizes', () {
       expect(SizeDefaults.defaultTerminalWidth, 80);
       expect(SizeDefaults.defaultTerminalHeight, 24);
-    });
-
-    test('spinner frames', () {
-      expect(SpinnerFrames.spinnerFrames, isNotEmpty);
-      expect(SpinnerFrames.spinnerFrames.length, 10);
     });
 
     test('border glyph sets', () {

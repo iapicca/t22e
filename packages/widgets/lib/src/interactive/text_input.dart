@@ -2,12 +2,13 @@ import '../model.dart' show Model;
 import '../msg.dart' show Msg, KeyMsg, CursorBlinkMsg;
 import '../cmd.dart' show Cmd, TickCmd;
 import 'package:protocol/protocol.dart'
-    show TextInputDefaults, TimingDefaults, UnicodeCodepoints, WidgetChars;
+    show TimingDefaults, UnicodeCodepoints, WidgetChars;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
 import '../enums.dart' show EchoMode;
 import 'package:core/core.dart' show TextStyle;
+import '../text_input_defaults.dart';
 import 'package:parser/terminal_parser.dart' show KeyCode, KeyEvent;
 
 /// An interactive text input widget with cursor, echo modes, and grapheme-aware editing.

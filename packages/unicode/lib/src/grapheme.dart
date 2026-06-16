@@ -1,6 +1,7 @@
 import 'width.dart';
+import 'unicode_ranges.dart';
 import 'package:protocol/protocol.dart'
-    show GraphemeProperties, UnicodeCodepoints, UnicodeRanges;
+    show GraphemeProperties, UnicodeCodepoints;
 
 /// Describes a grapheme cluster: rune range [start, end) and column width.
 typedef GraphemeCluster = ({int start, int end, int columnWidth});

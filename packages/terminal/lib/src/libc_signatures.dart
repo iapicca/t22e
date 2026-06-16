@@ -2,6 +2,8 @@ import 'dart:ffi';
 
 import 'package:meta/meta.dart';
 
+/// TODO this should be reworked with riverpod and freezed!
+
 /// Native C signature for libc `tcgetattr`.
 @internal
 typedef NativeTcGetAttr =

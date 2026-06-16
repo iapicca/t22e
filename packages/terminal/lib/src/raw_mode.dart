@@ -2,15 +2,16 @@ import 'dart:ffi';
 
 import 'package:meta/meta.dart';
 import 'package:notifier/notifier.dart' show Disposable, InitMixin;
-import 'package:protocol/protocol.dart' show Termios;
 
 import 'extensions.dart';
 import 'libc_signatures.dart';
 import 'raw_mode_state.dart';
 import 'pointer_extensions.dart';
+import 'termios.dart';
 import 'symbols_ffi.dart';
 
 /// Abstract base for raw mode lifecycle management.
+/// TODO THIS SHOULD BE A VALUE NOTIFIER
 abstract class RawModeInterface with InitMixin, Disposable {
   RawModeState get state;
 }
@@ -21,12 +22,15 @@ abstract class RawModeInterface with InitMixin, Disposable {
 /// This class is exposed under `src/` for advanced use at your own risk.
 @internal
 final class RawMode extends RawModeInterface {
+  /// TODO this should be injected with riverpod
   late final DynamicLibrary _library = openLibc();
+  /// TODO this should be initialized with init!
   late final RawModeState _state = RawModeState(null);
 
   RawMode();
 
   @override
+  /// TODO this will be unnecessary when RawModeInterface will be a ValueNotifier
   RawModeState get state => _state;
 
   @override
@@ -41,7 +45,7 @@ final class RawMode extends RawModeInterface {
     final malloc = _library.lookupFunction<NativeMalloc, Malloc>(
       SymbolsFFI.mallocName,
     );
-
+    /// TODO I don't like calling malloc directly!
     final buffer = malloc(Termios.termiosStructSize).cast<Uint8>();
     final tcGetAttrResult = tcGetAttr(Termios.stdinFd, buffer);
     if (tcGetAttrResult != 0) {

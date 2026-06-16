@@ -1,3 +1,4 @@
+export 'src/termios.dart';
 export 'src/system_io.dart' show SystemIo;
 export 'src/raw_mode.dart' show RawModeInterface, RawMode;
 export 'src/raw_mode_state.dart' show RawModeState, RawModeStateData;

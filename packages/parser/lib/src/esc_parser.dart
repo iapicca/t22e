@@ -1,5 +1,6 @@
-import 'package:protocol/protocol.dart'
-    show ControlBytes, EscFinals, InternalEvents;
+import 'package:protocol/protocol.dart' show ControlBytes;
+import 'esc_finals.dart';
+import 'internal_events.dart';
 import 'sequence_data.dart';
 import 'events.dart';
 

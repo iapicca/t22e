@@ -6,6 +6,7 @@ import 'libc_signatures.dart';
 import 'symbols_ffi.dart';
 
 /// Abstract interface for libc FFI calls used to manage terminal raw mode.
+/// TODO this should be named `TermiosBindingsInterface`
 @internal
 abstract class TermiosBindings {
   /// Posix tcgetattr: read terminal attributes into [buf].
@@ -22,6 +23,7 @@ abstract class TermiosBindings {
 }
 
 /// Concrete [TermiosBindings] backed by a [DynamicLibrary].
+/// TODO this should be named `TermiosBindings`
 @internal
 final class TermiosBindingsImpl implements TermiosBindings {
   late final DynamicLibrary _library;

@@ -1,4 +1,5 @@
-import 'package:protocol/protocol.dart' show DcsCodes, InternalEvents;
+import 'dcs_codes.dart';
+import 'internal_events.dart';
 import 'sequence_data.dart';
 import 'events.dart';
 

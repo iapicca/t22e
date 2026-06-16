@@ -3,7 +3,9 @@ import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
 import 'package:protocol/protocol.dart'
-    show ControlBytes, Environment, Da1Codes, OscCodes;
+    show ControlBytes, OscCodes;
+import 'da1_codes.dart';
+import 'environment.dart';
 import 'package:terminal/terminal.dart' show SystemIo;
 import 'da1_query.dart' show Da1Query, Da1Value;
 import 'system_io_probe_extension.dart' show SystemIoProbeExtension;

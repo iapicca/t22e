@@ -2,7 +2,7 @@ import 'package:ansi/ansi.dart' show AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show PrimaryDeviceAttributesEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Da1Codes;
+import 'da1_codes.dart';
 import 'package:terminal/terminal.dart' show SystemIo;
 import 'da1_query.dart' show Da1Query;
 import 'probe_definitions.dart' show Da1Probe;

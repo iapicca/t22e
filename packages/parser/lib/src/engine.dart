@@ -1,7 +1,8 @@
 import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
 import 'package:protocol/protocol.dart'
-    show ControlBytes, ByteRanges, UnicodeCodepoints;
+    show ControlBytes, UnicodeCodepoints;
 
+import 'byte_ranges.dart';
 import 'sequence_data.dart';
 import 'vt_state.dart';
 
