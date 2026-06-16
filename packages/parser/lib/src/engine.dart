@@ -1,6 +1,5 @@
 import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
-import 'package:protocol/protocol.dart'
-    show ControlBytes, UnicodeCodepoints;
+import 'package:protocol/protocol.dart' show ControlBytes, UnicodeCodepoints;
 
 import 'byte_ranges.dart';
 import 'sequence_data.dart';
@@ -68,6 +67,7 @@ SequenceData? _onGround(int byte, Vt500Engine e) {
     >= ByteRanges.byteRangePrintableLow &&
         <= ByteRanges.byteRangePrintableHigh =>
       SequenceData.char(byte),
+    0x03 => SequenceData.char(byte),
     >= ByteRanges.byteRangeC1Low && <= ByteRanges.byteRangeC1High => null,
     >= ByteRanges.byteRangeLowest && <= ByteRanges.byteRangeControlHigh2
         when byte != ControlBytes.escapeByte =>

@@ -96,7 +96,8 @@ Future<void> _runApp(
         model = result.$1;
         container.read(modelProvider.notifier).updateModel(model);
       } else if (event is KeyEvent) {
-        if (event.keyCode == KeyCode.char && event.codepoint == 113) {
+        if (event.keyCode == KeyCode.char &&
+            (event.codepoint == 113 || event.codepoint == 3)) {
           running = false;
           return;
         }

@@ -10,6 +10,10 @@ import 'package:notifier/notifier.dart' show Disposable, VoidCallback;
 /// interrupted (SIGINT) without restoring the terminal, the user's shell
 /// will be left in a broken state.
 ///
+/// In raw mode (ISIG flag cleared), keyboard-generated SIGINT (Ctrl+C) does
+/// not fire. Ctrl+C is received as byte 0x03 in the input stream and must
+/// be handled at the parser/app level. SIGTERM from external `kill` works.
+///
 /// SignalHandler ensures terminal restoration on any signal-triggered exit path.
 class SignalHandler with Disposable {
   final VoidCallback onInterrupt;

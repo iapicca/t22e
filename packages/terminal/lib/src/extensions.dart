@@ -34,9 +34,18 @@ DynamicLibrary openLibc() {
 }
 
 DynamicLibrary _openLinuxLibc() {
-  try {
-    return DynamicLibrary.open(SymbolsFFI.libcLinux6);
-  } catch (_) {
-    return DynamicLibrary.open(SymbolsFFI.libcLinux7);
+  final names = [
+    SymbolsFFI.libcLinux6,
+    SymbolsFFI.libcMuslX86,
+    SymbolsFFI.libcMuslAarch64,
+  ];
+  Object? lastError;
+  for (final name in names) {
+    try {
+      return DynamicLibrary.open(name);
+    } on ArgumentError catch (e) {
+      lastError = e;
+    }
   }
+  throw lastError ?? ArgumentError('Cannot open libc on Linux');
 }

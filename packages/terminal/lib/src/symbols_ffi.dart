@@ -24,6 +24,9 @@ final class SymbolsFFI {
   /// Linux libc path (glibc 6).
   static const String libcLinux6 = 'libc.so.6';
 
-  /// Linux libc path (glibc 7).
-  static const String libcLinux7 = 'libc.so.7';
+  /// Linux musl libc path (x86_64).
+  static const String libcMuslX86 = 'libc.musl-x86_64.so.1';
+
+  /// Linux musl libc path (aarch64).
+  static const String libcMuslAarch64 = 'libc.musl-aarch64.so.1';
 }

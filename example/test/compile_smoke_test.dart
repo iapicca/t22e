@@ -48,15 +48,16 @@ void main() {
 
       expect(compileResult.exitCode, equals(0));
 
-      final process = await Process.start('script', [
-        '-q',
-        '/dev/null',
-        testExePath,
-      ], workingDirectory: exampleDir);
+      final scriptArgs = [if (Platform.isLinux) '-q', '/dev/null', testExePath];
+      final process = await Process.start(
+        'script',
+        scriptArgs,
+        workingDirectory: exampleDir,
+      );
 
       await Future.delayed(const Duration(milliseconds: 500));
 
-      process.stdin.write('q\n');
+      process.stdin.write('q');
       await process.stdin.flush();
 
       final exitCode = await process.exitCode.timeout(

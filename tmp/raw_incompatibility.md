@@ -4,6 +4,8 @@
 
 ## 2. termios struct layout differs between macOS and Linux
 
+**Status: DONE**
+
 - **File**: `packages/terminal/lib/src/termios.dart:17-35`
 - `tcflag_t` is 4 bytes on Linux (`unsigned int`), 8 bytes on macOS 64-bit (`unsigned long`)
 - Struct size: 60 bytes (Linux) vs 72 bytes (macOS)
@@ -19,14 +21,22 @@
 
 - **Impact**: On macOS 64-bit, the code reads/writes the **wrong fields**. Flag changes land on bytes belonging to different fields. Raw mode is effectively broken on macOS. On Linux, VMIN/VTIME offsets are also wrong.
 
-### Plan
-- Introduce platform-specific constants for struct size, field offsets, and VMIN/VTIME positions
-- Use `Platform.operatingSystem` or FFI `sizeof` / `offsetof` approach to determine layout at runtime
-- Alternatively, use `dart:ffi` struct definitions with proper types instead of manual byte-level manipulation, letting the compiler handle offsets
+### Implementation
+- `Termios` fields converted from `static const` to platform-aware getters using `Platform.operatingSystem`
+- `tcflagSize` → 4 (Linux) / 8 (macOS); offsets computed from `tcflagSize * N`
+- `ccOffset → 17 (Linux, after c_line) / 32 (macOS, directly after flags)
+- `vminIndex → 6 (Linux) / 16 (macOS); vtimeIndex → 5 (Linux) / 17 (macOS)
+- `termiosStructSize → 60 (Linux) / 72 (macOS)
+- Added `read64`/`write64` to `PointerUint8Ops` for macOS 8-byte flag fields
+- Added `Termios.readFlag`/`Termios.writeFlag` static methods abstracting platform width
+- `RawMode.init()` and `dispose()` use `Termios.readFlag`/`writeFlag` instead of raw `read32`/`write32`
+- Files: `pointer_extensions.dart`, `termios.dart`, `raw_mode.dart`
 
 ---
 
 ## 3. VMIN/VTIME offsets wrong on both OSes
+
+**Status: DONE (resolved together with #2)**
 
 - **File**: `packages/terminal/lib/src/termios.dart:32-36`
 - Even on Linux, `termiosOffsetCCMin = 17` and `termiosOffsetCCTime = 18` are wrong
@@ -35,38 +45,46 @@
 - The code writes to `c_cc[0]` (VINTR) and `c_cc[1]` (VQUIT) on Linux, and into bytes of `c_cflag` on macOS
 - **Impact**: Breaks interrupt/quit characters on Linux; writes garbage into `c_cflag` on macOS
 
-### Plan
-- Same as #2 — platform-specific offsets or proper FFI struct definitions
+### Implementation
+- Offsets now computed as `ccOffset + vminIndex`/`ccOffset + vtimeIndex` with platform-aware `ccOffset` and indices
+- Same changes as #2 above
 
 ---
 
 ## 4. No musl libc support on Linux
+
+**Status: DONE**
 
 - **File**: `packages/terminal/lib/src/extensions.dart:34-37`
 - Only tries `libc.so.6` then `libc.so.7`
 - Fails on Alpine Linux, Void musl, etc. where libc is `libc.musl-x86_64.so.1` or similar
 - **Impact**: Crash on musl-based distros; `libc.so.7` is dead code (glibc 2.7 is from 2008)
 
-### Plan
-- Add musl libc names to the fallback chain: `libc.musl-x86_64.so.1`, `libc.musl-aarch64.so.1`
-- Or use `DynamicLibrary.process()` to resolve without specifying the libc name (but this may have security implications)
-- Or catch the error and fall back to a non-FFI raw mode backend (currently not implemented)
+### Implementation
+- Added musl libc paths in `symbols_ffi.dart`: `libcMuslX86`, `libcMuslAarch64`
+- `_openLinuxLibc()` now tries `libc.so.6` → `libc.musl-x86_64.so.1` → `libc.musl-aarch64.so.1`
+- Removed dead `libc.so.7` entry
+- Files: `symbols_ffi.dart`, `extensions.dart`
 
 ---
 
 ## 5. `script -q` doesn't exist on macOS
 
+**Status: DONE**
+
 - **File**: `example/test/e2e_smoke_test.dart:14`, `example/test/compile_smoke_test.dart:51`
 - macOS uses BSD `script` which has no `-q` flag
 - **Impact**: Tests fail on macOS
 
-### Plan
-- Detect platform and use `-q` only on Linux, or use the BSD-compatible flags on macOS
-- Or use `unbuffer` / `socat` / other PTY-wrapping approach
+### Implementation
+- `-q` flag now conditional: `if (Platform.isLinux) '-q'` using collection-if in arg lists
+- Files: `e2e_smoke_test.dart`, `compile_smoke_test.dart`
 
 ---
 
 ## 6. Signal handler events won't fire from keyboard in raw mode
+
+**Status: DONE**
 
 - **File**: `packages/lifecycle/lib/src/signal_handler.dart:1-62`
 - **File**: `packages/lifecycle/lib/src/signal_providers.dart:1-23`
@@ -76,10 +94,12 @@
 - SIGTERM from external `kill` command still works (doesn't involve terminal)
 - **Impact**: Ctrl+C doesn't quit the app in raw mode
 
-### Plan
-- Add byte-level detection of `0x03` (Ctrl+C) in the input stream
-- Keep SIGTERM handling for external process termination
-- Remove or repurpose `InterruptMsg`/`SuspendMsg`/`ResumeMsg` in `packages/widgets/lib/src/msg.dart:14-24` (defined but never dispatched)
+### Implementation
+- VT500 engine now passes `0x03` (Ctrl+C) through as `CharData(0x03)` instead of swallowing it in `_onGround`
+- Example app quit condition extended: `event.codepoint == 113 || event.codepoint == 3`
+- `SignalHandler` docs updated to note SIGINT won't fire from keyboard in raw mode
+- Removed dead `InterruptMsg`/`SuspendMsg`/`ResumeMsg` from `msg.dart` (never dispatched)
+- Files: `engine.dart`, `example.dart`, `signal_handler.dart`, `msg.dart`
 
 ---
 
@@ -123,10 +143,13 @@
 
 ## 10. Unnecessary `\n` bytes in test input
 
+**Status: DONE**
+
 - **File**: `example/test/e2e_smoke_test.dart:37` — sends `q\n` instead of just `q`
 - **File**: `example/test/compile_smoke_test.dart:51` — same pattern
 - In raw mode, `\n` is a harmless extra byte but reveals the test author assumed line-buffered input
 - **Impact**: Cosmetic — no functional difference
 
-### Plan
-- Replace `q\n` with just `q` in both test files
+### Implementation
+- Replaced `'q\n'` with `'q'` in both test files
+- Files: `e2e_smoke_test.dart`, `compile_smoke_test.dart`

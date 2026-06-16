@@ -24,6 +24,7 @@ abstract class RawModeInterface with InitMixin, Disposable {
 final class RawMode extends RawModeInterface {
   /// TODO this should be injected with riverpod
   late final DynamicLibrary _library = openLibc();
+
   /// TODO this should be initialized with init!
   late final RawModeState _state = RawModeState(null);
 
@@ -45,6 +46,7 @@ final class RawMode extends RawModeInterface {
     final malloc = _library.lookupFunction<NativeMalloc, Malloc>(
       SymbolsFFI.mallocName,
     );
+
     /// TODO I don't like calling malloc directly!
     final buffer = malloc(Termios.termiosStructSize).cast<Uint8>();
     final tcGetAttrResult = tcGetAttr(Termios.stdinFd, buffer);
@@ -55,10 +57,10 @@ final class RawMode extends RawModeInterface {
 
     final savedState = RawModeStateData(
       buffer,
-      buffer.read32(Termios.termiosOffsetIFlag),
-      buffer.read32(Termios.termiosOffsetOFlag),
-      buffer.read32(Termios.termiosOffsetCFlag),
-      buffer.read32(Termios.termiosOffsetLFlag),
+      Termios.readFlag(buffer, Termios.termiosOffsetIFlag),
+      Termios.readFlag(buffer, Termios.termiosOffsetOFlag),
+      Termios.readFlag(buffer, Termios.termiosOffsetCFlag),
+      Termios.readFlag(buffer, Termios.termiosOffsetLFlag),
     );
 
     final modifiedLFlag =
@@ -67,7 +69,7 @@ final class RawMode extends RawModeInterface {
             Termios.termiosICanon |
             Termios.termiosISig |
             Termios.termiosIExten);
-    buffer.write32(Termios.termiosOffsetLFlag, modifiedLFlag);
+    Termios.writeFlag(buffer, Termios.termiosOffsetLFlag, modifiedLFlag);
     buffer.write8(Termios.termiosOffsetCCMin, Termios.termiosVminRaw);
     buffer.write8(Termios.termiosOffsetCCTime, Termios.termiosVtimeRaw);
 
@@ -88,10 +90,26 @@ final class RawMode extends RawModeInterface {
       final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
         SymbolsFFI.tcSetAttrName,
       );
-      savedState.buf.write32(Termios.termiosOffsetIFlag, savedState.cIflag);
-      savedState.buf.write32(Termios.termiosOffsetOFlag, savedState.cOflag);
-      savedState.buf.write32(Termios.termiosOffsetCFlag, savedState.cCflag);
-      savedState.buf.write32(Termios.termiosOffsetLFlag, savedState.cLflag);
+      Termios.writeFlag(
+        savedState.buf,
+        Termios.termiosOffsetIFlag,
+        savedState.cIflag,
+      );
+      Termios.writeFlag(
+        savedState.buf,
+        Termios.termiosOffsetOFlag,
+        savedState.cOflag,
+      );
+      Termios.writeFlag(
+        savedState.buf,
+        Termios.termiosOffsetCFlag,
+        savedState.cCflag,
+      );
+      Termios.writeFlag(
+        savedState.buf,
+        Termios.termiosOffsetLFlag,
+        savedState.cLflag,
+      );
       tcSetAttr(Termios.stdinFd, Termios.tcsaNow, savedState.buf);
       _library.freePointer(savedState.buf.cast());
     }
