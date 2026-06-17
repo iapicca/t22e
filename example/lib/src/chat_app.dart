@@ -16,7 +16,14 @@ class ChatApp {
     final (newModel, cmd) = _model.update(msg);
     _model = newModel;
     if (cmd != null) {
-      cmd.execute((Msg newMsg) => dispatch(newMsg));
+      final result = cmd.execute((Msg newMsg) => dispatch(newMsg));
+      if (result is Msg) {
+        dispatch(result);
+      } else if (result is Future<Msg?>) {
+        result.then((msg) {
+          if (msg != null) dispatch(msg);
+        });
+      }
     }
   }
 

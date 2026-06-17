@@ -18,6 +18,7 @@ dependencies:
   terminal:     { path: ../packages/terminal }
   unicode:      { path: ../packages/unicode }
   widgets:      { path: ../packages/widgets }
+  notifier:     { path: ../packages/notifier }
   freezed_annotation: ^3.1.0
   meta: ^1.18.2
   riverpod: ^3.2.1
