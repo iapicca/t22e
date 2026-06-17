@@ -32,6 +32,7 @@ final class TermiosBindingsImpl implements TermiosBindings {
 
   /// Looks up tcgetattr and tcsetattr from the given [library].
   TermiosBindingsImpl(this._library)
+  /// TODO all the dynanic library operations shoul occure via `RawMode`!!!
     : _tcGetAttr = _library.lookupFunction<NativeTcGetAttr, TcGetAttr>(
         SymbolsFFI.tcGetAttrName,
       ),

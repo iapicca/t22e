@@ -4,6 +4,10 @@ import 'dart:io';
 import 'pointer_extensions.dart';
 
 /// termios structure flags, offsets, and raw mode configuration.
+/// 
+/// TODO instead of having ` _isMacOS ? 8 : 4;`
+/// we should have sealed class Termios with Linux and Macos implementation
+/// removing _isMacOS logic and 'dart:io' dependencies
 final class Termios {
   Termios._();
 

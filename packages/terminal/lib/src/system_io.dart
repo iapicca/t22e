@@ -1,6 +1,13 @@
 import 'dart:async';
 
 /// Wraps dart:io stdin/stdout/Platform to enable mocking.
+/// TODO evaluate creating a `SystemContext` freezed class that will contain
+/// - columns and rows (maybe named width and height)
+/// - "mode" enum (echo, line) if the can't be used concurrently!
+/// - hasTerminal
+/// - operatingSystem (enum)
+/// - environment (not as map but mapping Platform.environment to a freezed class in a separate file)
+/// SystemContext expose a ValueNotifier<SystemContext>
 mixin SystemIo {
   /// Raw input byte stream (like stdin).
   Stream<List<int>> get inputStream;
