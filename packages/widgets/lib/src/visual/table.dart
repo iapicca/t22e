@@ -1,7 +1,7 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg;
 import '../cmd.dart' show Cmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show WidgetChars;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -71,8 +71,8 @@ class Table extends Model<Table> {
       var label = columns[c];
       if (c == sortColumn) {
         label += sortAscending
-            ? ' ${Defaults.charUpTriangle}'
-            : ' ${Defaults.charDownTriangle}';
+            ? ' ${WidgetChars.charUpTriangle}'
+            : ' ${WidgetChars.charDownTriangle}';
       }
       headerWidgets.add(Text(label, style: const TextStyle(bold: true)));
     }

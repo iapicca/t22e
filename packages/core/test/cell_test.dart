@@ -30,10 +30,9 @@ void main() {
       expect(copy.wideContinuation, cell.wideContinuation);
     });
 
-    test('mergeStyle creates merged style', () {
+    test('copyWith merges style', () {
       const cell = Cell(char: 'A');
-      const override = TextStyle(bold: true);
-      final merged = cell.mergeStyle(override);
+      final merged = cell.copyWith(style: cell.style.copyWith(bold: true));
       expect(merged.style.bold, isTrue);
       expect(merged.char, 'A');
     });

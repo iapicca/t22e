@@ -98,14 +98,6 @@ void main() {
     });
   });
 
-  group('WindowResizeEvent', () {
-    test('resize', () {
-      final event = WindowResizeEvent(24, 80);
-      expect(event.rows, equals(24));
-      expect(event.cols, equals(80));
-    });
-  });
-
   group('FocusEvent', () {
     test('focus', () => expect(FocusEvent(true).focused, isTrue));
     test('blur', () => expect(FocusEvent(false).focused, isFalse));

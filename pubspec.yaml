@@ -5,18 +5,8 @@ environment:
   sdk: ^3.12.0
 
 workspace:
-  - packages/protocol
-  - packages/ansi
-  - packages/unicode
-  - packages/parser
-  - packages/terminal
-  - packages/core
-  - packages/renderer
-  - packages/capability
-  - packages/lifecycle
-  - packages/notifier
-  - packages/widgets
-  - packages/testing
+  - packages/*
+  - example
 
 dev_dependencies:
   melos: ^7.7.0
@@ -36,7 +26,7 @@ melos:
       description: Run code generation then tests in all workspace packages.
       run: |
         melos build
-        melos exec -- dart test
+        melos exec --dir-exists=test --ignore=example -- dart test
     format:
       description: Check code formatting across all packages.
       exec: dart format --output=none --set-exit-if-changed .

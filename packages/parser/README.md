@@ -14,7 +14,7 @@ of terminal communication.
 - **SequenceData** — sealed hierarchy: `CharData`, `CsiSequenceData`,
   `EscSequenceData`, `OscSequenceData`, `DcsSequenceData`
 - **Events** — `KeyEvent`, `MouseEvent`, `PasteEvent`, `CursorPositionEvent`,
-  `ColorQueryEvent`, `WindowResizeEvent`, `FocusEvent`, and more
+  `ColorQueryEvent`, `FocusEvent`, and more
 - **KeyCode** enum — all logical keys including F1-F24
 - **Parser functions** — `parseCsi()`, `parseEsc()`, `parseOsc()`, `parseDcs()`
 - **Riverpod providers** — parser instances for dependency injection

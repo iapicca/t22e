@@ -18,7 +18,7 @@ void main() {
     });
 
     test('paint positions children at correct rows', () {
-      final surface = Surface(10, 10);
+      final surface = Surface.genetate(const Size(10, 10));
       final col = Column(children: [Text('A'), Text('B')]);
       col.layout(Constraints(maxWidth: 10, maxHeight: 10));
       col.paint(PaintingContext(surface: surface));
@@ -31,7 +31,7 @@ void main() {
         children: [Text('A')],
         mainAxisAlignment: MainAxisAlignment.center,
       );
-      final surface = Surface(10, 10);
+      final surface = Surface.genetate(const Size(10, 10));
       col.layout(Constraints(maxWidth: 10, maxHeight: 10));
       col.paint(PaintingContext(surface: surface));
       expect(surface.grid[4][0].char, 'A');
@@ -42,7 +42,7 @@ void main() {
         children: [Text('AB')],
         crossAxisAlignment: CrossAxisAlignment.center,
       );
-      final surface = Surface(10, 10);
+      final surface = Surface.genetate(const Size(10, 10));
       col.layout(Constraints(maxWidth: 10, maxHeight: 10));
       col.paint(PaintingContext(surface: surface));
       expect(surface.grid[0][4].char, 'A');

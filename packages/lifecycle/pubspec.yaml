@@ -1,5 +1,5 @@
 name: lifecycle
-description: Application lifecycle management (signal handler, alt screen, terminal guard).
+description: Application lifecycle management — terminal restoration and signal handling.
 version: 0.0.1
 publish_to: none
 resolution: workspace
@@ -10,11 +10,8 @@ environment:
 dependencies:
   protocol:
     path: ../protocol
-  ansi:
-    path: ../ansi
-  terminal:
-    path: ../terminal
   freezed_annotation: ^3.1.0
+  meta: ^1.18.2
   notifier:
     path: ../notifier
   riverpod: ^3.2.1

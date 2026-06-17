@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'raw_mode_state.freezed.dart';
 
-/// Saved termios state captured before enabling raw mode.
+/// Saved termios state captured before entering raw mode.
 @freezed
 abstract class RawModeState with _$RawModeState {
   /// Captures termios buffer and flag field snapshots.

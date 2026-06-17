@@ -1,28 +1,13 @@
 import 'package:parser/terminal_parser.dart' show KeyEvent, MouseEvent;
 
-/// Base sealed class for all messages in the MVU architecture.
-sealed class Msg {
+/// Base class for all messages in the MVU architecture.
+abstract base class Msg {
   const Msg();
 }
 
 /// Signals the program to terminate.
 final class QuitMsg extends Msg {
   const QuitMsg();
-}
-
-/// Raised on SIGINT (Ctrl+C).
-final class InterruptMsg extends Msg {
-  const InterruptMsg();
-}
-
-/// Raised on SIGTSTP (suspend).
-final class SuspendMsg extends Msg {
-  const SuspendMsg();
-}
-
-/// Raised on SIGCONT (resume).
-final class ResumeMsg extends Msg {
-  const ResumeMsg();
 }
 
 /// The terminal window was resized.

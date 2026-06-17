@@ -1,79 +1,81 @@
 import 'width.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'unicode_ranges.dart';
+import 'package:protocol/protocol.dart'
+    show GraphemeProperties, UnicodeCodepoints;
 
 /// Describes a grapheme cluster: rune range [start, end) and column width.
 typedef GraphemeCluster = ({int start, int end, int columnWidth});
 
 /// Returns the grapheme break property for a codepoint.
 int _graphemeBreakProperty(int codepoint) {
-  if (codepoint == Defaults.codepointZwj) {
-    return Defaults.graphemePropZwj;
+  if (codepoint == UnicodeCodepoints.codepointZwj) {
+    return GraphemeProperties.graphemePropZwj;
   }
-  if (codepoint >= Defaults.codepointVariationSelectorStart &&
-      codepoint <= Defaults.codepointVariationSelectorEnd) {
-    return Defaults.graphemePropVariationSelector;
+  if (codepoint >= UnicodeRanges.codepointVariationSelectorStart &&
+      codepoint <= UnicodeRanges.codepointVariationSelectorEnd) {
+    return GraphemeProperties.graphemePropVariationSelector;
   }
-  if (codepoint >= Defaults.codepointRegionalIndicatorStart &&
-      codepoint <= Defaults.codepointRegionalIndicatorEnd) {
-    return Defaults.graphemePropRegionalIndicator;
+  if (codepoint >= UnicodeRanges.codepointRegionalIndicatorStart &&
+      codepoint <= UnicodeRanges.codepointRegionalIndicatorEnd) {
+    return GraphemeProperties.graphemePropRegionalIndicator;
   }
-  if ((codepoint >= Defaults.codepointCombiningDiacriticalStart &&
-          codepoint <= Defaults.codepointCombiningDiacriticalEnd) ||
-      (codepoint >= Defaults.codepointCombiningDiacriticalExtStart &&
-          codepoint <= Defaults.codepointCombiningDiacriticalExtEnd) ||
-      (codepoint >= Defaults.codepointCombiningDiacriticalSuppStart &&
-          codepoint <= Defaults.codepointCombiningDiacriticalSuppEnd) ||
-      (codepoint >= Defaults.codepointCombiningMarksSymbolsStart &&
-          codepoint <= Defaults.codepointCombiningMarksSymbolsEnd) ||
-      (codepoint >= Defaults.codepointCombiningHalfMarksStart &&
-          codepoint <= Defaults.codepointCombiningHalfMarksEnd)) {
-    return Defaults.graphemePropCombiningMark;
+  if ((codepoint >= UnicodeRanges.codepointCombiningDiacriticalStart &&
+          codepoint <= UnicodeRanges.codepointCombiningDiacriticalEnd) ||
+      (codepoint >= UnicodeRanges.codepointCombiningDiacriticalExtStart &&
+          codepoint <= UnicodeRanges.codepointCombiningDiacriticalExtEnd) ||
+      (codepoint >= UnicodeRanges.codepointCombiningDiacriticalSuppStart &&
+          codepoint <= UnicodeRanges.codepointCombiningDiacriticalSuppEnd) ||
+      (codepoint >= UnicodeRanges.codepointCombiningMarksSymbolsStart &&
+          codepoint <= UnicodeRanges.codepointCombiningMarksSymbolsEnd) ||
+      (codepoint >= UnicodeRanges.codepointCombiningHalfMarksStart &&
+          codepoint <= UnicodeRanges.codepointCombiningHalfMarksEnd)) {
+    return GraphemeProperties.graphemePropCombiningMark;
   }
-  if (codepoint >= Defaults.codepointEmojiModifierStart &&
-      codepoint <= Defaults.codepointEmojiModifierEnd) {
-    return Defaults.graphemePropEmojiModifier;
+  if (codepoint >= UnicodeRanges.codepointEmojiModifierStart &&
+      codepoint <= UnicodeRanges.codepointEmojiModifierEnd) {
+    return GraphemeProperties.graphemePropEmojiModifier;
   }
-  if (codepoint == Defaults.codepointTag ||
-      (codepoint >= Defaults.codepointVariationSelectorSuppStart &&
-          codepoint <= Defaults.codepointVariationSelectorSuppEnd)) {
-    return Defaults.graphemePropTag;
+  if (codepoint == UnicodeRanges.codepointTag ||
+      (codepoint >= UnicodeRanges.codepointVariationSelectorSuppStart &&
+          codepoint <= UnicodeRanges.codepointVariationSelectorSuppEnd)) {
+    return GraphemeProperties.graphemePropTag;
   }
-  if (codepoint >= Defaults.codepointHangulLeadingStart &&
-      codepoint <= Defaults.codepointHangulLeadingEnd) {
-    return Defaults.graphemePropHangulLeading;
+  if (codepoint >= UnicodeRanges.codepointHangulLeadingStart &&
+      codepoint <= UnicodeRanges.codepointHangulLeadingEnd) {
+    return GraphemeProperties.graphemePropHangulLeading;
   }
-  if ((codepoint >= Defaults.codepointHangulVowelStart &&
-          codepoint <= Defaults.codepointHangulVowelEnd) ||
-      (codepoint >= Defaults.codepointHangulSyllableStart &&
-          codepoint <= Defaults.codepointHangulSyllableEnd)) {
-    return Defaults.graphemePropHangulVowel;
+  if ((codepoint >= UnicodeRanges.codepointHangulVowelStart &&
+          codepoint <= UnicodeRanges.codepointHangulVowelEnd) ||
+      (codepoint >= UnicodeRanges.codepointHangulSyllableStart &&
+          codepoint <= UnicodeRanges.codepointHangulSyllableEnd)) {
+    return GraphemeProperties.graphemePropHangulVowel;
   }
-  if (codepoint >= Defaults.codepointHangulTrailingStart &&
-      codepoint <= Defaults.codepointHangulTrailingEnd) {
-    return Defaults.graphemePropHangulTrailing;
+  if (codepoint >= UnicodeRanges.codepointHangulTrailingStart &&
+      codepoint <= UnicodeRanges.codepointHangulTrailingEnd) {
+    return GraphemeProperties.graphemePropHangulTrailing;
   }
-  if (codepoint >= Defaults.codepointExtendedPictographicStart &&
-      codepoint <= Defaults.codepointExtendedPictographicEnd) {
-    return Defaults.graphemePropExtendedPictographic;
+  if (codepoint >= UnicodeRanges.codepointExtendedPictographicStart &&
+      codepoint <= UnicodeRanges.codepointExtendedPictographicEnd) {
+    return GraphemeProperties.graphemePropExtendedPictographic;
   }
-  if (codepoint == Defaults.codepointSoftHyphen ||
-      codepoint == Defaults.codepointArabicFormatChar ||
-      codepoint == Defaults.codepointMongolianVowelSeparator ||
-      (codepoint >= Defaults.codepointEnQuadStart &&
-          codepoint <= Defaults.codepointEnQuadEnd) ||
-      codepoint == Defaults.codepointLineSeparator ||
-      codepoint == Defaults.codepointParagraphSeparator ||
-      (codepoint >= Defaults.codepointBidiOverrideStart &&
-          codepoint <= Defaults.codepointBidiOverrideEnd) ||
-      (codepoint >= Defaults.codepointWordJoinerStart &&
-          codepoint <= Defaults.codepointWordJoinerEnd) ||
-      codepoint == Defaults.codepointBidiIsolateLri ||
-      codepoint == Defaults.codepointBidiIsolateRli ||
-      codepoint == Defaults.codepointBidiIsolateFsi ||
-      (codepoint >= Defaults.codepointBidiIsolatePdiStart &&
-          codepoint <= Defaults.codepointBidiIsolatePdiEnd) ||
-      codepoint == Defaults.codepointBomZwnbsp) {
-    return Defaults.graphemePropInvisible;
+  if (codepoint == UnicodeCodepoints.codepointSoftHyphen ||
+      codepoint == UnicodeCodepoints.codepointArabicFormatChar ||
+      codepoint == UnicodeCodepoints.codepointMongolianVowelSeparator ||
+      (codepoint >= UnicodeCodepoints.codepointEnQuadStart &&
+          codepoint <= UnicodeCodepoints.codepointEnQuadEnd) ||
+      codepoint == UnicodeCodepoints.codepointLineSeparator ||
+      codepoint == UnicodeCodepoints.codepointParagraphSeparator ||
+      (codepoint >= UnicodeCodepoints.codepointBidiOverrideStart &&
+          codepoint <= UnicodeCodepoints.codepointBidiOverrideEnd) ||
+      (codepoint >= UnicodeCodepoints.codepointWordJoinerStart &&
+          codepoint <= UnicodeCodepoints.codepointWordJoinerEnd) ||
+      codepoint == UnicodeCodepoints.codepointBidiIsolateLri ||
+      codepoint == UnicodeCodepoints.codepointBidiIsolateRli ||
+      codepoint == UnicodeCodepoints.codepointBidiIsolateFsi ||
+      (codepoint >= UnicodeCodepoints.codepointBidiIsolatePdiStart &&
+          codepoint <= UnicodeCodepoints.codepointBidiIsolatePdiEnd) ||
+      codepoint == UnicodeCodepoints.codepointBomZwnbsp) {
+    return GraphemeProperties.graphemePropInvisible;
   }
   return 0;
 }
@@ -94,10 +96,10 @@ List<GraphemeCluster> graphemeClusters(String text) {
     final cw = charWidth(cp);
 
     if (i > 0) {
-      if (prop == Defaults.graphemePropZwj ||
-          prop == Defaults.graphemePropVariationSelector ||
-          prop == Defaults.graphemePropCombiningMark ||
-          prop == Defaults.graphemePropEmojiModifier) {
+      if (prop == GraphemeProperties.graphemePropZwj ||
+          prop == GraphemeProperties.graphemePropVariationSelector ||
+          prop == GraphemeProperties.graphemePropCombiningMark ||
+          prop == GraphemeProperties.graphemePropEmojiModifier) {
         clusterWidth += cw;
         continue;
       }

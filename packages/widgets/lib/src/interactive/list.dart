@@ -1,7 +1,7 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, KeyMsg;
 import '../cmd.dart' show Cmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults, WidgetChars;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../basic/box.dart' show Box;
@@ -44,7 +44,7 @@ class ListView extends Model<ListView> {
     this.selectedIndex = 0,
     this.multiSelected = const {},
     this.multiSelect = false,
-    this.viewportHeight = Defaults.defaultViewportHeight,
+    this.viewportHeight = SizeDefaults.defaultViewportHeight,
   });
 
   @override
@@ -158,8 +158,8 @@ class ListView extends Model<ListView> {
   Widget _buildItemRow(ListItem item, bool isSelected, bool isMultiSelected) {
     final style = isSelected ? const TextStyle(reverse: true) : TextStyle.empty;
     final prefix = multiSelect
-        ? (isMultiSelected ? '[${Defaults.charCheckMark}] ' : '[ ] ')
-        : (isSelected ? '${Defaults.charRightTriangle} ' : '  ');
+        ? (isMultiSelected ? '[${WidgetChars.charCheckMark}] ' : '[ ] ')
+        : (isSelected ? '${WidgetChars.charRightTriangle} ' : '  ');
     return Text('$prefix${item.label}', style: style);
   }
 }
