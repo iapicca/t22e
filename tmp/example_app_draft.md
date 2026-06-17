@@ -11,37 +11,12 @@ A terminal-based chat application demonstrating the capabilities of the **t22e**
 
 ## Requirements
 
-- **Real terminal (TTY) required** — this app cannot run with:
-  - Piped input: `echo "hello" | dart run bin/example.dart`
-  - Redirected output: `dart run bin/example.dart > output.txt`
-  - Non-interactive shells (CI, cron, etc.)
 - macOS or Linux — Windows is not supported
 - Dart SDK `^3.12.0`
-
-## Troubleshooting
-
-### App exits immediately with no output
-
-You are not running in a real terminal. This app requires an interactive TTY.
-If you need to run tests, use `melos test` instead.
-
-## Building
-
-From the repository root:
-
-```bash
-# Install dependencies
-cd example
-dart pub get
-```
 
 ## Running
 
 ```bash
-# Run directly from source
-dart run bin/example.dart
-
-# Or compile to a native executable first
 dart compile exe bin/example.dart -o example_app
 ./example_app
 ```
@@ -55,9 +30,7 @@ dart compile exe bin/example.dart -o example_app
 | **Left/Right arrows** | Move cursor within input |
 | **Backspace** | Delete character before cursor |
 | **Delete** | Delete character after cursor |
-| **Home** | Move cursor to start of input |
-| **End** | Move cursor to end of input |
-| **q** | Quit the application |
+| **control+c** | Quit the application |
 
 ## UI Layout
 
