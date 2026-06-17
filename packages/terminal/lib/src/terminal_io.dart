@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:notifier/notifier.dart' show Disposable, InitMixin, ValueNotifier;
+import 'package:notifier/notifier.dart'
+    show Disposable, InitMixin, ValueNotifier;
 
 import 'libc_signatures.dart';
 import 'operating_system.dart';
@@ -20,15 +21,17 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
   @override
   void init({String? message, bool throwIfExists = false}) {
     super.init(message: message, throwIfExists: throwIfExists);
-    _context = ValueNotifier<SystemContext>(SystemContext(
-      width: stdout.terminalColumns,
-      height: stdout.terminalLines,
-      hasTerminal: stdout.hasTerminal,
-      operatingSystem: Platform.operatingSystem == 'macos'
-          ? OperatingSystem.macOS
-          : OperatingSystem.linux,
-      environment: Map<String, String>.from(Platform.environment),
-    ));
+    _context = ValueNotifier<SystemContext>(
+      SystemContext(
+        width: stdout.terminalColumns,
+        height: stdout.terminalLines,
+        hasTerminal: stdout.hasTerminal,
+        operatingSystem: Platform.operatingSystem == 'macos'
+            ? OperatingSystem.macOS
+            : OperatingSystem.linux,
+        environment: Map<String, String>.from(Platform.environment),
+      ),
+    );
     _initSigwinch();
   }
 
@@ -59,10 +62,8 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
     const sigwinch = 28;
     const bufferSize = 256;
 
-    final cMalloc =
-        _libc.lookupFunction<NativeMalloc, Malloc>('malloc');
-    final cFree =
-        _libc.lookupFunction<NativeFree, Free>('free');
+    final cMalloc = _libc.lookupFunction<NativeMalloc, Malloc>('malloc');
+    final cFree = _libc.lookupFunction<NativeFree, Free>('free');
 
     final buffer = cMalloc(bufferSize).cast<Uint8>();
 
@@ -74,10 +75,7 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
       final width = stdout.terminalColumns;
       final height = stdout.terminalLines;
       if (width != _context.value.width || height != _context.value.height) {
-        _context.value = _context.value.copyWith(
-          width: width,
-          height: height,
-        );
+        _context.value = _context.value.copyWith(width: width, height: height);
       }
     });
 
@@ -96,8 +94,9 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
     _sigwinchCallback = null;
     if (callback != null) {
       try {
-        final sigaction =
-            _libc.lookupFunction<NativeSigaction, DartSigaction>('sigaction');
+        final sigaction = _libc.lookupFunction<NativeSigaction, DartSigaction>(
+          'sigaction',
+        );
         sigaction(28, nullptr, nullptr);
       } on ArgumentError {
         // sigaction not available; handler will close regardless

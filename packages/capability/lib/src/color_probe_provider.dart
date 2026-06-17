@@ -24,5 +24,5 @@ ColorProbe colorProbe(Ref ref) async {
 /// Detect color profile from environment variables.
 ColorProfile colorFromEnv(Ref ref) {
   final io = ref.read(systemIoProvider);
-  return detectColorFromEnv(io.environment);
+  return detectColorFromEnv(io.context.value.environment);
 }

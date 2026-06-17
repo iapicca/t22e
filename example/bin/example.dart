@@ -63,8 +63,8 @@ Future<void> _runApp(
 ) async {
   final parser = container.read(terminalParserProvider);
 
-  final width = io.columns;
-  final height = io.rows;
+  final width = io.context.value.width;
+  final height = io.context.value.height;
   final modelProvider = chatModelStateProvider(width: width, height: height);
   var model = container.read(modelProvider);
   Frame? previousFrame;
@@ -86,16 +86,28 @@ Future<void> _runApp(
   _render(model, io, ref: previousFrame);
   previousFrame = _currentFrame(model);
 
+  var lastWidth = width;
+  var lastHeight = height;
+  io.context.addListener(() {
+    final ctx = io.context.value;
+    if (ctx.width != lastWidth || ctx.height != lastHeight) {
+      lastWidth = ctx.width;
+      lastHeight = ctx.height;
+      if (!running) return;
+      final result = model.update(WindowSizeMsg(ctx.width, ctx.height));
+      model = result.$1;
+      container.read(modelProvider.notifier).updateModel(model);
+      _render(model, io, ref: previousFrame);
+      previousFrame = _currentFrame(model);
+    }
+  });
+
   final subscription = io.inputStream.listen((bytes) {
     if (!running) return;
 
     final events = parser.advance(bytes);
     for (final event in events) {
-      if (event is WindowResizeEvent) {
-        final result = model.update(WindowSizeMsg(event.cols, event.rows));
-        model = result.$1;
-        container.read(modelProvider.notifier).updateModel(model);
-      } else if (event is KeyEvent) {
+      if (event is KeyEvent) {
         if (event.keyCode == KeyCode.char &&
             (event.codepoint == 113 || event.codepoint == 3)) {
           running = false;

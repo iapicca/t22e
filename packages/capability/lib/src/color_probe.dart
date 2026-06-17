@@ -52,7 +52,7 @@ Future<ColorProfile> probeColor(
   Da1Query da1Result,
   Duration timeout,
 ) async {
-  final env = detectColorFromEnv(io.environment);
+  final env = detectColorFromEnv(io.context.value.environment);
   if (env == ColorProfile.trueColor) return env;
 
   return io.probeTerminal<ColorQueryEvent, ColorProfile>(

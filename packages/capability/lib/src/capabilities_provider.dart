@@ -22,7 +22,7 @@ Future<Capabilities> capabilities(Ref ref) async {
     colorProfile: color,
     syncSupported: syncSupported,
     keyboardProtocol: keyboard,
-    cols: io.columns,
-    rows: io.rows,
+    cols: io.context.value.width,
+    rows: io.context.value.height,
   );
 }
