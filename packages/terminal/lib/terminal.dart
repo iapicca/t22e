@@ -4,7 +4,7 @@ export 'src/termios_macos.dart';
 export 'src/operating_system.dart';
 export 'src/system_io.dart' show SystemIo;
 export 'src/raw_mode.dart' show RawModeInterface, RawMode;
-export 'src/raw_mode_state.dart' show RawModeState, RawModeStateData;
+export 'src/raw_mode_state.dart' show RawModeState;
 export 'src/terminal_io.dart' show TerminalIo;
 export 'src/termios_bindings.dart' show TermiosBindings;
 export 'src/libc_signatures.dart' show TcGetAttr, TcSetAttr, Malloc, Free;

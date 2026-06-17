@@ -1,22 +1,15 @@
-import 'dart:ffi';
-import 'dart:io';
-
 import 'package:meta/meta.dart';
-import 'package:notifier/notifier.dart' show Disposable, InitMixin;
+import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
 
-import 'libc_provider.dart';
-import 'libc_signatures.dart';
 import 'raw_mode_state.dart';
 import 'pointer_extensions.dart';
 import 'termios.dart';
-import 'termios_linux.dart';
-import 'termios_macos.dart';
-import 'symbols_ffi.dart';
+import 'termios_bindings.dart';
 
 /// Abstract base for raw mode lifecycle management.
-/// TODO THIS SHOULD BE A VALUE NOTIFIER
-abstract class RawModeInterface with InitMixin, Disposable {
-  RawModeState get state;
+abstract class RawModeInterface extends ValueNotifier<RawModeState?>
+    with InitMixin {
+  RawModeInterface() : super(null);
 }
 
 /// Concrete [RawModeInterface] implementation using libc FFI.
@@ -25,48 +18,22 @@ abstract class RawModeInterface with InitMixin, Disposable {
 /// This class is exposed under `src/` for advanced use at your own risk.
 @internal
 final class RawMode extends RawModeInterface {
-  /// TODO this should be injected with riverpod
-  late final DynamicLibrary _library = openLibc();
+  final TermiosBindings _bindings;
+  final Termios _termios;
 
-  late final Termios _termios = switch (Platform.operatingSystem) {
-    'macos' => const MacosTermios(),
-    'linux' => const LinuxTermios(),
-    _ => throw UnsupportedError(
-      'FFI raw mode is not supported on ${Platform.operatingSystem}',
-    ),
-  };
-
-  /// TODO this should be initialized with init!
-  late final RawModeState _state = RawModeState(null);
-
-  RawMode();
-
-  @override
-  /// TODO this will be unnecessary when RawModeInterface will be a ValueNotifier
-  RawModeState get state => _state;
+  RawMode({required this._bindings, required this._termios});
 
   @override
   void init({String? message, bool throwIfExists = false}) {
     super.init(message: message, throwIfExists: throwIfExists);
-    final tcGetAttr = _library.lookupFunction<NativeTcGetAttr, TcGetAttr>(
-      SymbolsFFI.tcGetAttrName,
-    );
-    final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
-      SymbolsFFI.tcSetAttrName,
-    );
-    final malloc = _library.lookupFunction<NativeMalloc, Malloc>(
-      SymbolsFFI.mallocName,
-    );
-
-    /// TODO I don't like calling malloc directly!
-    final buffer = malloc(_termios.termiosStructSize).cast<Uint8>();
-    final tcGetAttrResult = tcGetAttr(Termios.stdinFd, buffer);
+    final buffer = _bindings.malloc(_termios.termiosStructSize);
+    final tcGetAttrResult = _bindings.tcGetAttr(Termios.stdinFd, buffer);
     if (tcGetAttrResult != 0) {
-      _library.freePointer(buffer.cast());
+      _bindings.free(buffer);
       throw StateError('tcgetattr failed (stdin is not a TTY?)');
     }
 
-    final savedState = RawModeStateData(
+    final savedState = RawModeState(
       buffer,
       _termios.readFlag(buffer, _termios.termiosOffsetIFlag),
       _termios.readFlag(buffer, _termios.termiosOffsetOFlag),
@@ -84,23 +51,23 @@ final class RawMode extends RawModeInterface {
     buffer.write8(_termios.termiosOffsetCCMin, Termios.termiosVminRaw);
     buffer.write8(_termios.termiosOffsetCCTime, Termios.termiosVtimeRaw);
 
-    final tcSetAttrResult = tcSetAttr(Termios.stdinFd, Termios.tcsaNow, buffer);
+    final tcSetAttrResult = _bindings.tcSetAttr(
+      Termios.stdinFd,
+      Termios.tcsaNow,
+      buffer,
+    );
     if (tcSetAttrResult != 0) {
-      _library.freePointer(buffer.cast());
+      _bindings.free(buffer);
       throw StateError('tcsetattr failed');
     }
 
-    _state.value = savedState;
+    value = savedState;
   }
 
   @override
   void dispose({String? message}) {
-    super.dispose(message: message);
-    final savedState = _state.value;
+    final savedState = value;
     if (savedState != null) {
-      final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
-        SymbolsFFI.tcSetAttrName,
-      );
       _termios.writeFlag(
         savedState.buf,
         _termios.termiosOffsetIFlag,
@@ -121,9 +88,9 @@ final class RawMode extends RawModeInterface {
         _termios.termiosOffsetLFlag,
         savedState.cLflag,
       );
-      tcSetAttr(Termios.stdinFd, Termios.tcsaNow, savedState.buf);
-      _library.freePointer(savedState.buf.cast());
+      _bindings.tcSetAttr(Termios.stdinFd, Termios.tcsaNow, savedState.buf);
+      _bindings.free(savedState.buf);
     }
-    _state.dispose();
+    super.dispose(message: message);
   }
 }
