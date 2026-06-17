@@ -21,11 +21,18 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
   @override
   void init({String? message, bool throwIfExists = false}) {
     super.init(message: message, throwIfExists: throwIfExists);
+
+    var hasTerminal = stdout.hasTerminal;
+    if (!hasTerminal) {
+      throw StdoutException('stdout has no terminal!');
+    }
+
     _context = ValueNotifier<SystemContext>(
       SystemContext(
         width: stdout.terminalColumns,
         height: stdout.terminalLines,
-        hasTerminal: stdout.hasTerminal,
+        hasTerminal: hasTerminal,
+        /// TODO the internal "OperatingSystem" should be used!
         operatingSystem: Platform.operatingSystem == 'macos'
             ? OperatingSystem.macOS
             : OperatingSystem.linux,
