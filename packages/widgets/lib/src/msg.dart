@@ -1,7 +1,7 @@
 import 'package:parser/terminal_parser.dart' show KeyEvent, MouseEvent;
 
-/// Base sealed class for all messages in the MVU architecture.
-sealed class Msg {
+/// Base class for all messages in the MVU architecture.
+abstract base class Msg {
   const Msg();
 }
 

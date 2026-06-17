@@ -20,6 +20,7 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
   late final Malloc _malloc;
   late final Free _free;
   late final DartWrite _writeFFI;
+
   /// TODO this shouls be in a class like SymbolsFFI
   static const _stdoutFd = 1;
 

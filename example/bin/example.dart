@@ -1,5 +1,3 @@
-import 'package:example/example.dart' as example;
-
 void main(List<String> arguments) {
-  print('Hello world: ${example.calculate()}!');
+  print('Chat app — Phase 2 data types implemented.');
 }
