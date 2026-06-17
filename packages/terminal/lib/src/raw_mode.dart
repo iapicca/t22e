@@ -66,6 +66,7 @@ final class RawMode extends RawModeInterface {
 
   @override
   void dispose({String? message}) {
+    if (isDisposed) return;
     final savedState = value;
     if (savedState != null) {
       _termios.writeFlag(

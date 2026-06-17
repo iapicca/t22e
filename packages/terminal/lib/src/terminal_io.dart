@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -11,10 +12,16 @@ import 'signal_bindings.dart';
 import 'system_context.dart';
 import 'system_io.dart';
 
+/// TODO rework FFI to live in a init/dispose class with narrow lifecycle
 final class TerminalIo with SystemIo, InitMixin, Disposable {
   final DynamicLibrary _libc;
   late final ValueNotifier<SystemContext> _context;
   NativeCallable<Void Function(Int32)>? _sigwinchCallback;
+  late final Malloc _malloc;
+  late final Free _free;
+  late final DartWrite _writeFFI;
+  /// TODO this shouls be in a class like SymbolsFFI
+  static const _stdoutFd = 1;
 
   TerminalIo({required this._libc});
 
@@ -27,11 +34,16 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
       throw StdoutException('stdout has no terminal!');
     }
 
+    _malloc = _libc.lookupFunction<NativeMalloc, Malloc>('malloc');
+    _free = _libc.lookupFunction<NativeFree, Free>('free');
+    _writeFFI = _libc.lookupFunction<NativeWrite, DartWrite>('write');
+
     _context = ValueNotifier<SystemContext>(
       SystemContext(
         width: stdout.terminalColumns,
         height: stdout.terminalLines,
         hasTerminal: hasTerminal,
+
         /// TODO the internal "OperatingSystem" should be used!
         operatingSystem: Platform.operatingSystem == 'macos'
             ? OperatingSystem.macOS
@@ -46,10 +58,18 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
   Stream<List<int>> get inputStream => stdin;
 
   @override
-  void write(String data) => stdout.write(data);
+  void write(String data) {
+    final encoded = utf8.encode(data);
+    final buffer = _malloc(encoded.length).cast<Uint8>();
+    for (var i = 0; i < encoded.length; i++) {
+      buffer[i] = encoded[i];
+    }
+    _writeFFI(_stdoutFd, buffer, encoded.length);
+    _free(buffer.cast<Void>());
+  }
 
   @override
-  Future<void> flush() => stdout.flush();
+  Future<void> flush() => Future.value();
 
   @override
   ValueNotifier<SystemContext> get context => _context;
@@ -69,10 +89,7 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
     const sigwinch = 28;
     const bufferSize = 256;
 
-    final cMalloc = _libc.lookupFunction<NativeMalloc, Malloc>('malloc');
-    final cFree = _libc.lookupFunction<NativeFree, Free>('free');
-
-    final buffer = cMalloc(bufferSize).cast<Uint8>();
+    final buffer = _malloc(bufferSize).cast<Uint8>();
 
     for (var i = 0; i < bufferSize; i++) {
       buffer[i] = 0;
@@ -92,7 +109,7 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
 
     sigaction(sigwinch, buffer.cast<Void>(), nullptr);
 
-    cFree(buffer.cast<Void>());
+    _free(buffer.cast<Void>());
   }
 
   @override

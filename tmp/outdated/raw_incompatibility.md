@@ -105,39 +105,49 @@
 
 ## 7. WindowResizeEvent never emitted by parser
 
-- **File**: `packages/parser/lib/src/events.dart:143-176`
-- `WindowResizeEvent` class is defined but never instantiated or returned by `TerminalParser.advance()`
-- `example/bin/example.dart:94` checks for `WindowResizeEvent` — dead branch, never executes
-- **Impact**: Terminal resize does nothing (no relay-out on window size change)
+**Status: DONE (via different architecture)**
 
-### Plan
-- Add resize detection mechanism (poll `io.columns`/`io.rows` on a timer, or handle SIGWINCH)
-- Move `WindowResizeEvent` out of parser or make parser emit it when it detects a size change
+- `WindowResizeEvent` class was removed (never existed in current codebase)
+- Resize detection is implemented via SIGWINCH FFI handler in `TerminalIo._initSigwinch()`, not parser events
+- SIGWINCH callback updates `SystemContext` via `ValueNotifier.copyWith`, triggering listeners
+- Example app listens to `io.context` and dispatches `WindowSizeMsg` to MVU model
+- This push-based `ValueNotifier` approach is architecturally cleaner than parser-emitted events
+
+### Implementation
+- FFI `sigaction()` (signal 28) handler in `packages/terminal/lib/src/terminal_io.dart:57-96`
+- `SystemContext` propagates changes via `ValueNotifier` listeners
+- Example app at `example/bin/example.dart:91-103` handles resize via `WindowSizeMsg`
+- No `WindowResizeEvent` class needed — resize is outside the input parser's concern
+- Files: `terminal_io.dart`, `system_context.dart`, `example.dart`
 
 ---
 
 ## 8. echoMode/lineMode on SystemIo dangerous in raw mode
 
-- **File**: `packages/terminal/lib/src/system_io.dart:23-29`
-- **File**: `packages/terminal/lib/src/terminal_io.dart:28-37`
-- `echoMode` and `lineMode` getter/setter wrappers around `dart:io.stdin.echoMode`/`stdin.lineMode`
-- In raw mode, calling these could re-enable echo or canonical processing, undoing raw mode
-- These are exposed via `SystemIo` interface and implemented in `TerminalIo`
-- **Impact**: Potential to accidentally exit raw mode if these are called
+**Status: DONE (risk never materialized)**
 
-### Plan
-- Guard behind a check, remove, or document as "do not call in raw mode"
-- Evaluate whether they're used anywhere (appears they are not called in the example app)
+- `echoMode` and `lineMode` getter/setter wrappers described in the original issue never existed in the current codebase
+- `SystemIo` mixin defines only `inputStream`, `write`, `flush`, and `context` — no echo/line mode surface
+- `TerminalIo` wraps `stdin`/`stdout` directly; echo/line disabling is handled at OS level by `RawMode` via `tcsetattr` FFI
+- No `dart:io.stdin.echoMode` or `stdin.lineMode` calls exist anywhere in the project
+
+### Implementation
+- Echo and canonical mode disabled via `RawMode.init()` clearing `ECHO`/`ICANON` bits in `c_lflag` using `tcsetattr`
+- `RawMode.dispose()` restores original termios state on any exit path
+- No getter/setter wrappers to guard — `SystemIo` surface is already clean
+- Files: `raw_mode.dart`, `system_io.dart`, `terminal_io.dart`
 
 ---
 
 ## 9. EchoMode in widgets is correct and distinct
 
+**Status: VERIFIED — no change needed**
+
 - **File**: `packages/widgets/lib/src/enums.dart:14` — `EchoMode` enum (normal, password, noEcho)
 - **File**: `packages/widgets/lib/src/interactive/text_input.dart` — `echoMode` field and `_displayValue`
 - This is display-layer logic (password masking), NOT terminal echo control
 - Does not conflict with raw mode — no change needed
-- **Verdict**: Keep as-is
+- **Verdict**: Confirmed correct; kept as-is
 
 ---
 
@@ -153,3 +163,21 @@
 ### Implementation
 - Replaced `'q\n'` with `'q'` in both test files
 - Files: `e2e_smoke_test.dart`, `compile_smoke_test.dart`
+
+---
+
+## Resolution Summary
+
+| # | Issue | Status |
+|---|-------|--------|
+| 2 | termios struct layout differs macOS/Linux | DONE |
+| 3 | VMIN/VTIME offsets wrong on both OSes | DONE |
+| 4 | No musl libc support on Linux | DONE |
+| 5 | `script -q` doesn't exist on macOS | DONE |
+| 6 | Signal handler events won't fire from keyboard in raw mode | DONE |
+| 7 | WindowResizeEvent never emitted by parser | DONE (SIGWINCH FFI approach) |
+| 8 | echoMode/lineMode on SystemIo dangerous in raw mode | DONE (risk never materialized) |
+| 9 | EchoMode in widgets is correct and distinct | VERIFIED (keep as-is) |
+| 10 | Unnecessary `\n` bytes in test input | DONE |
+
+All issues resolved. File archived on 2025-06-17.

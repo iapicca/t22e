@@ -23,10 +23,10 @@ Future<void> main() async {
   final guard = container.read(
     terminalGuardProvider(
       onRestore: () {
-        rawMode.dispose();
         io.write(AnsiDefaults.showCursor);
         io.write(AnsiDefaults.exitAltScreen);
         io.flush();
+        rawMode.dispose();
       },
     ),
   )..arm();

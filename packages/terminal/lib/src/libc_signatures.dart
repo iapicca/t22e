@@ -40,6 +40,15 @@ typedef NativeMalloc = Pointer<Void> Function(IntPtr size);
 @internal
 typedef Malloc = Pointer<Void> Function(int size);
 
+/// Native C signature for libc `write`.
+@internal
+typedef NativeWrite =
+    IntPtr Function(Int32 fd, Pointer<Uint8> buf, IntPtr count);
+
+/// Dart callable signature for libc `write`.
+@internal
+typedef DartWrite = int Function(int fd, Pointer<Uint8> buf, int count);
+
 /// Native C signature for libc `free`.
 @internal
 typedef NativeFree = Void Function(Pointer<Void> pointer);
