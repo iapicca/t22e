@@ -7,13 +7,23 @@ A terminal-based chat application demonstrating the capabilities of the **t22e**
 - **Chat bubbles**: Green bubbles for user messages (right-aligned), blue bubbles for bot messages (left-aligned)
 - **Real-time input**: Character-by-character input with a blinking cursor
 - **Automatic bot replies**: Every message you send gets a reply showing its character count
-- **Terminal management**: Properly enters/exits alternate screen mode and restores terminal state on exit
+- **Terminal management**: Raw mode via FFI, alternate screen, and guaranteed restoration on any exit path
 
-## Prerequisites
+## Requirements
 
+- **Real terminal (TTY) required** — this app cannot run with:
+  - Piped input: `echo "hello" | dart run bin/example.dart`
+  - Redirected output: `dart run bin/example.dart > output.txt`
+  - Non-interactive shells (CI, cron, etc.)
+- macOS or Linux — Windows is not supported
 - Dart SDK `^3.12.0`
-- Access to the parent `t22e` workspace
-- A real terminal (TTY) — the app requires interactive terminal input
+
+## Troubleshooting
+
+### App exits immediately with no output
+
+You are not running in a real terminal. This app requires an interactive TTY.
+If you need to run tests, use `melos test` instead.
 
 ## Building
 

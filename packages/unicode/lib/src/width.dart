@@ -1,16 +1,16 @@
 import 'tables.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show GraphemeProperties;
 
 /// Returns the display column width of a codepoint.
 int charWidth(int codepoint) => charWidthFromTable(codepoint);
 
 /// True if the codepoint uses 2 column widths (CJK wide).
 bool isWide(int codepoint) =>
-    charWidthFromTable(codepoint) == Defaults.wideCharWidth;
+    charWidthFromTable(codepoint) == GraphemeProperties.wideCharWidth;
 
 /// True if the codepoint has zero display width.
 bool isZeroWidth(int codepoint) =>
-    charWidthFromTable(codepoint) == Defaults.zeroCharWidth;
+    charWidthFromTable(codepoint) == GraphemeProperties.zeroCharWidth;
 
 /// True if the codepoint is an emoji.
 bool isEmoji(int codepoint) => isEmojiFromTable(codepoint);

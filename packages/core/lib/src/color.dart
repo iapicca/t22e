@@ -1,5 +1,6 @@
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ControlBytes, SgrCodes;
 
+import 'color_constants.dart';
 import 'color_profile.dart';
 
 export 'color_profile.dart';
@@ -9,7 +10,7 @@ extension type AnsiColor._(int _code) {
   AnsiColor(int code)
     : _code = code,
       assert(
-        code >= 0 && code <= Defaults.ansiColorMax,
+        code >= 0 && code <= ColorConstants.ansiColorMax,
         'ANSI code out of range',
       );
 
@@ -22,7 +23,7 @@ extension type IndexedColor._(int _index) {
   IndexedColor(int index)
     : _index = index,
       assert(
-        index >= 0 && index < Defaults.colorProfileIndexedCount,
+        index >= 0 && index < ColorConstants.colorProfileIndexedCount,
         'index out of range',
       );
 
@@ -33,13 +34,16 @@ extension type IndexedColor._(int _index) {
 /// A terminal color stored as exact RGB, with conversion getters.
 extension type Color._((int, int, int) _rgb) {
   const Color({int red = 0, int green = 0, int blue = 0})
-    : assert(red >= 0 && red <= Defaults.rgbComponentMax, 'red out of range'),
+    : assert(
+        red >= 0 && red <= ColorConstants.rgbComponentMax,
+        'red out of range',
+      ),
       assert(
-        green >= 0 && green <= Defaults.rgbComponentMax,
+        green >= 0 && green <= ColorConstants.rgbComponentMax,
         'green out of range',
       ),
       assert(
-        blue >= 0 && blue <= Defaults.rgbComponentMax,
+        blue >= 0 && blue <= ColorConstants.rgbComponentMax,
         'blue out of range',
       ),
       _rgb = (red, green, blue);
@@ -107,28 +111,28 @@ extension ColorSgr on Color {
     switch (profile) {
       case ColorProfile.noColor:
         return background
-            ? '${Defaults.csi}${Defaults.sgrBgReset}m'
-            : '${Defaults.csi}${Defaults.sgrFgReset}m';
+            ? '${ControlBytes.csi}${SgrCodes.sgrBgReset}m'
+            : '${ControlBytes.csi}${SgrCodes.sgrFgReset}m';
       case ColorProfile.ansi16:
         final code = ansi.code;
         final off = background
-            ? Defaults.sgrBgAnsiBase
-            : Defaults.sgrFgAnsiBase;
-        if (code < Defaults.ansiDarkThreshold) {
-          return '${Defaults.csi}${off + code}m';
+            ? SgrCodes.sgrBgAnsiBase
+            : SgrCodes.sgrFgAnsiBase;
+        if (code < ColorConstants.ansiDarkThreshold) {
+          return '${ControlBytes.csi}${off + code}m';
         }
-        return '${Defaults.csi}'
-            '${off + Defaults.ansiBrightOffset + code - Defaults.ansiDarkThreshold}m';
+        return '${ControlBytes.csi}'
+            '${off + ColorConstants.ansiBrightOffset + code - ColorConstants.ansiDarkThreshold}m';
       case ColorProfile.indexed256:
         final prefix = background
-            ? Defaults.sgrBgExtended
-            : Defaults.sgrFgExtended;
-        return '${Defaults.csi}$prefix;${Defaults.sgrColor256};${index}m';
+            ? SgrCodes.sgrBgExtended
+            : SgrCodes.sgrFgExtended;
+        return '${ControlBytes.csi}$prefix;${SgrCodes.sgrColor256};${index}m';
       case ColorProfile.trueColor:
         final prefix = background
-            ? Defaults.sgrBgExtended
-            : Defaults.sgrFgExtended;
-        return '${Defaults.csi}$prefix;${Defaults.sgrColorRgb};$red;$green;${blue}m';
+            ? SgrCodes.sgrBgExtended
+            : SgrCodes.sgrFgExtended;
+        return '${ControlBytes.csi}$prefix;${SgrCodes.sgrColorRgb};$red;$green;${blue}m';
     }
   }
 }
@@ -157,16 +161,17 @@ const Map<int, Color> _ansiToRgb = {
 
 /// Converts a 256-color palette index to RGB components.
 (int, int, int) _indexToRgb(int index) {
-  if (index < Defaults.indexedColorCubeStart) {
+  if (index < ColorConstants.indexedColorCubeStart) {
     final c = _ansiToRgb[index]!;
     return (c.red, c.green, c.blue);
   }
-  if (index >= Defaults.indexedColorGrayStart) {
-    final v = (index - Defaults.indexedColorGrayStart) * _grayStep + _grayBase;
+  if (index >= ColorConstants.indexedColorGrayStart) {
+    final v =
+        (index - ColorConstants.indexedColorGrayStart) * _grayStep + _grayBase;
     return (v, v, v);
   }
-  final i = index - Defaults.indexedColorCubeStart;
-  final cubeArea = Defaults.indexedColorCubeSize;
+  final i = index - ColorConstants.indexedColorCubeStart;
+  final cubeArea = ColorConstants.indexedColorCubeSize;
   final r = (i ~/ (cubeArea * cubeArea)) * _cubeStep;
   final g = ((i % (cubeArea * cubeArea)) ~/ cubeArea) * _cubeStep;
   final b = (i % cubeArea) * _cubeStep;
@@ -178,8 +183,8 @@ int _rgbToIndexed(int r, int g, int b) {
   var bestDist = double.infinity;
   var bestIdx = 0;
 
-  final cubeStart = Defaults.indexedColorCubeStart;
-  final cubeSize = Defaults.indexedColorCubeSize;
+  final cubeStart = ColorConstants.indexedColorCubeStart;
+  final cubeSize = ColorConstants.indexedColorCubeSize;
   final cubeEnd = cubeStart + cubeSize * cubeSize * cubeSize;
   final cubeStep = _cubeStep;
 
@@ -195,8 +200,8 @@ int _rgbToIndexed(int r, int g, int b) {
     }
   }
 
-  final grayStart = Defaults.indexedColorGrayStart;
-  final grayCount = Defaults.indexedColorGrayCount;
+  final grayStart = ColorConstants.indexedColorGrayStart;
+  final grayCount = ColorConstants.indexedColorGrayCount;
   for (var i = 0; i < grayCount; i++) {
     final gray = i * _grayStep + _grayBase;
     final dist = _redmeanDistance(r, g, b, gray, gray, gray);
@@ -211,14 +216,14 @@ int _rgbToIndexed(int r, int g, int b) {
 
 /// Converts a 256-color index to its nearest ANSI 16-color code.
 int _indexedToAnsi(int index) {
-  if (index < Defaults.indexedColorCubeStart) return index;
+  if (index < ColorConstants.indexedColorCubeStart) return index;
   const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
-  final gray = index - Defaults.indexedColorGrayStart;
-  if (gray >= 0 && gray < Defaults.indexedColorGrayCount) {
+  final gray = index - ColorConstants.indexedColorGrayStart;
+  if (gray >= 0 && gray < ColorConstants.indexedColorGrayCount) {
     return gray < 12 ? 8 : 15;
   }
-  final cubeSize = Defaults.indexedColorCubeSize;
-  final cube = index - Defaults.indexedColorCubeStart;
+  final cubeSize = ColorConstants.indexedColorCubeSize;
+  final cube = index - ColorConstants.indexedColorCubeStart;
   final cubeR = cube ~/ (cubeSize * cubeSize);
   final cubeG = (cube % (cubeSize * cubeSize)) ~/ cubeSize;
   final cubeB = cube % cubeSize;
@@ -248,7 +253,7 @@ double _redmeanDistance(int r1, int g1, int b1, int r2, int g2, int b2) {
 
 /// Step size between adjacent values in the 6x6x6 color cube.
 const int _cubeStep =
-    Defaults.rgbComponentMax ~/ (Defaults.indexedColorCubeSize - 1);
+    ColorConstants.rgbComponentMax ~/ (ColorConstants.indexedColorCubeSize - 1);
 
 /// Step size between grayscale ramp entries.
 const int _grayStep = 10;

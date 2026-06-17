@@ -19,7 +19,7 @@ void main() {
     });
 
     test('paint writes text to surface', () {
-      final surface = Surface(10, 3);
+      final surface = Surface.genetate(const Size(10, 3));
       final text = Text('Hi');
       text.layout(constraints(10, 3));
       text.paint(PaintingContext(surface: surface));
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('paint with center alignment', () {
-      final surface = Surface(10, 3);
+      final surface = Surface.genetate(const Size(10, 3));
       final text = Text('Hi', align: TextAlign.center);
       text.layout(constraints(10, 3));
       text.paint(PaintingContext(surface: surface));
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('paint with right alignment', () {
-      final surface = Surface(10, 3);
+      final surface = Surface.genetate(const Size(10, 3));
       final text = Text('Hi', align: TextAlign.right);
       text.layout(constraints(10, 3));
       text.paint(PaintingContext(surface: surface));
@@ -46,7 +46,7 @@ void main() {
     });
 
     test('paint applies style', () {
-      final surface = Surface(10, 3);
+      final surface = Surface.genetate(const Size(10, 3));
       const style = TextStyle(bold: true);
       final text = Text('Hi', style: style);
       text.layout(constraints(10, 3));
@@ -67,7 +67,7 @@ void main() {
     });
 
     test('inherited style merges with text style', () {
-      final surface = Surface(10, 3);
+      final surface = Surface.genetate(const Size(10, 3));
       const inherited = TextStyle(italic: true);
       const own = TextStyle(bold: true);
       final text = Text('Hi', style: own);

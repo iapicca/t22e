@@ -9,7 +9,8 @@ Drives rendering quality and input handling decisions.
 
 ## Exports
 
-- **QueryResult\<T\>** — sealed class: `Supported<T>` or `Unavailable<T>`
+- **Da1Query** — sealed class: `Da1QuerySupported` or `Da1QueryUnsupported`
+- **Da1Value** — parsed DA1 response with terminal ID and attributes
 - **Capabilities** — complete record: DA1, color profile, sync support,
   keyboard protocol, terminal dimensions
 - **Probe functions**: `probeDa1()`, `probeColor()`, `probeSync()`,

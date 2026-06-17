@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
+import 'package:core/core.dart';
 import 'package:lifecycle/lifecycle.dart';
 import 'package:parser/terminal_parser.dart';
 import 'package:renderer/renderer.dart';
@@ -14,29 +15,42 @@ import 'package:example/src/providers.dart';
 Future<void> main() async {
   final container = ProviderContainer();
 
-  final terminalIo = container.read(terminalIoProvider);
-  final runner = container.read(terminalRunnerProvider);
-  final altScreen = container.read(altScreenManagerProvider);
-  final guard = container.read(terminalGuardProvider)
-    ..init()
-    ..arm();
+  final io = container.read(systemIoProvider);
+  final rawMode = container.read(rawModeProvider);
 
-  final hasTty = terminalIo.io.hasTerminal;
-  if (hasTty) {
-    runner.enterRawMode();
-    altScreen
-      ..init()
-      ..enter();
-  }
+  final exitCompleter = Completer<void>();
 
-  try {
-    await _runApp(container, terminalIo, hasTty: hasTty);
-  } finally {
-    if (hasTty) {
-      altScreen.exit();
-      runner.exitRawMode();
-    }
-  }
+  final guard = container.read(
+    terminalGuardProvider(
+      onRestore: () {
+        io.write(AnsiDefaults.showCursor);
+        io.write(AnsiDefaults.exitAltScreen);
+        io.flush();
+        rawMode.dispose();
+      },
+    ),
+  )..arm();
+
+  final signalHandler = container.read(
+    signalHandlerProvider(
+      onInterrupt: () {
+        if (!exitCompleter.isCompleted) exitCompleter.complete();
+        guard.restore();
+      },
+      onCleanup: () {
+        if (!exitCompleter.isCompleted) exitCompleter.complete();
+        guard.restore();
+      },
+    ),
+  );
+  signalHandler.install();
+
+  rawMode.init();
+  io.write(AnsiDefaults.hideCursor);
+  io.write(AnsiDefaults.enterAltScreen);
+  io.flush();
+
+  await _runApp(container, io, exitCompleter.future);
 
   guard.restore();
   container.dispose();
@@ -44,23 +58,17 @@ Future<void> main() async {
 
 Future<void> _runApp(
   ProviderContainer container,
-  TerminalIo terminalIo, {
-  required bool hasTty,
-}) async {
+  SystemIo io,
+  Future<void> exitSignal,
+) async {
   final parser = container.read(terminalParserProvider);
 
-  final width = terminalIo.columns;
-  final height = terminalIo.rows;
+  final width = io.context.value.width;
+  final height = io.context.value.height;
   final modelProvider = chatModelStateProvider(width: width, height: height);
   var model = container.read(modelProvider);
   Frame? previousFrame;
   var running = true;
-
-  if (hasTty) {
-    terminalIo
-      ..write(hideCursor())
-      ..flush();
-  }
 
   final blinkCmd = TickCmd(
     const Duration(milliseconds: 500),
@@ -71,24 +79,37 @@ Future<void> _runApp(
     final result = model.update(msg);
     model = result.$1;
     container.read(modelProvider.notifier).updateModel(model);
-    _render(model, terminalIo, ref: previousFrame);
+    _render(model, io, ref: previousFrame);
     previousFrame = _currentFrame(model);
   });
 
-  _render(model, terminalIo, ref: previousFrame);
+  _render(model, io, ref: previousFrame);
   previousFrame = _currentFrame(model);
 
-  final subscription = terminalIo.inputStream.listen((bytes) {
+  var lastWidth = width;
+  var lastHeight = height;
+  io.context.addListener(() {
+    final ctx = io.context.value;
+    if (ctx.width != lastWidth || ctx.height != lastHeight) {
+      lastWidth = ctx.width;
+      lastHeight = ctx.height;
+      if (!running) return;
+      final result = model.update(WindowSizeMsg(ctx.width, ctx.height));
+      model = result.$1;
+      container.read(modelProvider.notifier).updateModel(model);
+      _render(model, io, ref: previousFrame);
+      previousFrame = _currentFrame(model);
+    }
+  });
+
+  final subscription = io.inputStream.listen((bytes) {
     if (!running) return;
 
     final events = parser.advance(bytes);
     for (final event in events) {
-      if (event is WindowResizeEvent) {
-        final result = model.update(WindowSizeMsg(event.cols, event.rows));
-        model = result.$1;
-        container.read(modelProvider.notifier).updateModel(model);
-      } else if (event is KeyEvent) {
-        if (event.keyCode == KeyCode.char && event.codepoint == 113) {
+      if (event is KeyEvent) {
+        if (event.keyCode == KeyCode.char &&
+            (event.codepoint == 113 || event.codepoint == 3)) {
           running = false;
           return;
         }
@@ -111,26 +132,18 @@ Future<void> _runApp(
             final r = model.update(m);
             model = r.$1;
             container.read(modelProvider.notifier).updateModel(model);
-            _render(model, terminalIo, ref: previousFrame);
+            _render(model, io, ref: previousFrame);
             previousFrame = _currentFrame(model);
           });
         }
       }
     }
-    _render(model, terminalIo, ref: previousFrame);
+    _render(model, io, ref: previousFrame);
     previousFrame = _currentFrame(model);
   });
 
-  while (running) {
-    await Future.delayed(const Duration(milliseconds: 50));
-  }
-
+  await exitSignal;
   await subscription.cancel();
-  if (hasTty) {
-    terminalIo
-      ..write(showCursor())
-      ..flush();
-  }
 }
 
 Frame _currentFrame(ChatModel model) {
@@ -143,7 +156,7 @@ Frame _currentFrame(ChatModel model) {
   );
 }
 
-void _render(ChatModel model, TerminalIo terminalIo, {required Frame? ref}) {
+void _render(ChatModel model, SystemIo io, {required Frame? ref}) {
   final surface = WidgetRenderer.render(
     model.view(),
     model.terminalWidth,
@@ -153,18 +166,18 @@ void _render(ChatModel model, TerminalIo terminalIo, {required Frame? ref}) {
   final currentFrame = Frame.fromSurface(surface);
 
   if (ref != null) {
-    final diffResult = diff(ref, currentFrame);
+    final diffResult = DiffResult.fromFrames(ref, currentFrame);
     final renderer = const SyncRenderer();
     final output = renderer.render(diffResult, currentFrame);
     if (output.isNotEmpty) {
-      terminalIo.write(output);
+      io.write(output);
     }
   } else {
     final lines = surface.toAnsiLines();
-    terminalIo
+    io
       ..write(lines.join('\n'))
       ..write(moveTo(model.terminalHeight, 1));
   }
 
-  terminalIo.flush();
+  io.flush();
 }

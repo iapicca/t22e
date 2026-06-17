@@ -30,8 +30,8 @@ class Hyperlink extends Widget {
   void paint(PaintingContext context) {
     if (text.isEmpty) return;
 
-    final resolvedStyle = context.inheritedStyle.merge(
-      style ?? TextStyle.link(),
+    final resolvedStyle = (style ?? TextStyle.link()).inherit(
+      context.inheritedStyle,
     );
     final x = context.offsetX;
     final y = context.offsetY;

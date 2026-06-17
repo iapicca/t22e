@@ -11,13 +11,18 @@ void main() {
   test(
     'E2E smoke test: app starts and quits cleanly',
     () async {
-      final process = await Process.start('script', [
-        '-q',
+      final scriptArgs = [
+        if (Platform.isLinux) '-q',
         '/dev/null',
         'dart',
         'run',
         'bin/example.dart',
-      ], workingDirectory: exampleDir);
+      ];
+      final process = await Process.start(
+        'script',
+        scriptArgs,
+        workingDirectory: exampleDir,
+      );
 
       final outputLines = <String>[];
       final stderrLines = <String>[];
@@ -34,7 +39,7 @@ void main() {
 
       await Future.delayed(const Duration(milliseconds: 500));
 
-      process.stdin.write('q\n');
+      process.stdin.write('q');
       await process.stdin.flush();
 
       final exitCode = await process.exitCode.timeout(

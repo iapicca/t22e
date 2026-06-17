@@ -1,5 +1,5 @@
 name: terminal
-description: Terminal raw mode management (FFI + IO).
+description: Terminal raw mode management via FFI.
 version: 0.0.1
 publish_to: none
 resolution: workspace

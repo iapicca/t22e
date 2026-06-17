@@ -32,6 +32,7 @@
 - **Constants**: camelCase in `Defaults` class (`escapeByte`, `csiFinalSgr`)
 - **Files**: snake_case (`terminal_parser.dart`, `color_profile.dart`)
 - **Enums**: PascalCase with camelCase values (`KeyCode.none`, `MouseAction.press`)
+- **Private named parameters**: Use `this._field` for initializing formals with private backing fields (Dart 3.12+). The constructor parameter and call site use the public name `field:` (without underscore). See https://dart.dev/blog/announcing-dart-3-12#private-named-parameters
 
 ## Comment Style
 
@@ -53,10 +54,10 @@
 
 ## Testing
 
-- Virtual terminal interprets ANSI output for headless assertions
-- `WidgetTester` drives widgets with simulated input events
-- Tests assert on `expectCell()` and `expectPlainText()`
-- No real terminal required for test execution
+- Standard `package:test` for all unit and widget tests
+- Widget tests assert on rendered output via `Surface`/`Frame` snapshots
+- Terminal-dependent tests use `script -q /dev/null` to fake a TTY
+- No real terminal required for most test execution
 
 ## Code Generation
 
@@ -84,7 +85,7 @@
 
 1. Widget tree → `WidgetRenderer.render()` → `Surface`
 2. `Surface` → `Frame.fromSurface()` → `Frame`
-3. `diff(previous, current)` → `DiffResult`
+3. `diff(previous, current)` → `DiffResult` (extension type over `List<int>`)
 4. `LineRenderer` or `CellRenderer` → ANSI output
 5. `SyncRenderer` wraps with DEC 2026 markers when supported
 
@@ -106,13 +107,76 @@
     ..write('World');
   ```
 
+## Collection Expressions
+
+- Prefer collection-for with null-aware elements (`?expression`) over mutable list
+  accumulation for filter-map operations (iterate → transform to nullable → collect
+  non-null results)
+- Prefer collection-for over mutable list accumulation for collect-all operations
+  (iterate → unconditionally add to list)
+- Use expression body (`=>`) when the method body is a single collection literal
+
+- Filter-map pattern (null-aware):
+  ```dart
+  // Good — collection-for with null-aware
+  List<T> method(Iterable<S> source) => [
+    for (final item in source) ?transform(item)
+  ];
+
+  // Bad — mutable list accumulation with null check
+  List<T> method(Iterable<S> source) {
+    final results = <T>[];
+    for (final item in source) {
+      final result = transform(item);
+      if (result != null) results.add(result);
+    }
+    return results;
+  }
+  ```
+
+- Collect-all pattern (no filtering):
+  ```dart
+  // Good — collection-for
+  List<Widget> buildRows(List<String> items) => [
+    for (final item in items) Text(item)
+  ];
+
+  // Bad — mutable list accumulation
+  List<Widget> buildRows(List<String> items) {
+    final widgets = <Widget>[];
+    for (final item in items) {
+      widgets.add(Text(item));
+    }
+    return widgets;
+  }
+  ```
+
+## Standard Library Helpers
+
+- Prefer built-in helpers from the Dart standard library over hand-written equivalents
+- Use `max` / `min` from `dart:math` instead of ternary comparisons
+- Use `clamp` from `dart:math` instead of manual range clamping
+- Example:
+  ```dart
+  // Good — use dart:math
+  final maxRows = max(previous.height, current.height);
+
+  // Bad — hand-written ternary
+  final maxRows = previous.height > current.height
+      ? previous.height
+      : current.height;
+  ```
+
 ## Riverpod Providers
 
 - All lifecycle-managed objects must be exposed as `@riverpod` providers
 - Raw implementation classes that have provider wrappers must be marked `@internal`
 - Consumers **must** read providers via `ProviderContainer` or `ref.watch()` — never instantiate raw classes directly
 - Always import and re-export providers from package barrel files
-- Each package barrel file must export its `providers.dart` (or equivalent)
+- When a class or function is exposed through a provider, that provider must
+  be defined in a dedicated file following the naming scheme:
+  `my_class.dart` → `my_class_provider.dart`
+- Each package barrel file must export all its provider files
 - Example:
   ```dart
   // Good — read from provider

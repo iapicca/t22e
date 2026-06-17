@@ -6,6 +6,7 @@ export 'src/tables.dart'
         isPrintableFromTable,
         isPrivateUseFromTable,
         isAmbiguousWidthFromTable;
+export 'src/unicode_ranges.dart';
 export 'src/width.dart'
     show
         charWidth,

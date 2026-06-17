@@ -26,7 +26,7 @@ melos:
       description: Run code generation then tests in all workspace packages.
       run: |
         melos build
-        melos exec -- dart test
+        melos exec --dir-exists=test --ignore=example -- dart test
     format:
       description: Check code formatting across all packages.
       exec: dart format --output=none --set-exit-if-changed .

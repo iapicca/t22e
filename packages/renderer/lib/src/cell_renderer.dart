@@ -1,80 +1,79 @@
+import 'dart:math';
+
 import 'package:core/core.dart' show TextStyle, ColorSgr;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show ControlBytes, SgrCodes;
 import 'package:ansi/ansi.dart' show hyperlink;
 import 'frame.dart' show Frame;
 
 /// Per-cell diff renderer that only outputs changed cells for minimal terminal output.
-class CellRenderer {
-  const CellRenderer();
+/// Produces ANSI output by diffing individual cells between frames.
+String cellRrender(Frame previous, Frame current) {
+  if (current.cells.isEmpty) {
+    return '';
+  }
 
-  /// Produces ANSI output by diffing individual cells between frames.
-  String render(Frame previous, Frame current) {
-    final buf = StringBuffer();
-    final prevCells = previous.cells;
-    final currCells = current.cells;
-    if (currCells == null) return '';
-    final prevHeight = prevCells?.length ?? 0;
-    final curHeight = currCells.length;
-    final maxRows = prevHeight > curHeight ? prevHeight : curHeight;
+  final buf = StringBuffer();
 
-    for (var r = 0; r < maxRows; r++) {
-      final prevRow = (prevCells != null && r < prevCells.length)
-          ? prevCells[r]
-          : null;
-      final curRow = currCells[r];
-      final curWidth = curRow.length;
+  for (var i = 0; i < max(previous.cells.height, current.cells.height); ++i) {
+    final previousRow = previous.cells.row(i);
+    final currentRow = current.cells.row(i);
 
-      for (var c = 0; c < curWidth; c++) {
-        final curr = curRow[c];
-        if (curr.wideContinuation) continue;
+    for (var j = 0; j < currentRow.length; j++) {
+      final currentCell = currentRow[j];
+      if (currentCell.wideContinuation) continue;
 
-        final prev = (prevRow != null && c < prevRow.length)
-            ? prevRow[c]
-            : null;
+      final previousCell = (j < previousRow.length) ? previousRow[j] : null;
 
-        if (prev != null && prev == curr) continue;
+      if (previousCell != null && previousCell == currentCell) continue;
 
-        final linkChanged = prev?.hyperlink != curr.hyperlink;
+      final hasLinkChanged = previousCell?.hyperlink != currentCell.hyperlink;
 
-        if (prev == null || prev.style != curr.style || linkChanged) {
-          buf.write(_styleAndLinkToAnsi(curr.style, curr.hyperlink));
+      if (previousCell == null ||
+          previousCell.style != currentCell.style ||
+          hasLinkChanged) {
+        buf.write(
+          _styleAndLinkToAnsi(currentCell.style, currentCell.hyperlink),
+        );
+      }
+
+      if (previousCell == null ||
+          previousCell.char != currentCell.char ||
+          hasLinkChanged) {
+        /// TODO this doesn't belong here!
+        buf.write('\x1b[${i + 1};${j + 1}H');
+        if (previousCell?.hyperlink != null && currentCell.hyperlink == null) {
+          buf.write(ControlBytes.st);
         }
-
-        if (prev == null || prev.char != curr.char || linkChanged) {
-          buf.write('\x1b[${r + 1};${c + 1}H');
-          if (prev?.hyperlink != null && curr.hyperlink == null) {
-            buf.write(Defaults.st);
-          }
-          buf.write(curr.char);
-        }
+        buf.write(currentCell.char);
       }
     }
-
-    return buf.toString();
   }
 
-  /// Converts a TextStyle and optional hyperlink URI to SGR escape sequences.
-  String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
-    final buf = StringBuffer();
-    if (s.bold == true) buf.write('${Defaults.csi}${Defaults.sgrBold}m');
-    if (s.dim == true) buf.write('${Defaults.csi}${Defaults.sgrFaint}m');
-    if (s.italic == true) buf.write('${Defaults.csi}${Defaults.sgrItalic}m');
-    if (s.underline == true) {
-      buf.write('${Defaults.csi}${Defaults.sgrUnderline}m');
-    }
-    if (s.blink == true) buf.write('${Defaults.csi}${Defaults.sgrBlink}m');
-    if (s.reverse == true) buf.write('${Defaults.csi}${Defaults.sgrReverse}m');
-    if (s.strikethrough == true) {
-      buf.write('${Defaults.csi}${Defaults.sgrStrikethrough}m');
-    }
-    if (s.overline == true) {
-      buf.write('${Defaults.csi}${Defaults.sgrOverline}m');
-    }
-    if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
-    if (s.background != null) {
-      buf.write(s.background!.sgrSequence(background: true));
-    }
-    if (linkUri != null) buf.write(hyperlink(linkUri, ''));
-    return buf.toString();
+  return buf.toString();
+}
+
+/// Converts a TextStyle and optional hyperlink URI to SGR escape sequences.
+String _styleAndLinkToAnsi(TextStyle s, String? linkUri) {
+  final buf = StringBuffer();
+  if (s.bold == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrBold}m');
+  if (s.dim == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrFaint}m');
+  if (s.italic == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrItalic}m');
+  if (s.underline == true) {
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrUnderline}m');
   }
+  if (s.blink == true) buf.write('${ControlBytes.csi}${SgrCodes.sgrBlink}m');
+  if (s.reverse == true)
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrReverse}m');
+  if (s.strikethrough == true) {
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrStrikethrough}m');
+  }
+  if (s.overline == true) {
+    buf.write('${ControlBytes.csi}${SgrCodes.sgrOverline}m');
+  }
+  if (s.foreground != null) buf.write(s.foreground!.sgrSequence());
+  if (s.background != null) {
+    buf.write(s.background!.sgrSequence(background: true));
+  }
+  if (linkUri != null) buf.write(hyperlink(linkUri, ''));
+  return buf.toString();
 }

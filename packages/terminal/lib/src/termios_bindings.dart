@@ -2,20 +2,19 @@ import 'dart:ffi';
 
 import 'package:meta/meta.dart';
 
-import 'system_io.dart';
-import 'platform_service.dart';
+import 'libc_signatures.dart';
 import 'symbols_ffi.dart';
 
-typedef GetAttr = int Function(int fd, Pointer<Uint8> buf);
-typedef SetAttr = int Function(int fd, int opt, Pointer<Uint8> buf);
-
 /// Abstract interface for libc FFI calls used to manage terminal raw mode.
+@internal
 abstract class TermiosBindings {
+  factory TermiosBindings(DynamicLibrary library) = _TermiosBindings;
+
   /// Posix tcgetattr: read terminal attributes into [buf].
-  GetAttr get getAttr;
+  TcGetAttr get tcGetAttr;
 
   /// Posix tcsetattr: set terminal attributes from [buf].
-  SetAttr get setAttr;
+  TcSetAttr get tcSetAttr;
 
   /// C malloc: allocate [size] bytes.
   Pointer<Uint8> malloc(int size);
@@ -25,53 +24,33 @@ abstract class TermiosBindings {
 }
 
 /// Concrete [TermiosBindings] backed by a [DynamicLibrary].
-@internal
-final class TermiosBindingsImpl implements TermiosBindings {
-  final DynamicLibrary _libc;
+final class _TermiosBindings implements TermiosBindings {
+  _TermiosBindings(DynamicLibrary library)
+    : _tcGetAttr = library.lookupFunction<NativeTcGetAttr, TcGetAttr>(
+        SymbolsFFI.tcGetAttrName,
+      ),
+      _tcSetAttr = library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
+        SymbolsFFI.tcSetAttrName,
+      ),
+      _malloc = library.lookupFunction<NativeMalloc, Malloc>(
+        SymbolsFFI.mallocName,
+      ),
+      _free = library.lookupFunction<NativeFree, Free>(SymbolsFFI.freeName);
 
-  final int Function(int, Pointer<Uint8>) _getAttr;
-  final int Function(int, int, Pointer<Uint8>) _setAttr;
-
-  /// Looks up tcgetattr and tcsetattr from the given [library].
-  TermiosBindingsImpl(this._libc)
-    : _getAttr = _libc
-          .lookupFunction<
-            Int32 Function(Int32, Pointer<Uint8>),
-            int Function(int, Pointer<Uint8>)
-          >(SymbolsFFI.getAttrName),
-      _setAttr = _libc
-          .lookupFunction<
-            Int32 Function(Int32, Int32, Pointer<Uint8>),
-            int Function(int, int, Pointer<Uint8>)
-          >(SymbolsFFI.setAttrName);
+  final TcGetAttr _tcGetAttr;
+  final TcSetAttr _tcSetAttr;
+  final Malloc _malloc;
+  final Free _free;
 
   @override
-  GetAttr get getAttr => _getAttr;
+  TcGetAttr get tcGetAttr => _tcGetAttr;
 
   @override
-  SetAttr get setAttr => _setAttr;
+  TcSetAttr get tcSetAttr => _tcSetAttr;
 
   @override
-  Pointer<Uint8> malloc(int size) {
-    final fn = _libc
-        .lookupFunction<
-          Pointer<Void> Function(IntPtr),
-          Pointer<Void> Function(int)
-        >(SymbolsFFI.mallocName);
-    return fn(size).cast();
-  }
+  Pointer<Uint8> malloc(int size) => _malloc(size).cast();
 
   @override
-  void free(Pointer<Uint8> ptr) {
-    final fn = _libc
-        .lookupFunction<
-          Void Function(Pointer<Void>),
-          void Function(Pointer<Void>)
-        >(SymbolsFFI.freeName);
-    fn(ptr.cast());
-  }
-
-  /// Uses [PlatformService] to open the platform libc.
-  static TermiosBindingsImpl fromPlatformService(SystemIo io) =>
-      TermiosBindingsImpl(PlatformService(io: io).library);
+  void free(Pointer<Uint8> ptr) => _free(ptr.cast());
 }

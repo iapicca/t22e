@@ -2,7 +2,7 @@ import '../widget.dart' show Widget, PaintingContext;
 import '../enums.dart' show TextAlign;
 import 'package:core/core.dart' show Constraints, Size;
 import 'package:core/core.dart' show TextStyle;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show UnicodeCodepoints;
 import 'package:unicode/unicode.dart' show stringWidth, charWidth;
 
 /// A text display widget with alignment and optional word wrapping.
@@ -91,8 +91,8 @@ class Text extends Widget {
           }
           break;
         }
-        if (runeList[i] == Defaults.codepointSpace ||
-            runeList[i] == Defaults.codepointIdeographicSpace) {
+        if (runeList[i] == UnicodeCodepoints.codepointSpace ||
+            runeList[i] == UnicodeCodepoints.codepointIdeographicSpace) {
           lastBreak = i;
           lastBreakWidth = lineWidth;
         }
@@ -102,7 +102,8 @@ class Text extends Widget {
 
       result.add(String.fromCharCodes(runeList.sublist(lineStart, lineEnd)));
       lineStart = lineEnd;
-      if (lineStart < total && runeList[lineStart] == Defaults.codepointSpace) {
+      if (lineStart < total &&
+          runeList[lineStart] == UnicodeCodepoints.codepointSpace) {
         lineStart++;
       }
     }
@@ -114,7 +115,7 @@ class Text extends Widget {
   void paint(PaintingContext context) {
     if (_lines == null || _lines!.isEmpty) return;
 
-    final resolvedStyle = context.inheritedStyle.merge(style);
+    final resolvedStyle = style.inherit(context.inheritedStyle);
 
     for (var i = 0; i < _lines!.length; i++) {
       final line = _lines![i];

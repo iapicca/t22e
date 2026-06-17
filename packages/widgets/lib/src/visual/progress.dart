@@ -1,7 +1,8 @@
 import '../model.dart' show Model;
 import '../msg.dart' show Msg, ProgressTickMsg;
 import '../cmd.dart' show Cmd, TickCmd;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show SizeDefaults, TimingDefaults, WidgetChars;
 import '../widget.dart' show Widget;
 import '../basic/text.dart' show Text;
 import '../container/row.dart' show Row;
@@ -32,10 +33,10 @@ class ProgressBar extends Model<ProgressBar> {
   const ProgressBar({
     this.fraction,
     this.label,
-    this.barWidth = Defaults.defaultProgressBarWidth,
-    this.fillChar = Defaults.charFullBlock,
-    this.emptyChar = Defaults.charLightShade,
-    this.animInterval = Defaults.progressAnimInterval,
+    this.barWidth = SizeDefaults.defaultProgressBarWidth,
+    this.fillChar = WidgetChars.charFullBlock,
+    this.emptyChar = WidgetChars.charLightShade,
+    this.animInterval = TimingDefaults.progressAnimInterval,
     this.indeterminateOffset = 0,
   });
 

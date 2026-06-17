@@ -2,54 +2,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'events.freezed.dart';
+part 'key_event.dart';
+part 'mouse_event.dart';
 
+/// TODO this should be a freezed class
 sealed class Event {
   const Event();
-}
-
-/// Identifies logical keys (arrows, function keys, home, end, etc.).
-enum KeyCode {
-  none,
-  tab,
-  enter,
-  escape,
-  backspace,
-  space,
-  up,
-  down,
-  left,
-  right,
-  home,
-  end,
-  pageUp,
-  pageDown,
-  insert,
-  delete,
-  f1,
-  f2,
-  f3,
-  f4,
-  f5,
-  f6,
-  f7,
-  f8,
-  f9,
-  f10,
-  f11,
-  f12,
-  f13,
-  f14,
-  f15,
-  f16,
-  f17,
-  f18,
-  f19,
-  f20,
-  f21,
-  f22,
-  f23,
-  f24,
-  char,
 }
 
 /// Keyboard modifier flags for key events.
@@ -63,92 +21,21 @@ abstract class KeyModifiers with _$KeyModifiers {
   }) = _KeyModifiers;
 }
 
-/// Key event type: press, release, or repeat.
-enum KeyEventType { down, up, repeat }
-
-/// A keyboard input event.
-final class KeyEvent extends Event {
-  /// Which logical key was pressed.
-  final KeyCode keyCode;
-
-  /// Modifier keys held at the time.
-  final KeyModifiers modifiers;
-
-  /// Event type (down/up/repeat).
-  final KeyEventType type;
-
-  /// Unicode codepoint for char events, null otherwise.
-  final int? codepoint;
-
-  const KeyEvent({
-    required this.keyCode,
-    this.modifiers = const KeyModifiers(),
-    this.type = KeyEventType.down,
-    this.codepoint,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      other is KeyEvent &&
-      keyCode == other.keyCode &&
-      modifiers == other.modifiers &&
-      type == other.type &&
-      codepoint == other.codepoint;
-
-  @override
-  int get hashCode => Object.hash(keyCode, modifiers, type, codepoint);
-
-  @override
-  String toString() =>
-      'KeyEvent($keyCode, $modifiers, $type${codepoint != null ? ', U+${codepoint!.toRadixString(16).padLeft(4, '0')}' : ''})';
-}
-
-/// Mouse button identifiers.
-enum MouseButton { left, middle, right, none, wheelUp, wheelDown }
-
-/// Mouse action type.
-enum MouseAction { press, release, move, drag }
-
 /// A mouse input event.
+@freezed
+abstract class MouseEvent extends Event with _$MouseEvent {
+  const MouseEvent._();
 
-/// TODO why is this not using freezed?
-/// events should be split in separate files!
-final class MouseEvent extends Event {
-  /// Which mouse button was involved.
-  final MouseButton button;
-
-  /// Press, release, move, or drag.
-  final MouseAction action;
-
-  /// Column position (0-based).
-  final int x;
-
-  /// Row position (0-based).
-  final int y;
-
-  const MouseEvent({
-    required this.button,
-    required this.action,
-    required this.x,
-    required this.y,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      other is MouseEvent &&
-      button == other.button &&
-      action == other.action &&
-      x == other.x &&
-      y == other.y;
-
-  @override
-  int get hashCode => Object.hash(button, action, x, y);
-
-  @override
-  String toString() => 'MouseEvent($button, $action, $x, $y)';
+  const factory MouseEvent({
+    required MouseButton button,
+    required MouseAction action,
+    required int x,
+    required int y,
+  }) = _MouseEvent;
 }
 
 /// A bracketed paste event.
+/// TODO this should be a freezed class
 final class PasteEvent extends Event {
   /// The pasted text content.
   final String content;
@@ -167,6 +54,7 @@ final class PasteEvent extends Event {
 }
 
 /// Terminal response: cursor position report.
+/// TODO this should be a freezed class
 final class CursorPositionEvent extends Event {
   /// Row (1-based).
   final int row;
@@ -188,6 +76,7 @@ final class CursorPositionEvent extends Event {
 }
 
 /// Terminal response: color query with optional RGB values.
+/// TODO this should be a freezed class
 final class ColorQueryEvent extends Event {
   /// OSC color number (10=fg, 11=bg).
   final int colorNumber;
@@ -219,6 +108,7 @@ final class ColorQueryEvent extends Event {
 }
 
 /// Terminal response: primary device attributes (DA1).
+/// TODO this should be a freezed class
 final class PrimaryDeviceAttributesEvent extends Event {
   /// The DA1 parameter list.
   final List<int> params;
@@ -238,6 +128,7 @@ final class PrimaryDeviceAttributesEvent extends Event {
 }
 
 /// Terminal response: Kitty keyboard protocol flags.
+/// TODO this should be a freezed class
 final class KeyboardEnhancementFlagsEvent extends Event {
   /// The flags value reported by the terminal.
   final int flags;
@@ -255,43 +146,8 @@ final class KeyboardEnhancementFlagsEvent extends Event {
   String toString() => 'KeyboardEnhancementFlagsEvent($flags)';
 }
 
-/// SIGWINCH / window resize event.
-final class WindowResizeEvent extends Event {
-  /// New terminal rows.
-  final int rows;
-
-  /// New terminal columns.
-  final int cols;
-
-  /// Width in pixels (optional).
-  final int? widthPixels;
-
-  /// Height in pixels (optional).
-  final int? heightPixels;
-
-  const WindowResizeEvent(
-    this.rows,
-    this.cols, [
-    this.widthPixels,
-    this.heightPixels,
-  ]);
-
-  @override
-  bool operator ==(Object other) =>
-      other is WindowResizeEvent &&
-      rows == other.rows &&
-      cols == other.cols &&
-      widthPixels == other.widthPixels &&
-      heightPixels == other.heightPixels;
-
-  @override
-  int get hashCode => Object.hash(rows, cols, widthPixels, heightPixels);
-
-  @override
-  String toString() => 'WindowResizeEvent(${rows}x$cols)';
-}
-
 /// Focus gained/lost event.
+/// TODO this should be a freezed class
 final class FocusEvent extends Event {
   /// True if the terminal gained focus.
   final bool focused;
@@ -310,6 +166,7 @@ final class FocusEvent extends Event {
 }
 
 /// Terminal response: synchronized update capability.
+/// TODO this should be a freezed class
 final class QuerySyncUpdateEvent extends Event {
   /// True if the terminal supports sync updates.
   final bool supported;
@@ -328,6 +185,7 @@ final class QuerySyncUpdateEvent extends Event {
 }
 
 /// Clipboard read/write event.
+/// TODO this should be a freezed class
 final class ClipboardEvent extends Event {
   /// Clipboard selection name (e.g. 'c' for system).
   final String clipboard;
@@ -352,6 +210,7 @@ final class ClipboardEvent extends Event {
 }
 
 /// Error event for malformed or unhandled sequences.
+/// TODO this should be a freezed class
 final class ErrorEvent extends Event {
   /// Human-readable error message.
   final String message;
@@ -366,6 +225,7 @@ final class ErrorEvent extends Event {
 }
 
 /// Internal event for plumbing between parser layers.
+/// TODO this should be a freezed class
 final class InternalEvent extends Event {
   /// Event kind string.
   final String kind;

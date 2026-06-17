@@ -10,13 +10,28 @@ void main() {
     expect(eraseLine(1), equals('\x1b[1K'));
   });
 
-  test('eraseScreen', () => expect(eraseScreen(), equals('\x1b[2J')));
+  test(
+    'eraseScreen',
+    () => expect(AnsiDefaults.eraseScreen, equals('\x1b[2J')),
+  );
 
-  test('eraseSavedLines', () => expect(eraseSavedLines(), equals('\x1b[3J')));
+  test(
+    'eraseSavedLines',
+    () => expect(AnsiDefaults.eraseSavedLines, equals('\x1b[3J')),
+  );
 
-  test('eraseLineToEnd', () => expect(eraseLineToEnd(), equals('\x1b[0K')));
+  test(
+    'eraseLineToEnd',
+    () => expect(AnsiDefaults.eraseLineToEnd, equals('\x1b[0K')),
+  );
 
-  test('eraseLineToStart', () => expect(eraseLineToStart(), equals('\x1b[1K')));
+  test(
+    'eraseLineToStart',
+    () => expect(AnsiDefaults.eraseLineToStart, equals('\x1b[1K')),
+  );
 
-  test('eraseLineAll', () => expect(eraseLineAll(), equals('\x1b[2K')));
+  test(
+    'eraseLineAll',
+    () => expect(AnsiDefaults.eraseLineAll, equals('\x1b[2K')),
+  );
 }

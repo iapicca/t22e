@@ -10,21 +10,6 @@ final class QuitMsg extends Msg {
   const QuitMsg();
 }
 
-/// Raised on SIGINT (Ctrl+C).
-final class InterruptMsg extends Msg {
-  const InterruptMsg();
-}
-
-/// Raised on SIGTSTP (suspend).
-final class SuspendMsg extends Msg {
-  const SuspendMsg();
-}
-
-/// Raised on SIGCONT (resume).
-final class ResumeMsg extends Msg {
-  const ResumeMsg();
-}
-
 /// The terminal window was resized.
 final class WindowSizeMsg extends Msg {
   /// New width in columns.

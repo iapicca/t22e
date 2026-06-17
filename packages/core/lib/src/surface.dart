@@ -1,61 +1,57 @@
 import 'cell.dart';
+import 'cell_grid.dart' show CellGrid;
 import 'color.dart';
 import 'geometry.dart';
+import 'layout.dart';
 import 'style.dart';
 import 'package:unicode/unicode.dart' show graphemeClusters;
 import 'package:unicode/unicode.dart' show charWidth, stringWidth;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart'
+    show ControlBytes, GraphemeProperties, WidgetChars;
 import 'package:ansi/ansi.dart'
-    show
-        bold,
-        dim,
-        italic,
-        underline,
-        blink,
-        reverse,
-        strikethrough,
-        overLine,
-        resetAll;
-import 'package:ansi/ansi.dart' show hyperlink;
+    show bold, dim, italic, underline, blink, reverse, strikethrough, overLine;
+import 'package:ansi/ansi.dart' show hyperlink, AnsiDefaults;
 
 /// A grid-based terminal surface for painting text and borders.
 class Surface {
+  /// Surface dimensions.
+  final Size size;
+
+  /// TODO there is no reason to expose size and width direcly can just access Surface.size.width!
   /// Total width in columns.
-  final int width;
+  int get width => size.width;
 
   /// Total height in rows.
-  final int height;
+  int get height => size.height;
 
   /// Row-major grid of Cell objects.
-  final List<List<Cell>> grid;
+  final CellGrid grid;
+
+  Surface({required this.size, required this.grid});
 
   /// Creates a blank surface of the given dimensions.
-  Surface(this.width, this.height)
-    : grid = List.generate(
-        height,
-        (_) => List.filled(width, const Cell()),
-        growable: false,
-      );
+  factory Surface.genetate(Size size) =>
+      Surface(size: size, grid: CellGrid.generate(size));
 
   /// Creates a surface from an existing grid.
   Surface.fromGrid(this.grid)
-    : width = grid.isEmpty ? 0 : grid[0].length,
-      height = grid.length;
+    : size = Size(grid.isEmpty ? 0 : grid[0].length, grid.length);
 
   /// Creates a resized copy, preserving overlapping region.
   Surface._resized(Surface source, int newWidth, int newHeight)
-    : width = newWidth,
-      height = newHeight,
-      grid = List.generate(
-        newHeight,
-        (y) => List<Cell>.generate(
-          newWidth,
-          (x) => y < source.height && x < source.width
-              ? source.grid[y][x]
-              : const Cell(),
+    : size = Size(newWidth, newHeight),
+      grid = CellGrid(
+        List.generate(
+          newHeight,
+          (y) => List<Cell>.generate(
+            newWidth,
+            (x) => y < source.height && x < source.width
+                ? source.grid[y][x]
+                : const Cell(),
+            growable: false,
+          ),
           growable: false,
         ),
-        growable: false,
       );
 
   /// Returns a new surface with the given dimensions.
@@ -71,7 +67,7 @@ class Surface {
     final cw = ch.runes.isEmpty ? 1 : charWidth(ch.runes.first);
     grid[y][x] = Cell(char: ch, style: style);
 
-    if (cw == Defaults.wideCharWidth && x + 1 < width) {
+    if (cw == GraphemeProperties.wideCharWidth && x + 1 < width) {
       grid[y][x + 1] = const Cell(char: '', wideContinuation: true);
     }
   }
@@ -90,7 +86,7 @@ class Surface {
 
       final sub = _substringByCodeUnits(text, cluster.start, cluster.end);
 
-      if (cluster.columnWidth == Defaults.wideCharWidth) {
+      if (cluster.columnWidth == GraphemeProperties.wideCharWidth) {
         if (col + 1 < width) {
           grid[y][col] = Cell(char: sub, style: style);
           grid[y][col + 1] = const Cell(char: '', wideContinuation: true);
@@ -117,7 +113,7 @@ class Surface {
       grid[row] = List<Cell>.of(grid[row]);
       for (var col = rect.left; col < rect.right; col++) {
         grid[row][col] = Cell(char: ch, style: style);
-        if (cw == Defaults.wideCharWidth && col + 1 < rect.right) {
+        if (cw == GraphemeProperties.wideCharWidth && col + 1 < rect.right) {
           grid[row][col + 1] = const Cell(char: '', wideContinuation: true);
           col++;
         }
@@ -148,24 +144,25 @@ class Surface {
     if (rect.isEmpty || rect.width < 2 || rect.height < 2) return;
     final s = style ?? TextStyle.empty;
 
-    final hChar = borderChars != null && borderChars.length >= 2
-        ? borderChars[1]
-        : '\u2500';
-    final vChar = borderChars != null && borderChars.isNotEmpty
-        ? borderChars[0]
-        : '\u2502';
-    final tl = borderChars != null && borderChars.length >= 4
-        ? borderChars[3]
-        : '\u250C';
-    final tr = borderChars != null && borderChars.length >= 5
-        ? borderChars[4]
-        : '\u2510';
-    final bl = borderChars != null && borderChars.length >= 6
-        ? borderChars[5]
-        : '\u2514';
-    final br = borderChars != null && borderChars.length >= 7
-        ? borderChars[6]
-        : '\u2518';
+    final defaultChars = borderChars ?? WidgetChars.borderSingle;
+    final vChar = defaultChars.isNotEmpty
+        ? defaultChars[0]
+        : WidgetChars.borderSingle[0];
+    final hChar = defaultChars.length >= 2
+        ? defaultChars[1]
+        : WidgetChars.borderSingle[1];
+    final tl = defaultChars.length >= 3
+        ? defaultChars[2]
+        : WidgetChars.borderSingle[2];
+    final tr = defaultChars.length >= 4
+        ? defaultChars[3]
+        : WidgetChars.borderSingle[3];
+    final bl = defaultChars.length >= 5
+        ? defaultChars[4]
+        : WidgetChars.borderSingle[4];
+    final br = defaultChars.length >= 6
+        ? defaultChars[5]
+        : WidgetChars.borderSingle[5];
 
     final left = rect.left;
     final top = rect.top;
@@ -202,41 +199,6 @@ class Surface {
         putText(titleX, top, title, s);
       }
     }
-  }
-
-  /// Exports the surface as ANSI-escaped lines ready for terminal output.
-  List<String> toAnsiLines() {
-    return grid
-        .map((row) {
-          final buf = StringBuffer();
-          TextStyle? lastStyle;
-          String? lastHyperlink;
-          for (final cell in row) {
-            if (cell.wideContinuation) continue;
-            if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
-              if (lastHyperlink != null && cell.hyperlink == null) {
-                buf.write(Defaults.st);
-              }
-              buf.write(_styleToAnsi(cell.style));
-              lastStyle = cell.style;
-              if (cell.hyperlink != null && cell.hyperlink != lastHyperlink) {
-                buf.write(hyperlink(cell.hyperlink!, ''));
-                lastHyperlink = cell.hyperlink;
-              } else if (cell.hyperlink == null) {
-                lastHyperlink = null;
-              }
-            }
-            buf.write(cell.char);
-          }
-          if (lastHyperlink != null) {
-            buf.write(Defaults.st);
-          }
-          if (lastStyle != null && !lastStyle.isClear) {
-            buf.write(resetAll());
-          }
-          return buf.toString();
-        })
-        .toList(growable: false);
   }
 
   /// Exports the surface as plain text lines (no escape sequences).
@@ -278,4 +240,41 @@ class Surface {
 
   /// Re-wraps a string through rune conversion for safety.
   static String _s(String ch) => String.fromCharCodes(ch.runes);
+}
+
+extension SurfaceAnsiExport on Surface {
+  /// Exports the surface as ANSI-escaped lines ready for terminal output.
+  List<String> toAnsiLines() {
+    return grid
+        .map((row) {
+          final buf = StringBuffer();
+          TextStyle? lastStyle;
+          String? lastHyperlink;
+          for (final cell in row) {
+            if (cell.wideContinuation) continue;
+            if (cell.style != lastStyle || cell.hyperlink != lastHyperlink) {
+              if (lastHyperlink != null && cell.hyperlink == null) {
+                buf.write(ControlBytes.st);
+              }
+              buf.write(Surface._styleToAnsi(cell.style));
+              lastStyle = cell.style;
+              if (cell.hyperlink != null && cell.hyperlink != lastHyperlink) {
+                buf.write(hyperlink(cell.hyperlink!, ''));
+                lastHyperlink = cell.hyperlink;
+              } else if (cell.hyperlink == null) {
+                lastHyperlink = null;
+              }
+            }
+            buf.write(cell.char);
+          }
+          if (lastHyperlink != null) {
+            buf.write(ControlBytes.st);
+          }
+          if (lastStyle != null && !lastStyle.isClear) {
+            buf.write(AnsiDefaults.resetAll);
+          }
+          return buf.toString();
+        })
+        .toList(growable: false);
+  }
 }

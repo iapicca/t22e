@@ -14,7 +14,7 @@ void main() {
     test('paint sets hyperlink on cells', () {
       final link = Hyperlink('https://example.com', 'Hi');
       link.layout(Constraints.tight(80, 24));
-      final surface = Surface(80, 24);
+      final surface = Surface.genetate(const Size(80, 24));
       final ctx = PaintingContext(surface: surface);
       link.paint(ctx);
       expect(surface.grid[0][0].hyperlink, equals('https://example.com'));
@@ -24,7 +24,7 @@ void main() {
     test('paint uses link style by default', () {
       final link = Hyperlink('https://example.com', 'Hi');
       link.layout(Constraints.tight(80, 24));
-      final surface = Surface(80, 24);
+      final surface = Surface.genetate(const Size(80, 24));
       final ctx = PaintingContext(surface: surface);
       link.paint(ctx);
       final linkStyle = TextStyle.link();
@@ -35,7 +35,7 @@ void main() {
       final style = const TextStyle(bold: true);
       final link = Hyperlink('https://example.com', 'Hi', style: style);
       link.layout(Constraints.tight(80, 24));
-      final surface = Surface(80, 24);
+      final surface = Surface.genetate(const Size(80, 24));
       final ctx = PaintingContext(surface: surface);
       link.paint(ctx);
       expect(surface.grid[0][0].style.bold, equals(true));
@@ -44,7 +44,7 @@ void main() {
     test('empty text paints nothing', () {
       final link = Hyperlink('https://example.com', '');
       link.layout(Constraints.tight(80, 24));
-      final surface = Surface(80, 24);
+      final surface = Surface.genetate(const Size(80, 24));
       final ctx = PaintingContext(surface: surface);
       link.paint(ctx);
       expect(surface.grid[0][0].char, equals(' '));

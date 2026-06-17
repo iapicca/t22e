@@ -14,11 +14,4 @@ abstract class Cell with _$Cell {
     @Default(false) bool wideContinuation,
     String? hyperlink,
   }) = _Cell;
-
-  /// Returns a new cell with the given style merged on top.
-  Cell mergeStyle(TextStyle override) {
-    final merged = style.merge(override);
-    if (identical(merged, style)) return this;
-    return copyWith(style: merged);
-  }
 }

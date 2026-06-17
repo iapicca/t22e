@@ -1,21 +1,23 @@
-import 'package:protocol/protocol.dart' show Defaults;
-import 'engine.dart';
+import 'dcs_codes.dart';
+import 'internal_events.dart';
+import 'sequence_data.dart';
 import 'events.dart';
 
-/// TODO hardcoded values should be in a "Default" class
+/// Parses DCS sequences into events (Kitty graphics).
+/// TODO, where is the provider?
 Event? parseDcs(SequenceData data) {
   final sequenceData = data as DcsSequenceData;
   final finalByte = sequenceData.finalByte;
   final intermediates = sequenceData.intermediates;
 
-  if (finalByte == Defaults.dcsKittyGraphicsP &&
-      intermediates.contains(Defaults.dcsKittyIntermediate)) {
-    return InternalEvent('kitty_graphics');
+  if (finalByte == DcsCodes.dcsKittyGraphicsP &&
+      intermediates.contains(DcsCodes.dcsKittyIntermediate)) {
+    return InternalEvent(InternalEvents.internalEventKittyGraphics);
   }
 
-  if (finalByte == Defaults.dcsKittyGraphicsQ &&
-      intermediates.contains(Defaults.dcsKittyIntermediate)) {
-    return InternalEvent('kitty_graphics');
+  if (finalByte == DcsCodes.dcsKittyGraphicsQ &&
+      intermediates.contains(DcsCodes.dcsKittyIntermediate)) {
+    return InternalEvent(InternalEvents.internalEventKittyGraphics);
   }
 
   return null;

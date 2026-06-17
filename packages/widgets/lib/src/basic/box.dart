@@ -3,7 +3,7 @@ import '../enums.dart' show BorderStyle;
 import 'package:core/core.dart' show Insets, Rect;
 import 'package:core/core.dart' show Constraints, Size;
 import 'package:core/core.dart' show TextStyle;
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show WidgetChars;
 import 'package:unicode/unicode.dart' show stringWidth;
 
 /// A bordered container widget with optional title, padding, and child.
@@ -140,10 +140,10 @@ class Box extends Widget {
   /// Returns the border character set for the current style.
   String _borderChars() {
     return switch (borderStyle) {
-      BorderStyle.single => Defaults.borderSingle,
-      BorderStyle.double => Defaults.borderDouble,
-      BorderStyle.rounded => Defaults.borderRounded,
-      BorderStyle.thick => Defaults.borderThick,
+      BorderStyle.single => WidgetChars.borderSingle,
+      BorderStyle.double => WidgetChars.borderDouble,
+      BorderStyle.rounded => WidgetChars.borderRounded,
+      BorderStyle.thick => WidgetChars.borderThick,
     };
   }
 }

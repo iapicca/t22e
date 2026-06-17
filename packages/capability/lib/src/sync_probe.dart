@@ -1,20 +1,20 @@
-import 'package:ansi/ansi.dart' show querySyncUpdate;
+import 'package:ansi/ansi.dart' show AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show QuerySyncUpdateEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
-import 'terminal_probe_extension.dart' show TerminalProbeExtension;
+import 'package:terminal/terminal.dart' show SystemIo;
+
+import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
 /// Probe for synchronized update support via DECRPM query.
 @internal
 Future<bool> probeSync(
-  TerminalIoInterface io,
-  TerminalParser parser, {
-  Duration timeout = Defaults.defaultProbeTimeout,
-}) async {
-  return io.probe<QuerySyncUpdateEvent, bool>(
-    query: querySyncUpdate(),
+  SystemIo io,
+  TerminalParser parser,
+  Duration timeout,
+) async {
+  return io.probeTerminal<QuerySyncUpdateEvent, bool>(
+    query: AnsiDefaults.querySyncUpdate,
     parser: parser,
     timeout: timeout,
     onEvent: (event) => event.supported,
