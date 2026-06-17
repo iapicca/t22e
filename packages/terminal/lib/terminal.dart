@@ -1,4 +1,7 @@
 export 'src/termios.dart';
+export 'src/termios_linux.dart';
+export 'src/termios_macos.dart';
+export 'src/operating_system.dart';
 export 'src/system_io.dart' show SystemIo;
 export 'src/raw_mode.dart' show RawModeInterface, RawMode;
 export 'src/raw_mode_state.dart' show RawModeState, RawModeStateData;
@@ -6,7 +9,9 @@ export 'src/terminal_io.dart' show TerminalIo;
 export 'src/termios_bindings.dart' show TermiosBindings;
 export 'src/libc_signatures.dart' show TcGetAttr, TcSetAttr, Malloc, Free;
 export 'src/pointer_extensions.dart' show PointerUint8Ops;
-export 'src/extensions.dart' show DynamicLibraryFfi, openLibc;
 export 'src/symbols_ffi.dart' show SymbolsFFI;
+export 'src/libc_provider.dart' show DynamicLibraryFfi, openLibc;
+export 'src/termios_bindings_provider.dart';
+export 'src/termios_provider.dart';
 export 'src/system_io_provider.dart';
 export 'src/raw_mode_provider.dart';

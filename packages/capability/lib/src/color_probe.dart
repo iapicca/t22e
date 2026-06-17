@@ -2,8 +2,7 @@ import 'package:core/core.dart' show ColorProfile;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show ColorQueryEvent, TerminalParser;
-import 'package:protocol/protocol.dart'
-    show ControlBytes, OscCodes;
+import 'package:protocol/protocol.dart' show ControlBytes, OscCodes;
 import 'da1_codes.dart';
 import 'environment.dart';
 import 'package:terminal/terminal.dart' show SystemIo;

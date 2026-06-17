@@ -27,12 +27,6 @@ rawModeProvider  systemIoProvider
 
 ---
 
-## Phase 0 — Write the plan file
-
-- [x] Write plan to `./tmp/terminal_refactor.md`
-
----
-
 ## Phase 1 — Platform Abstraction (no behavior change)
 
 ### Step 1.1 — Convert `Termios` to sealed class with platform subclasses

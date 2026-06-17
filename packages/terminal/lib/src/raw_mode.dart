@@ -1,13 +1,16 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:meta/meta.dart';
 import 'package:notifier/notifier.dart' show Disposable, InitMixin;
 
-import 'extensions.dart';
+import 'libc_provider.dart';
 import 'libc_signatures.dart';
 import 'raw_mode_state.dart';
 import 'pointer_extensions.dart';
 import 'termios.dart';
+import 'termios_linux.dart';
+import 'termios_macos.dart';
 import 'symbols_ffi.dart';
 
 /// Abstract base for raw mode lifecycle management.
@@ -24,6 +27,14 @@ abstract class RawModeInterface with InitMixin, Disposable {
 final class RawMode extends RawModeInterface {
   /// TODO this should be injected with riverpod
   late final DynamicLibrary _library = openLibc();
+
+  late final Termios _termios = switch (Platform.operatingSystem) {
+    'macos' => const MacosTermios(),
+    'linux' => const LinuxTermios(),
+    _ => throw UnsupportedError(
+      'FFI raw mode is not supported on ${Platform.operatingSystem}',
+    ),
+  };
 
   /// TODO this should be initialized with init!
   late final RawModeState _state = RawModeState(null);
@@ -48,7 +59,7 @@ final class RawMode extends RawModeInterface {
     );
 
     /// TODO I don't like calling malloc directly!
-    final buffer = malloc(Termios.termiosStructSize).cast<Uint8>();
+    final buffer = malloc(_termios.termiosStructSize).cast<Uint8>();
     final tcGetAttrResult = tcGetAttr(Termios.stdinFd, buffer);
     if (tcGetAttrResult != 0) {
       _library.freePointer(buffer.cast());
@@ -57,10 +68,10 @@ final class RawMode extends RawModeInterface {
 
     final savedState = RawModeStateData(
       buffer,
-      Termios.readFlag(buffer, Termios.termiosOffsetIFlag),
-      Termios.readFlag(buffer, Termios.termiosOffsetOFlag),
-      Termios.readFlag(buffer, Termios.termiosOffsetCFlag),
-      Termios.readFlag(buffer, Termios.termiosOffsetLFlag),
+      _termios.readFlag(buffer, _termios.termiosOffsetIFlag),
+      _termios.readFlag(buffer, _termios.termiosOffsetOFlag),
+      _termios.readFlag(buffer, _termios.termiosOffsetCFlag),
+      _termios.readFlag(buffer, _termios.termiosOffsetLFlag),
     );
 
     final modifiedLFlag =
@@ -69,9 +80,9 @@ final class RawMode extends RawModeInterface {
             Termios.termiosICanon |
             Termios.termiosISig |
             Termios.termiosIExten);
-    Termios.writeFlag(buffer, Termios.termiosOffsetLFlag, modifiedLFlag);
-    buffer.write8(Termios.termiosOffsetCCMin, Termios.termiosVminRaw);
-    buffer.write8(Termios.termiosOffsetCCTime, Termios.termiosVtimeRaw);
+    _termios.writeFlag(buffer, _termios.termiosOffsetLFlag, modifiedLFlag);
+    buffer.write8(_termios.termiosOffsetCCMin, Termios.termiosVminRaw);
+    buffer.write8(_termios.termiosOffsetCCTime, Termios.termiosVtimeRaw);
 
     final tcSetAttrResult = tcSetAttr(Termios.stdinFd, Termios.tcsaNow, buffer);
     if (tcSetAttrResult != 0) {
@@ -90,24 +101,24 @@ final class RawMode extends RawModeInterface {
       final tcSetAttr = _library.lookupFunction<NativeTcSetAttr, TcSetAttr>(
         SymbolsFFI.tcSetAttrName,
       );
-      Termios.writeFlag(
+      _termios.writeFlag(
         savedState.buf,
-        Termios.termiosOffsetIFlag,
+        _termios.termiosOffsetIFlag,
         savedState.cIflag,
       );
-      Termios.writeFlag(
+      _termios.writeFlag(
         savedState.buf,
-        Termios.termiosOffsetOFlag,
+        _termios.termiosOffsetOFlag,
         savedState.cOflag,
       );
-      Termios.writeFlag(
+      _termios.writeFlag(
         savedState.buf,
-        Termios.termiosOffsetCFlag,
+        _termios.termiosOffsetCFlag,
         savedState.cCflag,
       );
-      Termios.writeFlag(
+      _termios.writeFlag(
         savedState.buf,
-        Termios.termiosOffsetLFlag,
+        _termios.termiosOffsetLFlag,
         savedState.cLflag,
       );
       tcSetAttr(Termios.stdinFd, Termios.tcsaNow, savedState.buf);

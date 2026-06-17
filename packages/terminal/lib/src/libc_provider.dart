@@ -2,11 +2,14 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:meta/meta.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'libc_signatures.dart';
 import 'symbols_ffi.dart';
 
-/// Extension on [DynamicLibrary] providing FFI memory and platform helpers.
+part 'libc_provider.g.dart';
+
+/// Extension on [DynamicLibrary] providing FFI memory helpers.
 @internal
 extension DynamicLibraryFfi on DynamicLibrary {
   /// Releases [ptr] via libc `free`.
@@ -16,12 +19,7 @@ extension DynamicLibraryFfi on DynamicLibrary {
   }
 }
 
-/// TODO DynamicLibrary SHOULD BE ABSTRACTED!
-
 /// Opens the appropriate libc library for the current platform.
-/// TODO this isn't an extension, why it's here!
-@internal
-/// TODO this shoul be dependency injected with riverpod
 DynamicLibrary openLibc() {
   final operatingSystem = Platform.operatingSystem;
   return switch (operatingSystem) {
@@ -49,3 +47,7 @@ DynamicLibrary _openLinuxLibc() {
   }
   throw lastError ?? ArgumentError('Cannot open libc on Linux');
 }
+
+/// Riverpod provider for the platform libc [DynamicLibrary].
+@riverpod
+DynamicLibrary libc(Ref ref) => openLibc();
