@@ -1,9 +1,7 @@
-# Code Standards — t22e
+# Code Standards
 
 ## Architecture
 
-- **TEA (The Elm Architecture)**: All state management follows Model/Msg/Cmd pattern
-- **Layered design**: protocol → ansi/unicode/parser → core → renderer → widgets
 - **Riverpod DI**: Dependency injection and lifecycle management throughout
 - **Freezed immutability**: All data classes use `@freezed` for immutable records
 
@@ -27,11 +25,11 @@
 
 ## Naming Conventions
 
-- **Classes**: PascalCase (`Vt500Engine`, `TerminalRunner`)
-- **Functions/methods**: camelCase (`splitHorizontal()`, `advance()`)
-- **Constants**: camelCase in `Defaults` class (`escapeByte`, `csiFinalSgr`)
-- **Files**: snake_case (`terminal_parser.dart`, `color_profile.dart`)
-- **Enums**: PascalCase with camelCase values (`KeyCode.none`, `MouseAction.press`)
+- **Classes**: PascalCase 
+- **Functions/methods**: camelCase
+- **Values**: camelCase
+- **Files**: snake_case
+- **Enums**: PascalCase with camelCase values
 - **Private named parameters**: Use `this._field` for initializing formals with private backing fields (Dart 3.12+). The constructor parameter and call site use the public name `field:` (without underscore). See https://dart.dev/blog/announcing-dart-3-12#private-named-parameters
 
 ## Comment Style
@@ -45,19 +43,9 @@
 - Inline comments (`//`) for internal notes only
 - TODO comments are allowed but should be resolved before release
 
-## Error Handling
-
-- Use `StateError` for lifecycle violations (use-before-init, use-after-dispose)
-- Guards via `check` and `checkInit` patterns in `notifier` package
-- `ErrorEvent` for parser-level errors
-- Terminal restoration guaranteed via `TerminalGuard` on any exit path
-
 ## Testing
 
 - Standard `package:test` for all unit and widget tests
-- Widget tests assert on rendered output via `Surface`/`Frame` snapshots
-- Terminal-dependent tests use `script -q /dev/null` to fake a TTY
-- No real terminal required for most test execution
 
 ## Code Generation
 
@@ -70,30 +58,9 @@
 
 - Workspace resolution via `resolution: workspace` — single shared lockfile
 - Internal packages use `path:` references (resolved to local versions automatically)
-- External deps: `riverpod`, `freezed_annotation`, `meta`, `ffi`
+- External deps: `riverpod`, `freezed_annotation`, `meta`
 - Dev deps: `build_runner`, `freezed`, `riverpod_generator`, `lints`, `test`
 - No circular dependencies between packages
-
-## Terminal I/O
-
-- FFI-first approach: `FfiRawModeBackend` via libc `tcgetattr`/`tcsetattr`
-- IO fallback: `IoRawModeBackend` via `dart:io` stdin modes
-- `TerminalRunner` orchestrates backends with automatic fallback
-- Raw mode state is always restored on disposal
-
-## Rendering Pipeline
-
-1. Widget tree → `WidgetRenderer.render()` → `Surface`
-2. `Surface` → `Frame.fromSurface()` → `Frame`
-3. `diff(previous, current)` → `DiffResult` (extension type over `List<int>`)
-4. `LineRenderer` or `CellRenderer` → ANSI output
-5. `SyncRenderer` wraps with DEC 2026 markers when supported
-
-## Input Pipeline
-
-1. Raw bytes → `Vt500Engine.advance()` → `SequenceData`
-2. `SequenceData` → semantic parsers (`parseCsi`, `parseEsc`, etc.) → `Event`
-3. `Event` → wrapped as `Msg` → `Model.update()` → `(newModel, Cmd?)`
 
 ## Cascade Notation
 
@@ -170,25 +137,14 @@
 ## Riverpod Providers
 
 - All lifecycle-managed objects must be exposed as `@riverpod` providers
-- Raw implementation classes that have provider wrappers must be marked `@internal`
-- Consumers **must** read providers via `ProviderContainer` or `ref.watch()` — never instantiate raw classes directly
-- Always import and re-export providers from package barrel files
+- Raw implementation classes and functions that have provider wrappers must be marked `@internal`
+- Always export providers from package barrel files
 - When a class or function is exposed through a provider, that provider must
   be defined in a dedicated file following the naming scheme:
   `my_class.dart` → `my_class_provider.dart`
 - Each package barrel file must export all its provider files
-- Example:
-  ```dart
-  // Good — read from provider
-  final container = ProviderContainer();
-  final runner = container.read(terminalRunnerProvider);
-
-  // Bad — manual instantiation of a class that has a provider
-  final runner = TerminalRunner(backends: [...]);
-  ```
-- Stateless utilities (`SyncRenderer`, `Vt500Engine`) and widget classes
-  (`Text`, `Box`, `Row`) do not need providers — they are created on-demand
-- Data structures (`Surface`, `Cell`, `TextStyle`, `Color`) do not need providers
+- Stateless utilities and widget classes do not need providers — they are created on-demand
+- Data structures  do not need providers
 
 ## AI Agent Rules
 

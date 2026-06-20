@@ -20,6 +20,8 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
   late final Malloc _malloc;
   late final Free _free;
   late final DartWrite _writeFFI;
+  StreamController<List<int>>? _inputController;
+  StreamSubscription<List<int>>? _stdinSub;
 
   /// TODO this shouls be in a class like SymbolsFFI
   static const _stdoutFd = 1;
@@ -53,10 +55,21 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
       ),
     );
     _initSigwinch();
+    _initStdinBroadcast();
+  }
+
+  void _initStdinBroadcast() {
+    _inputController = StreamController<List<int>>.broadcast();
+    _stdinSub = stdin.listen(
+      _inputController!.add,
+      onError: _inputController!.addError,
+      onDone: _inputController!.close,
+      cancelOnError: false,
+    );
   }
 
   @override
-  Stream<List<int>> get inputStream => stdin;
+  Stream<List<int>> get inputStream => _inputController!.stream;
 
   @override
   void write(String data) {
@@ -128,6 +141,9 @@ final class TerminalIo with SystemIo, InitMixin, Disposable {
       }
       callback.close();
     }
+
+    _stdinSub?.cancel();
+    _inputController?.close();
 
     _context.dispose();
     super.dispose(message: message);

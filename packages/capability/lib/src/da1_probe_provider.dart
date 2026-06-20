@@ -9,7 +9,7 @@ import 'probe_timeout_provider.dart' show probeTimeoutProvider;
 
 part 'da1_probe_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 /// Probe for primary device attributes (DA1) support.
 Da1Probe da1Probe(Ref ref) {
   final io = ref.read(systemIoProvider);

@@ -6,7 +6,7 @@ import 'system_io.dart';
 
 part 'system_io_provider.g.dart';
 
-@riverpod
+
 SystemIo systemIo(Ref ref) {
   final libc = ref.watch(libcProvider);
   final io = TerminalIo(libc: libc);
