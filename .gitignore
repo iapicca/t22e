@@ -4,3 +4,4 @@
 *.iml
 *.freezed.dart
 *.g.dart
+example/example_app*

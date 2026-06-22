@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults;
 
 part 'geometry.freezed.dart';
 
@@ -81,8 +81,8 @@ abstract class Rect with _$Rect {
   Rect inflate(int dx, int dy) {
     final l = left - dx;
     final t = top - dy;
-    final r = (right + dx).clamp(l, Defaults.unbounded);
-    final b = (bottom + dy).clamp(t, Defaults.unbounded);
+    final r = (right + dx).clamp(l, SizeDefaults.unbounded);
+    final b = (bottom + dy).clamp(t, SizeDefaults.unbounded);
     return Rect(l, t, r - l, b - t);
   }
 }

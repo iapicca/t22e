@@ -1,4 +1,4 @@
-import 'package:core/core.dart' show Surface;
+import 'package:core/core.dart' show Size, Surface;
 import 'package:core/core.dart' show Constraints;
 import 'widget.dart' show Widget, PaintingContext;
 
@@ -6,7 +6,7 @@ import 'widget.dart' show Widget, PaintingContext;
 class WidgetRenderer {
   /// Lays out and paints the widget tree, returning the resulting Surface.
   static Surface render(Widget root, int width, int height) {
-    final surface = Surface(width, height);
+    final surface = Surface.genetate(Size(width, height));
     final constraints = Constraints.tight(width, height);
     root.layout(constraints);
     final context = PaintingContext(surface: surface);

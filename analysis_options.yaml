@@ -20,6 +20,8 @@ linter:
 analyzer:
   errors:
     invalid_annotation_target: ignore
+    invalid_export_of_internal_element: info
+    invalid_use_of_internal_member: info
 
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints

@@ -25,7 +25,6 @@ Model → View → Layout → Paint → Diff → ANSI Output
 | `lifecycle` | Signal handling, alt screen, terminal restoration |
 | `notifier` | Observable objects with disposal lifecycle |
 | `widgets` | Declarative widget library with TEA state management |
-| `testing` | Virtual terminal and widget test utilities |
 
 ## Quick Start
 

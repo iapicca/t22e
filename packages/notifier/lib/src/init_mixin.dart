@@ -8,10 +8,12 @@ extension type const Initialized._(bool _isInitialized) {
   const Initialized({bool isInitialized = false})
     : _isInitialized = isInitialized;
 
+  /// Throws [StateError] if not yet initialized.
   void check({String? message}) {
     if (!_isInitialized) throw StateError(message ?? 'Not initialized');
   }
 
+  /// Whether this guard is in an initialized state.
   bool get safeCheck => _isInitialized;
 }
 

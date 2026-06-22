@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:protocol/protocol.dart' show Defaults;
+import 'package:protocol/protocol.dart' show SizeDefaults;
 
 part 'layout.freezed.dart';
 
@@ -10,9 +10,9 @@ abstract class Constraints with _$Constraints {
 
   const factory Constraints({
     @Default(0) int minWidth,
-    @Default(Defaults.unbounded) int maxWidth,
+    @Default(SizeDefaults.unbounded) int maxWidth,
     @Default(0) int minHeight,
-    @Default(Defaults.unbounded) int maxHeight,
+    @Default(SizeDefaults.unbounded) int maxHeight,
   }) = _Constraints;
 
   factory Constraints.tight(int width, int height) {
@@ -29,7 +29,7 @@ abstract class Constraints with _$Constraints {
 
   /// True if either maxWidth or maxHeight is unbounded.
   bool get isUnbounded =>
-      maxWidth == Defaults.unbounded || maxHeight == Defaults.unbounded;
+      maxWidth == SizeDefaults.unbounded || maxHeight == SizeDefaults.unbounded;
 
   /// Clamps a size to fit within these constraints.
   Size constrain(Size size) {
@@ -53,7 +53,25 @@ abstract class Constraints with _$Constraints {
 /// A simple width × height size.
 @freezed
 abstract class Size with _$Size {
+  const Size._();
+
   const factory Size(int width, int height) = _Size;
+
+  /// True if either dimension is zero.
+  bool get isEmpty => width == 0 || height == 0;
+
+  /// Clamps this size to fit within the given constraints.
+  Size constrain(Constraints constraints) {
+    return Size(
+      width.clamp(constraints.minWidth, constraints.maxWidth),
+      height.clamp(constraints.minHeight, constraints.maxHeight),
+    );
+  }
+
+  /// Scales both dimensions by the given factor.
+  Size multiply(double factor) {
+    return Size((width * factor).round(), (height * factor).round());
+  }
 }
 
 /// Describes a flex item with optional fixed size and flex factor.
@@ -69,6 +87,7 @@ abstract class LayoutItem with _$LayoutItem {
 }
 
 /// Distributes available space among items using a flexbox-like algorithm.
+/// Internal flexbox space distribution algorithm.
 List<int> _splitSpace(int total, List<LayoutItem> items, int gap) {
   if (items.isEmpty) return [];
   if (items.length == 1) {

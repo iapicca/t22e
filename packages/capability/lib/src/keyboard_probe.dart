@@ -1,28 +1,29 @@
-import 'package:ansi/ansi.dart' show enableKittyKeyboard, disableKittyKeyboard;
+import 'package:ansi/ansi.dart' show enableKittyKeyboard, AnsiDefaults;
 import 'package:meta/meta.dart';
 import 'package:parser/terminal_parser.dart'
     show KeyboardEnhancementFlagsEvent, TerminalParser;
-import 'package:protocol/protocol.dart' show Defaults;
-import 'package:terminal/terminal.dart' show TerminalIoInterface;
-import 'result.dart' show KeyboardProtocol;
-import 'terminal_probe_extension.dart' show TerminalProbeExtension;
+import 'package:protocol/protocol.dart' show KittyCodes;
+import 'package:terminal/terminal.dart' show SystemIo;
+import 'capabilities.dart' show KeyboardProtocol;
+import 'system_io_probe_extension.dart' show SystemIoProbeExtension;
 
+/// Probe for Kitty keyboard protocol via enable/query/disable sequence.
 @internal
 Future<KeyboardProtocol> probeKeyboard(
-  TerminalIoInterface io,
-  TerminalParser parser, {
-  Duration timeout = Defaults.defaultProbeTimeout,
-}) async {
+  SystemIo io,
+  TerminalParser parser,
+  Duration timeout,
+) async {
   final result = await io
-      .probe<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
-        query: enableKittyKeyboard(Defaults.kittyDisambiguate),
+      .probeTerminal<KeyboardEnhancementFlagsEvent, KeyboardProtocol>(
+        query: enableKittyKeyboard(KittyCodes.kittyDisambiguate),
         parser: parser,
         timeout: timeout,
         onEvent: (event) => KeyboardProtocol.kitty,
         onTimeout: () => KeyboardProtocol.basic,
       );
   if (result == KeyboardProtocol.basic) {
-    io.write(disableKittyKeyboard());
+    io.write(AnsiDefaults.disableKittyKeyboard);
   }
   return result;
 }

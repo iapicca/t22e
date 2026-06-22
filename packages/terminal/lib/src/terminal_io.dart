@@ -1,34 +1,151 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
+
+import 'package:notifier/notifier.dart'
+    show Disposable, InitMixin, ValueNotifier;
+
+import 'libc_signatures.dart';
+import 'operating_system.dart';
+import 'signal_bindings.dart';
+import 'system_context.dart';
 import 'system_io.dart';
 
-typedef Write = void Function(String data);
-typedef Flush = Future<void> Function();
+/// TODO rework FFI to live in a init/dispose class with narrow lifecycle
+final class TerminalIo with SystemIo, InitMixin, Disposable {
+  final DynamicLibrary _libc;
+  late final ValueNotifier<SystemContext> _context;
+  NativeCallable<Void Function(Int32)>? _sigwinchCallback;
+  late final Malloc _malloc;
+  late final Free _free;
+  late final DartWrite _writeFFI;
+  StreamController<List<int>>? _inputController;
+  StreamSubscription<List<int>>? _stdinSub;
 
-/// Interface for terminal I/O operations used by probe extensions.
-abstract interface class TerminalIoInterface {
-  Stream<List<int>> get inputStream;
-  Write get write;
-  Flush get flush;
-}
+  /// TODO this shouls be in a class like SymbolsFFI
+  static const _stdoutFd = 1;
 
-/// Terminal I/O facade for input/output operations.
-final class TerminalIo implements TerminalIoInterface {
-  final SystemIo io;
-
-  /// Creates with injected [io].
-  const TerminalIo({required this.io});
-
-  @override
-  Stream<List<int>> get inputStream => io.inputStream;
+  TerminalIo({required this._libc});
 
   @override
-  Write get write => io.write;
+  void init({String? message, bool throwIfExists = false}) {
+    super.init(message: message, throwIfExists: throwIfExists);
+
+    var hasTerminal = stdout.hasTerminal;
+    if (!hasTerminal) {
+      throw StdoutException('stdout has no terminal!');
+    }
+
+    _malloc = _libc.lookupFunction<NativeMalloc, Malloc>('malloc');
+    _free = _libc.lookupFunction<NativeFree, Free>('free');
+    _writeFFI = _libc.lookupFunction<NativeWrite, DartWrite>('write');
+
+    _context = ValueNotifier<SystemContext>(
+      SystemContext(
+        width: stdout.terminalColumns,
+        height: stdout.terminalLines,
+        hasTerminal: hasTerminal,
+
+        /// TODO the internal "OperatingSystem" should be used!
+        operatingSystem: Platform.operatingSystem == 'macos'
+            ? OperatingSystem.macOS
+            : OperatingSystem.linux,
+        environment: Map<String, String>.from(Platform.environment),
+      ),
+    );
+    _initSigwinch();
+    _initStdinBroadcast();
+  }
+
+  void _initStdinBroadcast() {
+    _inputController = StreamController<List<int>>.broadcast();
+    _stdinSub = stdin.listen(
+      _inputController!.add,
+      onError: _inputController!.addError,
+      onDone: _inputController!.close,
+      cancelOnError: false,
+    );
+  }
 
   @override
-  Flush get flush => io.flush;
+  Stream<List<int>> get inputStream => _inputController!.stream;
 
-  /// Current terminal width in columns.
-  int get columns => io.columns;
+  @override
+  void write(String data) {
+    final encoded = utf8.encode(data);
+    final buffer = _malloc(encoded.length).cast<Uint8>();
+    for (var i = 0; i < encoded.length; i++) {
+      buffer[i] = encoded[i];
+    }
+    _writeFFI(_stdoutFd, buffer, encoded.length);
+    _free(buffer.cast<Void>());
+  }
 
-  /// Current terminal height in rows.
-  int get rows => io.rows;
+  @override
+  Future<void> flush() => Future.value();
+
+  @override
+  ValueNotifier<SystemContext> get context => _context;
+
+  void _initSigwinch() {
+    if (!_context.value.hasTerminal) return;
+
+    final DartSigaction sigaction;
+    try {
+      sigaction = _libc.lookupFunction<NativeSigaction, DartSigaction>(
+        'sigaction',
+      );
+    } on ArgumentError {
+      return;
+    }
+
+    const sigwinch = 28;
+    const bufferSize = 256;
+
+    final buffer = _malloc(bufferSize).cast<Uint8>();
+
+    for (var i = 0; i < bufferSize; i++) {
+      buffer[i] = 0;
+    }
+
+    final callback = NativeCallable<Void Function(Int32)>.listener((int _) {
+      final width = stdout.terminalColumns;
+      final height = stdout.terminalLines;
+      if (width != _context.value.width || height != _context.value.height) {
+        _context.value = _context.value.copyWith(width: width, height: height);
+      }
+    });
+
+    _sigwinchCallback = callback;
+
+    buffer.cast<Pointer<Void>>()[0] = callback.nativeFunction.cast<Void>();
+
+    sigaction(sigwinch, buffer.cast<Void>(), nullptr);
+
+    _free(buffer.cast<Void>());
+  }
+
+  @override
+  void dispose({String? message}) {
+    final callback = _sigwinchCallback;
+    _sigwinchCallback = null;
+    if (callback != null) {
+      try {
+        final sigaction = _libc.lookupFunction<NativeSigaction, DartSigaction>(
+          'sigaction',
+        );
+        sigaction(28, nullptr, nullptr);
+      } on ArgumentError {
+        // sigaction not available; handler will close regardless
+      }
+      callback.close();
+    }
+
+    _stdinSub?.cancel();
+    _inputController?.close();
+
+    _context.dispose();
+    super.dispose(message: message);
+  }
 }

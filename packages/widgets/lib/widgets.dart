@@ -1,3 +1,4 @@
+/// Declarative widget library with TEA state management and MVU pattern.
 export 'src/model.dart' show Model;
 export 'src/msg.dart';
 export 'src/cmd.dart';
@@ -19,4 +20,7 @@ export 'src/visual/progress.dart' show ProgressBar;
 export 'src/visual/spinner.dart' show Spinner;
 export 'src/visual/table.dart' show Table;
 export 'src/visual/dialog.dart' show Dialog, DialogButton, SizedBox;
+export 'src/dialog_layout.dart';
+export 'src/spinner_frames.dart';
+export 'src/text_input_defaults.dart';
 export 'src/providers.dart';

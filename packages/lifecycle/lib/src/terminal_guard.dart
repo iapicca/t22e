@@ -1,12 +1,18 @@
-import 'package:notifier/notifier.dart' show InitMixin, ValueNotifier;
-import 'package:terminal/terminal.dart' show TerminalRunner;
-import 'alt_screen_manager.dart' show AltScreenManager;
+import 'package:notifier/notifier.dart'
+    show InitMixin, ValueNotifier, VoidCallback;
 
+/// Manages terminal lifecycle state — ensures cleanup runs exactly once.
+///
+/// When a TUI app runs in raw mode with alternate screen enabled, the terminal
+/// is in a non-standard state. If the process exits without restoring the
+/// terminal, the user's shell will be left in a broken state.
+///
+/// TerminalGuard ensures restoration runs exactly once, whether the app exits
+/// normally, throws an exception, or is interrupted by a signal.
 class TerminalGuard extends ValueNotifier<bool> with InitMixin {
-  final TerminalRunner _runner;
-  final AltScreenManager _altScreen;
+  final VoidCallback onRestore;
 
-  TerminalGuard(this._runner, this._altScreen) : super(false);
+  TerminalGuard({required this.onRestore}) : super(false);
 
   bool get isRestored => value;
 
@@ -18,8 +24,7 @@ class TerminalGuard extends ValueNotifier<bool> with InitMixin {
   void restore() {
     if (value) return;
     value = true;
-    _altScreen.exit();
-    _runner.exitRawMode();
+    onRestore();
   }
 
   void disarm() {
