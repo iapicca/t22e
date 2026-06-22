@@ -6,7 +6,7 @@ The project uses three task levels. The filename pattern indicates the type:
 |-------------|------------------|---------------|
 | Feature     | `task-X.md`      | `task-3.md`   |
 | Story       | `task-X-Y.md`    | `task-3-5.md` |
-| Simple Task | `task-X.Y.Z.md`  | `task-3.5.1.md` |
+| Simple Task | `task-X-Y-Z.md`  | `task-3-5-1.md` |
 
 ---
 
@@ -119,10 +119,10 @@ Explain why this story is needed and how it contributes to the parent feature.
 
 ---
 
-## Simple Task Template (`task-X.Y.Z.md`)
+## Simple Task Template (`task-X-Y-Z.md`)
 
 ````markdown
-# task-X.Y.Z
+# task-X-Y-Z
 
 ## Identity
 
