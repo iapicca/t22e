@@ -1,6 +1,0 @@
-.dart_tool/
-*.lock
-.idea
-*.iml
-*.freezed.dart
-*.g.dart
