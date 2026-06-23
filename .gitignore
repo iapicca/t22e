@@ -1,0 +1,7 @@
+# Generated files
+*.g.dart
+*.freezed.dart
+
+# Dart tooling
+.dart_tool/
+pubspec.lock

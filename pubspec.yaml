@@ -1,0 +1,20 @@
+name: t22e
+description: A pure-Dart Terminal User Interface (TUI) framework.
+version: 0.0.1
+repository: https://github.com/francesco/t22e
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  freezed_annotation: ^3.1.0
+  meta: ^1.18.3
+  riverpod: ^3.3.2
+  riverpod_annotation: ^4.0.3
+
+dev_dependencies:
+  build_runner: ^2.15.0
+  freezed: ^3.2.5
+  lints: ^6.1.0
+  riverpod_generator: ^4.0.4
+  test: ^1.31.1
