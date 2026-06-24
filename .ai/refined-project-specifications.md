@@ -263,7 +263,7 @@ The following milestones are designed to map to the task hierarchy defined in `.
 *Objective:* Create the repository skeleton, dependencies, and tooling needed by all later work.
 
 * Deliverables:
-  * `pubspec.yaml` with `riverpod`, `freezed`, `freezed_annotation`, `build_runner`, `meta`, `test`, `mocktail`.
+  * `pubspec.yaml` with `riverpod`, `freezed`, `freezed_annotation`, `build_runner`, `meta`, `test`.
   * `analysis_options.yaml`.
   * `lib/src/` directory structure from Section 4.
   * Public barrel file `lib/t22e.dart`.

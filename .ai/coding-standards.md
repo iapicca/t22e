@@ -101,6 +101,12 @@
   ```
 )
 
+## Research Sources
+
+- When resolving questions about Dart or a package API, consult the official
+  documentation first (e.g. `https://dart.dev`, `https://pub.dev/packages/<pkg>`).
+- Do not rely on local package cache source files as authoritative references.
+
 ## Riverpod Providers
 
 - All lifecycle-managed objects must be exposed as `@riverpod` providers

@@ -13,6 +13,12 @@ Before planning or building, read:
 
 Ignore the content of generated files (`*.g.dart`, `*.freezed.dart`). They are build artifacts and must not be edited by hand.
 
+## Research and references
+
+- When looking up package or Dart language behavior, prefer official documentation
+  (e.g. `https://pub.dev/packages/<package>` and `https://dart.dev`) over reading
+  files from the local `.pub-cache`.
+
 ## Post-build hand-off
 
 After completing work, do **not** directly append to `.ai/project.md` or `.ai/coding-standards.md`. Instead, present the proposed additions to the user and wait for approval before writing them.
