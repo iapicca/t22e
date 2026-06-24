@@ -2,10 +2,6 @@
 
 A pure-Dart Terminal User Interface (TUI) framework.
 
-## Status
-
-This project is in Milestone 0 (bootstrap). The public API is not yet available.
-
 ## Requirements
 
 - Dart SDK ^3.12.0

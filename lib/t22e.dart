@@ -15,3 +15,18 @@ export 'src/models/constraints.dart' show Constraints;
 export 'src/models/offset.dart' show Offset;
 export 'src/models/rect.dart' show Rect;
 export 'src/models/size.dart' show Size;
+
+export 'src/notifier/notifier.dart'
+    show
+        ChangeNotifier,
+        CheckDisposed,
+        CheckInitialized,
+        Disposable,
+        Disposed,
+        InitMixin,
+        ValueNotifier,
+        VoidCallback;
+
+export 'src/io/stdin_stream_provider.dart' show stdinStreamProvider;
+export 'src/async_value/stdin_value_notifier_provider.dart'
+    show stdinValueNotifierProvider;
