@@ -39,6 +39,7 @@ extension type const Color._((int, int, int) _rgb) {
       _rgb = (red, green, blue);
 
   /// Black.
+  /// TODO the "const" below shouel be const factory(s)
   const Color.black() : _rgb = (0, 0, 0);
 
   /// Red.

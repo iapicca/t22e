@@ -30,14 +30,5 @@ abstract class Constraints with _$Constraints {
     maxWidth: size.width,
     minHeight: 0,
     maxHeight: size.height,
-  );
-
-  /// True when both axes have equal min and max bounds.
-  bool get isTight => minWidth == maxWidth && minHeight == maxHeight;
-
-  /// Returns [size] clamped to these constraints on both axes.
-  Size constrain(Size size) => Size(
-    size.width.clamp(minWidth, maxWidth),
-    size.height.clamp(minHeight, maxHeight),
-  );
+  ); 
 }
