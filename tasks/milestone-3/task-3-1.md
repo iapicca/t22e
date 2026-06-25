@@ -5,55 +5,58 @@
 | Field          | Value                       |
 |----------------|-----------------------------|
 | Type           | Story                       |
-| Title          | Build Pass and Engine Nodes |
+| Title          | Render Tree Abstractions    |
 | Parent Feature | task-3                      |
 | Children Tasks | task-3-1-1                  |
 
 ## Logical Flow
 
-Declarative widgets describe what the UI should look like, but the engine needs a runtime representation it can layout and paint. This story introduces the widget-to-node build pass, which compiles a tree of immutable widgets into a tree of immutable engine nodes.
+The render tree is the long-lived, mutable layer that knows how to measure and draw terminal cells. This story introduces the `RenderObject` abstraction and the concrete render objects needed for the first full-screen text deliverable: a leaf that renders a string and a root that sizes its child to the terminal.
 
 ```mermaid
 graph TD
-    A[Widget Tree] --> B[Build Pass]
-    B --> C[Engine Node Tree]
-    C --> D[Layout Pass]
-    D --> E[Paint Pass]
+    A[RenderRoot] -->|owns| B[RenderText]
+    B --> C[Layout Pass]
+    C --> D[Paint Pass]
 ```
 
 ## Objective
 
-Create the build pass that compiles widget trees into engine nodes:
-- Define the base `Widget` and `Node` abstractions.
-- Implement a `Text` widget that compiles to a `TextNode`.
-- Provide access to the `TuiContext` provider container during the build pass.
+Create the render tree abstractions needed by the rendering pipeline:
+- Define the base `RenderObject` class.
+- Define `RenderText`, a leaf render object that renders a string.
+- Define `RenderRoot`, a single-child render object that fills the terminal and positions its child.
+- Establish the single-child render object protocol.
 
 ## Scope Boundary
 
 - Deliverable this story introduces:
-  - Base `Widget` class with a `build` or `compile` contract.
-  - Base `Node` class representing the runtime engine node.
-  - `TextNode` carrying string content and style flags.
-  - `TuiContext` bridge so nodes can read Riverpod providers.
+  - Base `RenderObject` class with size, offset, and lifecycle hooks.
+  - `SingleChildRenderObject` mixin/base for one-child render objects.
+  - `RenderText` carrying string content and style.
+  - `RenderRoot` that sizes its child to the terminal bounds and paints it at `(0, 0)`.
+  - Parent-data protocol for offsets and slots.
 
 Out of scope (to be handled in child tasks):
 
-- Layout, paint, diff, or ANSI output logic.
-- Multi-child widgets such as Row, Column, or Flex.
-- Real stdin input or provider state changes.
+- Layout and paint algorithms.
+- Diff engine or ANSI output.
+- Widget/Element/BuildContext abstractions (Milestone 5).
+- Multi-child render objects.
 
 ## Acceptance Criteria
 
 - All children tasks are completed and accepted.
-- A widget tree can be compiled into a corresponding node tree.
-- `Text` widget produces a `TextNode` with the correct content and style.
-- The build pass can read model snapshots through `TuiContext`.
-- Unit tests verify widget-to-node compilation.
+- `RenderObject` exposes size, offset, parent, and child accessors.
+- `RenderText` is a leaf render object.
+- `RenderRoot` is a single-child render object that owns a child.
+- The render tree can be constructed and traversed manually.
+- Unit tests verify render tree construction and parent/child relationships.
 
 ## How
 
-Create immutable base classes for `Widget` and `Node`. A widget exposes a method that, given a `TuiContext`, returns a `Node`. The engine pipeline invokes this recursively to produce the runtime tree. Keep the abstraction minimal: nodes are data-only runtime blueprints that later passes will layout and paint.
+Model `RenderObject` as a mutable base class with `Size size`, `Offset offset`, and `RenderObject? parent`. Introduce a `SingleChildRenderObject` helper for nodes with exactly one child, managing `child` assignment and parent-data updates. `RenderText` stores the string and style and has no children. `RenderRoot` stores a single child and will later layout that child to match the terminal size and paint it at the origin. Keep the API aligned with Flutter's `RenderObject` surface so the future Widget/Element layer can attach to it without changes.
 
 ## Why
 
-Separating the declarative widget layer from the runtime node layer keeps widgets cheap to reconstruct on every state change while giving the engine a stable, purpose-built structure to operate on during layout and paint.
+The render tree is the stable, long-lived counterpart to the short-lived widget tree that will be introduced later. Defining it first lets the pipeline operate on real layout/paint objects while the widget layer is still being designed.

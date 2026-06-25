@@ -5,54 +5,57 @@
 | Field          | Value                       |
 |----------------|-----------------------------|
 | Type           | Story                       |
-| Title          | Simplified Layout Pass      |
+| Title          | Two-Pass Constraint Layout  |
 | Parent Feature | task-3                      |
 | Children Tasks | task-3-2-1                  |
 
 ## Logical Flow
 
-Before painting, the engine must know the size and position of each node. This story implements a simplified layout pass where the root node receives the full terminal size and each node reports its exact integer-cell size back to its parent.
+Before painting, the engine must know the size and position of each render object. This story implements the Flutter-style two-pass layout protocol on the render tree: parents pass constraints down, children measure themselves and report sizes up, then parents assign offsets.
 
 ```mermaid
 graph TD
-    A[Root Node] -->|Constraints down| B[Child Node]
-    B -->|Size up| A
-    A -->|Offset down| B
+    A[RenderRoot] -->|constraints down| B[RenderText]
+    B -->|size up| A
+    A -->|offset down| B
 ```
 
 ## Objective
 
-Implement the simplified layout pass:
+Implement the two-pass constraint layout pass:
 - Pass available terminal dimensions from the root downward.
-- Let each node compute and report its exact size upward.
-- Assign integer-cell offsets to each node.
+- Let each render object compute and report its exact size upward.
+- Assign integer-cell offsets to each render object.
 
 ## Scope Boundary
 
 - Deliverable this story introduces:
-  - Layout method on `Node` that accepts `Constraints` and returns `TuiSize`.
+  - `RenderObject.layout(Constraints constraints)` entry point.
+  - `RenderObject.performLayout(Constraints constraints)` subclass contract.
+  - Two-pass protocol on `RenderRoot` and `RenderText`.
   - Integer-only width and height calculations.
   - Root layout seeded with terminal dimensions.
-  - `TextNode` layout that measures string dimensions.
 
 Out of scope (to be handled in child tasks):
 
 - Multi-child layout and positioning.
-- Fractional sizes or constraint negotiation.
-- Scrollable or overflow behavior.
+- Flex, Row, Column, or alignment widgets.
+- Fractional sizes or complex constraint negotiation.
+- Scrollable or overflow behavior beyond clipping.
 
 ## Acceptance Criteria
 
 - All children tasks are completed and accepted.
-- The layout pass computes sizes for every node in the tree.
+- The layout pass computes sizes for every render object in the tree.
 - All dimensions are integer terminal cells.
-- `TextNode` reports a size matching its content within given constraints.
-- Unit tests verify layout results for single and nested nodes.
+- `RenderText` reports a size matching its content within given constraints.
+- `RenderRoot` sizes its child to the terminal bounds and assigns offset `(0, 0)`.
+- Unit tests verify layout results for single and nested render objects.
 
 ## How
 
-Implement a `TuiSize layout(Constraints constraints)` method on `Node`. The pipeline calls this on the root node with constraints equal to the terminal size. For this milestone, `TextNode` measures its string content and returns a size bounded by the constraints. Offsets can be computed top-down after sizes are known, or embedded during the same recursive pass.
+Implement `layout(Constraints)` on `RenderObject` as the public entry point that delegates to `performLayout(Constraints)`. Subclasses set `this.size` during `performLayout`. `RenderText` splits its string on newlines, computes width as the longest line and height as the line count, and clamps both by the constraints. `RenderRoot` receives tight terminal constraints, calls `child.layout(constraints)`, and sets `child.offset` to `(0, 0)`. The pipeline starts the pass by calling `root.layout(Constraints.tight(terminalSize))`.
 
 ## Why
 
-Layout determines where each node will paint. Keeping the first pass simple avoids premature investment in a full constraint engine while still providing the geometry needed by the paint pass.
+Layout determines where each render object will paint. Adopting Flutter's two-pass constraint protocol from the start ensures the API can grow into real layout widgets later without a breaking redesign.

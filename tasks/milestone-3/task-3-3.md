@@ -5,17 +5,17 @@
 | Field          | Value                            |
 |----------------|----------------------------------|
 | Type           | Story                            |
-| Title          | Paint Pass and CellBuffer Rendering |
+| Title          | RenderObject Paint Pass          |
 | Parent Feature | task-3                           |
 | Children Tasks | task-3-3-1                       |
 
 ## Logical Flow
 
-Once sizes and offsets are known, the engine can paint the desired frame into a target buffer. This story implements the paint pass, where each node writes immutable `Cell` values into the target `CellBuffer`.
+Once sizes and offsets are known, the engine can paint the desired frame into a target buffer. This story implements the paint pass, where each render object writes immutable `Cell` values into the target `CellBuffer` at its assigned offset.
 
 ```mermaid
 graph TD
-    A[Node Tree with Sizes/Offsets] --> B[Paint Pass]
+    A[Render Tree with Sizes/Offsets] --> B[Paint Pass]
     B --> C[Target CellBuffer]
     C --> D[Diff & Flush]
 ```
@@ -23,34 +23,36 @@ graph TD
 ## Objective
 
 Implement the paint pass:
-- Add a `paint` method to engine nodes.
+- Add a `paint` method to render objects.
 - Write immutable `Cell` values into the target `CellBuffer`.
-- Handle clipping to the node's bounds.
+- Handle clipping to the render object's bounds.
 
 ## Scope Boundary
 
 - Deliverable this story introduces:
-  - `paint` method on `Node` that receives a `CellBuffer` and an offset.
-  - `TextNode` paint implementation that writes characters with styles.
-  - Bounds checking/clipping against the node size.
+  - `paint(CellBuffer buffer, Offset offset)` contract on `RenderObject`.
+  - `RenderText` paint implementation that writes characters with styles.
+  - `RenderRoot` paint implementation that delegates to its child at the child's offset.
+  - Bounds checking/clipping against the render object size.
 
 Out of scope (to be handled in child tasks):
 
 - Diff engine and ANSI output.
-- Multi-child composition.
+- Multi-child composition and z-ordering.
 - Scrollable or virtualized content.
 
 ## Acceptance Criteria
 
 - All children tasks are completed and accepted.
 - The paint pass fills the target `CellBuffer` with `Cell` values.
-- `TextNode` writes its content at the correct offset and style.
-- Painting does not write outside the node bounds.
-- Unit tests verify paint results for single and nested nodes.
+- `RenderText` writes its content at the correct offset and style.
+- `RenderRoot` paints its child at the child's assigned offset.
+- Painting does not write outside the render object bounds.
+- Unit tests verify paint results for single and nested render objects.
 
 ## How
 
-Implement a `void paint(CellBuffer buffer, TuiOffset offset)` method on `Node`. The pipeline creates a fresh target `CellBuffer` of terminal size, then recursively calls `paint` on the root node at offset `(0, 0)`. `TextNode` iterates over its content lines and writes one `Cell` per character, using the node style for foreground, background, and flags. Any character that would fall outside the node's computed size is skipped.
+Implement `void paint(CellBuffer buffer, Offset offset)` on `RenderObject`. The pipeline creates a fresh target `CellBuffer` of terminal size, then calls `root.paint(target, Offset.zero)`. `RenderText` iterates over its content lines and writes one `Cell` per character, using the render object's style for foreground, background, and flags, skipping characters that fall outside its computed size. `RenderRoot` calls `child.paint(target, offset + child.offset)`. Because cells are immutable, every write is a value write into the flat buffer.
 
 ## Why
 
