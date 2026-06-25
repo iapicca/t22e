@@ -12,9 +12,7 @@ void main() {
     test('starts with an empty list', () {
       final controller = StreamController<List<int>>();
       final container = ProviderContainer(
-        overrides: [
-          stdinStreamProvider.overrideWithValue(controller.stream),
-        ],
+        overrides: [stdinStreamProvider.overrideWithValue(controller.stream)],
       );
       addTearDown(container.dispose);
 
@@ -25,9 +23,7 @@ void main() {
     test('updates value on stream events', () async {
       final controller = StreamController<List<int>>();
       final container = ProviderContainer(
-        overrides: [
-          stdinStreamProvider.overrideWithValue(controller.stream),
-        ],
+        overrides: [stdinStreamProvider.overrideWithValue(controller.stream)],
       );
       addTearDown(container.dispose);
 
@@ -38,20 +34,23 @@ void main() {
       controller.add([65, 66]);
       await _pump();
       expect(notifier.value, [65, 66]);
-      expect(events, [[65, 66]]);
+      expect(events, [
+        [65, 66],
+      ]);
 
       controller.add([67]);
       await _pump();
       expect(notifier.value, [67]);
-      expect(events, [[65, 66], [67]]);
+      expect(events, [
+        [65, 66],
+        [67],
+      ]);
     });
 
     test('disposing container cancels subscription and disposes notifier', () {
       final controller = StreamController<List<int>>();
       final container = ProviderContainer(
-        overrides: [
-          stdinStreamProvider.overrideWithValue(controller.stream),
-        ],
+        overrides: [stdinStreamProvider.overrideWithValue(controller.stream)],
       );
 
       final notifier = container.read(stdinValueNotifierProvider);
@@ -66,9 +65,7 @@ void main() {
     test('same value does not notify listeners twice', () async {
       final controller = StreamController<List<int>>();
       final container = ProviderContainer(
-        overrides: [
-          stdinStreamProvider.overrideWithValue(controller.stream),
-        ],
+        overrides: [stdinStreamProvider.overrideWithValue(controller.stream)],
       );
       addTearDown(container.dispose);
 

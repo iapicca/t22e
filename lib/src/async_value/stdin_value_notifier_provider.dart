@@ -11,7 +11,9 @@ import '../notifier/value_notifier.dart';
 /// provider is destroyed.
 
 /// TODO change naming for this! including the folder
-final stdinValueNotifierProvider = Provider<Raw<ValueNotifier<List<int>>>>((ref) {
+final stdinValueNotifierProvider = Provider<Raw<ValueNotifier<List<int>>>>((
+  ref,
+) {
   final stream = ref.watch(stdinStreamProvider);
   final notifier = ValueNotifier<List<int>>([]);
   final subscription = stream.listen((event) => notifier.value = event);

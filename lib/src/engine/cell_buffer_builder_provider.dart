@@ -7,8 +7,5 @@ part 'cell_buffer_builder_provider.g.dart';
 
 /// Provides a [CellBufferBuilder] of the given dimensions.
 @riverpod
-CellBufferBuilder cellBufferBuilder(
-  Ref ref,
-  int width,
-  int height,
-) => CellBufferBuilder(Size(width, height));
+CellBufferBuilder cellBufferBuilder(Ref ref, int width, int height) =>
+    CellBufferBuilder(Size(width, height));

@@ -28,11 +28,7 @@ void main() {
       expect(
         () => d.check(message: 'Custom error'),
         throwsA(
-          isA<StateError>().having(
-            (e) => e.message,
-            'message',
-            'Custom error',
-          ),
+          isA<StateError>().having((e) => e.message, 'message', 'Custom error'),
         ),
       );
     });

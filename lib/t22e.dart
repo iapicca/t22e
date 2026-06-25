@@ -12,15 +12,21 @@ export 'src/engine/cell_buffer_builder_extensions.dart'
     show CellBufferBuilderBatch;
 export 'src/engine/cell_buffer_builder_provider.dart'
     show cellBufferBuilderProvider;
+export 'src/engine/ansi_writer.dart' show AnsiWriter;
+export 'src/engine/ansi_writer_provider.dart' show ansiWriterProvider;
 export 'src/engine/cell_buffer_extensions.dart' show CellBufferExtensions;
 export 'src/engine/cell_style.dart' show CellStyle;
+export 'src/engine/diff_engine.dart'
+    show DiffEngine, DiffOp, DiffOpMove, DiffOpStyle, DiffOpWrite;
+export 'src/engine/diff_engine_provider.dart' show diffEngineProvider;
 export 'src/engine/color.dart' show AnsiColor, Color, IndexedColor;
 export 'src/engine/color_extensions.dart'
     show AnsiToColor, ColorAnsi, ColorIndex, IndexedToColor;
+export 'src/engine/pipeline.dart' show Pipeline;
+export 'src/engine/pipeline_provider.dart' show pipelineProvider;
 export 'src/engine/render_object.dart'
     show BoxParentData, ParentData, RenderObject, SingleChildRenderObject;
-export 'src/engine/render_object_extensions.dart'
-    show RenderObjectTraversal;
+export 'src/engine/render_object_extensions.dart' show RenderObjectTraversal;
 export 'src/engine/render_root.dart' show RenderRoot;
 export 'src/engine/render_root_extensions.dart' show RenderRootBinding;
 export 'src/engine/render_root_provider.dart' show renderRootProvider;
