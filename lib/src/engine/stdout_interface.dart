@@ -7,6 +7,12 @@ mixin StdoutInterface {
   void write(String ansi);
 }
 
+/// TODO: Re-evaluate folder structure for this class.
+///
+/// Options: (a) move implementation to `lib/src/io/stdout_writer.dart` while
+/// keeping the interface here; (b) keep both interface and implementation in
+/// `lib/src/engine/stdout_interface.dart`; (c) rename this file to clarify it
+/// contains both the interface and the default writer implementation.
 /// Wraps an [IOSink] and flushes generated ANSI strings.
 @internal
 class StdoutWriter with StdoutInterface {

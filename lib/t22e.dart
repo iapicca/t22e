@@ -51,6 +51,12 @@ export 'src/notifier/notifier.dart'
         ValueNotifier,
         VoidCallback;
 
+export 'src/io/stdin_reader.dart' show StdinReader;
+export 'src/io/stdin_reader_provider.dart' show stdinReaderProvider;
 export 'src/io/stdin_stream_provider.dart' show stdinStreamProvider;
+export 'src/io/ansi_parser.dart'
+    show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent, Key;
+export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
+export 'src/io/input_event_stream_provider.dart' show inputEventStreamProvider;
 export 'src/async_value/stdin_value_notifier_provider.dart'
     show stdinValueNotifierProvider;
