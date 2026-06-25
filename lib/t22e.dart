@@ -58,5 +58,11 @@ export 'src/io/ansi_parser.dart'
     show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent, Key;
 export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
 export 'src/io/input_event_stream_provider.dart' show inputEventStreamProvider;
+export 'src/view/context.dart' show Context;
+export 'src/view/element.dart' show Element;
+export 'src/view/render_object_element.dart' show RenderObjectElement;
+export 'src/view/single_child_render_object_element.dart'
+    show SingleChildRenderObjectElement;
+export 'src/view/widget.dart' show Widget;
 export 'src/async_value/stdin_value_notifier_provider.dart'
     show stdinValueNotifierProvider;
