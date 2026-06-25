@@ -58,7 +58,7 @@ Out of scope (to be handled in child stories and later milestones):
 
 ## How
 
-Promote Riverpod providers to the primary public API surface for accessing framework services (e.g., stdin event stream, terminal size, frame scheduler) and application state. Walk through `lib/src/` and apply `@internal` to classes and functions that are not part of the public contract. Update `lib/t22e.dart` to re-export only public symbols, leaving direct `src/` imports unsupported. Finally, write a smoke test that wires a simulated stdin byte sequence through the ANSI parser, `StreamValueNotifier`, a Riverpod ViewModel, a `Consumer`, the full-screen root widget, and the diff engine, asserting that the rendered output updates correctly.
+Promote Riverpod providers to the primary public API surface for accessing framework services (e.g., stdin event stream, terminal size) and application state. Walk through `lib/src/` and apply `@internal` to classes and functions that are not part of the public contract. Update `lib/t22e.dart` to re-export only public symbols, leaving direct `src/` imports unsupported. Finally, write a smoke test that wires a simulated stdin byte sequence through the ANSI parser, `StreamValueNotifier`, a Riverpod ViewModel, a `Consumer`, the full-screen root widget, and the diff engine, asserting that the rendered output updates correctly.
 
 ## Why
 

@@ -44,7 +44,7 @@ Out of scope (to be handled in child tasks):
 - All children tasks are completed and accepted.
 - The root widget fills the full terminal width and height.
 - The child widget is laid out with the full terminal size as its constraint.
-- The root integrates cleanly with the engine's frame scheduler.
+- The root integrates cleanly with the engine pipeline.
 - Unit tests verify full-screen sizing behavior.
 
 ## How

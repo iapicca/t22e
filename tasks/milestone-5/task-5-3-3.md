@@ -10,13 +10,13 @@
 
 ## Objective
 
-Connect the root widget to the engine frame scheduler so the engine can build a frame from a developer-supplied widget tree.
+Connect the root widget to the engine pipeline so the engine can build a frame from a developer-supplied widget tree.
 
 ## Scope Boundary
 
 This task is intentionally scoped to a single focused session. It must only cover:
 
-- `lib/src/engine/pipeline.dart` and `lib/src/engine/scheduler.dart`:
+- `lib/src/engine/pipeline.dart`:
   - Accept a root widget builder or instance from the application.
   - Construct the root widget with the current terminal size.
   - Run build, layout, paint, diff, and flush on the root node tree.
@@ -42,7 +42,7 @@ Out of scope (to be handled in later tasks):
 
 ## How
 
-Update the engine pipeline or scheduler to accept a `Widget root` or a builder that returns one. At frame time, read the current terminal size, construct the root widget with that size and the application child, compile it to a node tree, run layout, paint into the target `CellBuffer`, diff, and flush. Keep the integration minimal; the public binding API is refined in Milestone 6.
+Update the engine pipeline to accept a `Widget root` or a builder that returns one. At frame time, read the current terminal size, construct the root widget with that size and the application child, compile it to a node tree, run layout, paint into the target `CellBuffer`, diff, and flush. Keep the integration minimal; the public binding API is refined in Milestone 6.
 
 ## Why
 

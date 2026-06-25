@@ -17,9 +17,9 @@ Application developers should interact with the framework through Riverpod provi
 graph TD
     A[Application Code] -->|reads| B[Public Provider]
     B --> C[Framework Service]
-    C --> D[stdin / Scheduler / Context]
+    C --> D[stdin / Context]
     D --> E[Declarative Widget]
-```
+    ```
 
 ## Objective
 
@@ -28,7 +28,7 @@ Promote Riverpod providers to the primary public API surface for framework servi
 ## Scope Boundary
 
 - Deliverable this story introduces:
-  - Public providers for terminal input events, terminal size, frame scheduler, and `TuiContext`.
+  - Public providers for terminal input events, terminal size, and `TuiContext`.
   - Provider factories that keep application code free of direct engine class construction.
   - Unit tests verifying provider exposure and watchability.
 
@@ -48,7 +48,7 @@ Out of scope (to be handled in child tasks):
 
 ## How
 
-Audit the framework services produced in earlier milestones (stdin event stream, terminal size, frame scheduler, `TuiContext`, and any ViewModel integration points). For each service that application code needs, define a public Riverpod provider in the appropriate `lib/src/` location and re-export it from `lib/t22e.dart`. Keep the provider definitions thin so they delegate to existing engine classes; this story is about exposure, not reimplementation.
+Audit the framework services produced in earlier milestones (stdin event stream, terminal size, `TuiContext`, and any ViewModel integration points). For each service that application code needs, define a public Riverpod provider in the appropriate `lib/src/` location and re-export it from `lib/t22e.dart`. Keep the provider definitions thin so they delegate to existing engine classes; this story is about exposure, not reimplementation.
 
 ## Why
 

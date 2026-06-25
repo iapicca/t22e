@@ -36,7 +36,6 @@ Out of scope (to be handled in later tasks):
 - A clear list of public providers exists, including at minimum:
   - stdin event provider,
   - terminal size provider,
-  - frame scheduler provider,
   - `TuiContext` / provider container access.
 - Each listed provider has a one-sentence rationale.
 - Internal-only services are explicitly excluded.

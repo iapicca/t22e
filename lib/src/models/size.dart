@@ -5,6 +5,9 @@ extension type const Size._((int width, int height) _value) implements Offset {
   /// Creates a size from explicit width and height values.
   const Size(int width, int height) : this._((width, height));
 
+  /// A zero-area size.
+  static const Size zero = Size(0, 0);
+
   /// The width.
   int get width => _value.$1;
 

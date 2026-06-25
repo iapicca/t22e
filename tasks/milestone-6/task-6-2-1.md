@@ -24,8 +24,6 @@ This task is intentionally scoped to a single focused session. It must only cove
   - Mark the diff engine class and functions as `@internal`.
 - `lib/src/engine/pipeline.dart`:
   - Mark the render pipeline class and functions as `@internal`.
-- `lib/src/engine/scheduler.dart`:
-  - Mark the frame scheduler as `@internal`.
 - `lib/src/engine/ansi_writer.dart`:
   - Mark ANSI writer helpers as `@internal`.
 

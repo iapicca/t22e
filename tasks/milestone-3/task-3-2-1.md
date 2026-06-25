@@ -26,6 +26,7 @@ This task is intentionally scoped to a single focused session. It must only cove
 - `lib/src/engine/render_object.dart`:
   - Add a `Size layout(Constraints constraints)` contract to `RenderObject`.
   - Implement `performLayout(Constraints constraints)` for `RenderText` and `RenderRoot`.
+  - Store child offsets in `BoxParentData` attached to the child.
 
 - `lib/src/engine/pipeline.dart`:
   - Implement the layout step that invokes `layout` on the root render object with terminal-size constraints.
@@ -55,7 +56,7 @@ Out of scope (to be handled in later tasks):
 
 ## How
 
-Implement `layout(Constraints)` on `RenderObject` as the public entry point that delegates to `performLayout(Constraints)`. Subclasses set `this.size` during `performLayout`. `RenderText` splits its string on newlines, computes width as the longest line and height as the line count, and clamps both by the constraints. `RenderRoot` receives tight terminal constraints, calls `child.layout(constraints)`, and sets `child.offset` to `Offset(0, 0)`. The pipeline starts the pass by calling `root.layout(Constraints.tight(terminalSize))`.
+Implement `layout(Constraints)` on `RenderObject` as the public entry point that delegates to `performLayout(Constraints)`. Subclasses set `this.size` during `performLayout`. `RenderText` splits its string on newlines, computes width as the longest line and height as the line count, and clamps both by the constraints. `RenderRoot` receives tight terminal constraints, calls `child.layout(constraints)`, and sets the child's `BoxParentData.offset` to `Offset(0, 0)` (exposed via `child.offset`). The pipeline starts the pass by calling `root.layout(Constraints.tight(terminalSize))`.
 
 ## Why
 

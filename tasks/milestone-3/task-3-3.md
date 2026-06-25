@@ -24,13 +24,15 @@ graph TD
 
 Implement the paint pass:
 - Add a `paint` method to render objects.
-- Write immutable `Cell` values into the target `CellBuffer`.
+- Write immutable `Cell` values into a mutable `CellBufferBuilder`.
+- Build the immutable target `CellBuffer` after all writes are collected.
 - Handle clipping to the render object's bounds.
 
 ## Scope Boundary
 
 - Deliverable this story introduces:
-  - `paint(CellBuffer buffer, Offset offset)` contract on `RenderObject`.
+  - `paint(CellBufferBuilder buffer, Offset offset)` contract on `RenderObject`.
+  - `CellBufferBuilder` that collects many cell writes and builds an immutable `CellBuffer`.
   - `RenderText` paint implementation that writes characters with styles.
   - `RenderRoot` paint implementation that delegates to its child at the child's offset.
   - Bounds checking/clipping against the render object size.
@@ -44,7 +46,7 @@ Out of scope (to be handled in child tasks):
 ## Acceptance Criteria
 
 - All children tasks are completed and accepted.
-- The paint pass fills the target `CellBuffer` with `Cell` values.
+- The paint pass fills a `CellBufferBuilder` with `Cell` values and produces an immutable target `CellBuffer`.
 - `RenderText` writes its content at the correct offset and style.
 - `RenderRoot` paints its child at the child's assigned offset.
 - Painting does not write outside the render object bounds.
@@ -52,7 +54,7 @@ Out of scope (to be handled in child tasks):
 
 ## How
 
-Implement `void paint(CellBuffer buffer, Offset offset)` on `RenderObject`. The pipeline creates a fresh target `CellBuffer` of terminal size, then calls `root.paint(target, Offset.zero)`. `RenderText` iterates over its content lines and writes one `Cell` per character, using the render object's style for foreground, background, and flags, skipping characters that fall outside its computed size. `RenderRoot` calls `child.paint(target, offset + child.offset)`. Because cells are immutable, every write is a value write into the flat buffer.
+Implement `void paint(CellBufferBuilder buffer, Offset offset)` on `RenderObject`. The pipeline creates a `CellBufferBuilder` of terminal size, calls `root.paint(builder, Offset.zero)`, and then builds the immutable target `CellBuffer`. `RenderText` iterates over its content lines and writes one `Cell` per character, using the render object's style for foreground, background, and flags, skipping characters that fall outside its computed size. `RenderRoot` calls `child.paint(builder, offset + child.offset)`. Because the final `CellBuffer` is immutable, all writes are collected on the builder and committed in a single `build()` call.
 
 ## Why
 

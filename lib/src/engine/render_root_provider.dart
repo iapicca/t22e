@@ -1,0 +1,9 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'render_root.dart' show RenderRoot;
+
+part 'render_root_provider.g.dart';
+
+/// Provides a default [RenderRoot] instance.
+@riverpod
+RenderRoot renderRoot(Ref ref) => RenderRoot();

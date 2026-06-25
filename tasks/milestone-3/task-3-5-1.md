@@ -25,14 +25,10 @@ This task is intentionally scoped to a single focused session. It must only cove
   - Define a `Pipeline` class that owns the buffers, `AnsiWriter`, and `StdoutWriter`.
   - Implement `void render(RenderObject root, Size size)` or similar that runs:
     1. Layout pass with terminal-size constraints.
-    2. Paint pass into a fresh target `CellBuffer`.
+    2. Paint pass into a fresh target `CellBuffer` via a `CellBufferBuilder`.
     3. Diff pass against the current buffer.
     4. ANSI generation and stdout flush.
     5. Copy target buffer into current buffer.
-
-- `lib/src/engine/scheduler.dart`:
-  - Define a simple `Scheduler` that accepts frame requests and invokes a callback.
-  - For this milestone, a synchronous or microtask-based scheduler is sufficient.
 
 Out of scope (to be handled in later tasks):
 
@@ -53,13 +49,12 @@ Out of scope (to be handled in later tasks):
 - `Pipeline.render` executes layout, paint, diff, ANSI generation, and flush in order.
 - `Pipeline.render` accepts a `RenderObject` root and a `Size` terminal size.
 - After rendering, the current buffer matches the target buffer.
-- `Scheduler` can request a frame and invoke a callback.
 - All new code follows the existing project style and passes static analysis.
 - Unit tests added or updated and passing, if applicable.
 
 ## How
 
-Implement `StdoutWriter` as a thin wrapper around an `IOSink` (defaulting to `stdout`). `Pipeline` constructs the target and current buffers, `AnsiWriter`, and `StdoutWriter`. In `render`, it calls `layout` on the root render object, creates a target buffer of the given size and calls `paint`, runs the diff engine to produce operations, converts them to an ANSI string, writes the string via `StdoutWriter`, and finally copies the target buffer values into the current buffer. `Scheduler` holds a queue of frame callbacks and drains them using `scheduleMicrotask` or a simple loop.
+Implement `StdoutWriter` as a thin wrapper around an `IOSink` (defaulting to `stdout`). `Pipeline` constructs the target and current buffers, `AnsiWriter`, and `StdoutWriter`. In `render`, it calls `layout` on the root render object, creates a `CellBufferBuilder` of the given size, calls `paint` to collect cell writes, builds the immutable target `CellBuffer`, runs the diff engine to produce operations, converts them to an ANSI string, writes the string via `StdoutWriter`, and finally copies the target buffer values into the current buffer. Frames are driven by calling `Pipeline.render` directly.
 
 ## Why
 

@@ -9,6 +9,8 @@ import '../notifier/value_notifier.dart';
 /// Watches [stdinStreamProvider] and updates its value on every stream event.
 /// The notifier is initialized with an empty list and is disposed when the
 /// provider is destroyed.
+
+/// TODO change naming for this! including the folder
 final stdinValueNotifierProvider = Provider<Raw<ValueNotifier<List<int>>>>((ref) {
   final stream = ref.watch(stdinStreamProvider);
   final notifier = ValueNotifier<List<int>>([]);

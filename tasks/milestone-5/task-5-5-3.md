@@ -23,7 +23,7 @@ This task is intentionally scoped to a single focused session. It must only cove
 
 Out of scope (to be handled in later tasks):
 
-- Listener-driven rebuild tests (deferred until scheduler integration).
+- Listener-driven rebuild tests (deferred until frame-request integration).
 - Async provider tests.
 - Multi-provider consumer tests.
 

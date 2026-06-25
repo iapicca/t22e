@@ -28,14 +28,13 @@ graph TD
 Integrate the full rendering pipeline and flush output to stdout:
 - Create a `StdoutWriter` abstraction around `dart:io` stdout.
 - Implement a `Pipeline` that orchestrates the render passes.
-- Trigger the pipeline on frame requests from the scheduler.
+- Expose a simple entry point for driving frames directly.
 
 ## Scope Boundary
 
 - Deliverable this story introduces:
   - `StdoutWriter` that wraps `IOSink` and flushes generated ANSI strings.
   - `Pipeline` class exposing a `render` or `run` method.
-  - `Scheduler` integration that requests frames and drives the pipeline.
   - End-to-end smoke test that renders a full-screen `RenderText` through `RenderRoot`.
 
 Out of scope (to be handled in child tasks):
@@ -50,12 +49,11 @@ Out of scope (to be handled in child tasks):
 - All children tasks are completed and accepted.
 - The pipeline runs all four passes in order for each frame.
 - `StdoutWriter` writes the generated ANSI string and flushes the sink.
-- The scheduler can trigger repeated frames.
 - Unit and/or integration tests verify end-to-end output.
 
 ## How
 
-Create a `Pipeline` class that owns the target and current `CellBuffer` instances, an `AnsiWriter`, and a `StdoutWriter`. Its `render(RenderObject root, Size size)` method runs layout, paint, diff, and flush in sequence. The `StdoutWriter` wraps `dart:io` stdout, writes the ANSI string, and calls `flush()`. The `Scheduler` exposes a `requestFrame(VoidCallback callback)` API and invokes the pipeline callback when a frame is due. For this milestone the render tree is constructed directly in tests; in later milestones it will be produced by the widget/element layer.
+Create a `Pipeline` class that owns the target and current `CellBuffer` instances, an `AnsiWriter`, and a `StdoutWriter`. Its `render(RenderObject root, Size size)` method runs layout, paint, diff, and flush in sequence. The `StdoutWriter` wraps `dart:io` stdout, writes the ANSI string, and calls `flush()`. For this milestone the render tree is constructed directly in tests and frames are driven by calling `Pipeline.render`; in later milestones it will be produced by the widget/element layer and driven by provider change notifications.
 
 ## Why
 

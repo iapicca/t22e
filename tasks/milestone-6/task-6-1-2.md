@@ -17,7 +17,7 @@ Implement the public Riverpod providers identified in task-6-1-1.
 This task is intentionally scoped to a single focused session. It must only cover:
 
 - `lib/src/providers.dart` (new file) or appropriate existing `lib/src/view/` files:
-  - Define public providers for terminal input events, terminal size, frame scheduler, and `TuiContext` access.
+  - Define public providers for terminal input events, terminal size, and `TuiContext` access.
   - Keep each provider as a thin wrapper around the existing engine classes.
 - `lib/t22e.dart`:
   - Re-export the new public provider symbols.

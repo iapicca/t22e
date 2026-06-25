@@ -40,7 +40,7 @@ Implement the rendering engine that turns a render tree into terminal output:
 
 - Render tree abstractions (`RenderObject`, `RenderText`, `RenderRoot`).
 - Two-pass integer-cell constraint layout.
-- Paint pass writing into the target `CellBuffer`.
+- Paint pass writing into a `CellBufferBuilder` and building the immutable target `CellBuffer`.
 - Sequential diff engine over flat cell buffers.
 - `AnsiWriter` for SGR and cursor-positioning sequences.
 - `StdoutWriter` and pipeline orchestration.

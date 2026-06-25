@@ -11,7 +11,7 @@
 
 ## Logical Flow
 
-A `Consumer` widget observes a Riverpod provider. When the provider value changes, the framework schedules a new frame and rebuilds the consumer subtree, producing an updated node tree.
+A `Consumer` widget observes a Riverpod provider. When the provider value changes, the framework requests a new frame and rebuilds the consumer subtree, producing an updated node tree.
 
 ```mermaid
 graph TD
@@ -19,7 +19,7 @@ graph TD
     B --> C[Consumer Rebuilds]
     C --> D[Builder Function Called]
     D --> E[New Widget / Node]
-```
+    ```
 
 ## Objective
 
@@ -44,12 +44,12 @@ Out of scope (to be handled in child tasks):
 - All children tasks are completed and accepted.
 - `Consumer` reads a provider value through `TuiContext`.
 - The builder function is invoked during build.
-- A provider update triggers a new frame and rebuild.
+- A provider update triggers a new frame request and rebuild.
 - Unit tests verify rebuild and output changes.
 
 ## How
 
-Define a `Consumer<P, T>` widget that holds a provider and a builder function `(BuildContext-like, T value) => Widget`. During compilation it reads the provider from `TuiContext`, calls the builder, and compiles the resulting child widget. Register a listener on the provider so that when it changes, the framework's frame scheduler is asked to rebuild. For this milestone a simple listener-to-scheduler bridge is sufficient; selective element reuse is deferred.
+Define a `Consumer<P, T>` widget that holds a provider and a builder function `(BuildContext-like, T value) => Widget`. During compilation it reads the provider from `TuiContext`, calls the builder, and compiles the resulting child widget. Register a listener on the provider so that when it changes, the framework requests a new frame. For this milestone a simple listener-to-frame-request bridge is sufficient; selective element reuse is deferred.
 
 ## Why
 
