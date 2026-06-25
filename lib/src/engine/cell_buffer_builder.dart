@@ -6,6 +6,8 @@ import 'cell_buffer.dart' show CellBuffer;
 
 /// Mutable accumulator that produces an immutable [CellBuffer] in a single
 /// build step.
+
+/// TODO this looks like bullshit!
 @internal
 class CellBufferBuilder {
   /// Creates a builder of [size] filled with [defaultCell].

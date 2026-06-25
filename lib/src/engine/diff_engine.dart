@@ -6,6 +6,8 @@ import 'cell.dart' show Cell;
 import 'cell_buffer.dart' show CellBuffer;
 import 'cell_buffer_extensions.dart' show CellBufferExtensions;
 
+/// TODO I don't like this one bit! looks like TEA approach!
+
 /// A terminal update operation emitted by [DiffEngine].
 sealed class DiffOp {
   /// Creates a diff operation.

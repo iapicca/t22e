@@ -2,6 +2,8 @@ import 'package:riverpod/riverpod.dart';
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
 
+import 'fake_iosink.dart';
+
 void main() {
   group('Pipeline layout', () {
     test('seeds root with tight terminal constraints', () {
@@ -9,7 +11,7 @@ void main() {
       final child = RenderText(text: 'hi');
       root.child = child;
 
-      final pipeline = Pipeline();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter());
       final size = pipeline.layout(root, Size(80, 24));
 
       expect(size, Size(80, 24));
@@ -23,7 +25,7 @@ void main() {
       final child = RenderText(text: 'abcdefghijklmnopqrstuvwxyz');
       root.child = child;
 
-      final pipeline = Pipeline();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter());
       pipeline.layout(root, Size(10, 5));
 
       expect(child.size, Size(10, 5));
@@ -36,7 +38,7 @@ void main() {
       final child = RenderText(text: 'hi');
       root.child = child;
 
-      final pipeline = Pipeline();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter());
       pipeline.layout(root, Size(5, 5));
       final buffer = pipeline.paint(root, Size(5, 5));
 
@@ -49,7 +51,7 @@ void main() {
       final root = RenderRoot();
       root.child = RenderText(text: 'x');
 
-      final pipeline = Pipeline();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter());
       pipeline.layout(root, Size(3, 3));
       final buffer = pipeline.paint(root, Size(3, 3));
 
@@ -66,7 +68,7 @@ void main() {
         styles: const {CellStyle.bold},
       );
 
-      final pipeline = Pipeline();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter());
       pipeline.layout(root, Size(2, 2));
       final buffer = pipeline.paint(root, Size(2, 2));
 
@@ -85,6 +87,49 @@ void main() {
       final pipeline = container.read(pipelineProvider);
 
       expect(pipeline, isA<Pipeline>());
+    });
+  });
+
+  group('Pipeline render', () {
+    test('flushes ANSI output for a full frame', () {
+      final sink = FakeIOSink();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter(sink: sink));
+      final root = RenderRoot();
+      root.child = RenderText(text: 'hi');
+
+      pipeline.render(root, Size(5, 5));
+
+      expect(sink.output, 'hi');
+      expect(sink.flushes, const ['hi']);
+    });
+
+    test('emits an empty diff on an identical second frame', () {
+      final sink = FakeIOSink();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter(sink: sink));
+      final root = RenderRoot();
+      root.child = RenderText(text: 'hi');
+
+      pipeline.render(root, Size(5, 5));
+      sink.clear();
+      pipeline.render(root, Size(5, 5));
+
+      expect(sink.output, isEmpty);
+    });
+
+    test('emits a minimal diff when content changes', () {
+      final sink = FakeIOSink();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter(sink: sink));
+      final root = RenderRoot();
+      final text = RenderText(text: 'hi');
+      root.child = text;
+
+      pipeline.render(root, Size(5, 5));
+      sink.clear();
+
+      text.text = 'ho';
+      pipeline.render(root, Size(5, 5));
+
+      expect(sink.output, '\x1B[1;2Ho');
     });
   });
 }

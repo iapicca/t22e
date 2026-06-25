@@ -24,6 +24,8 @@ export 'src/engine/color_extensions.dart'
     show AnsiToColor, ColorAnsi, ColorIndex, IndexedToColor;
 export 'src/engine/pipeline.dart' show Pipeline;
 export 'src/engine/pipeline_provider.dart' show pipelineProvider;
+export 'src/engine/stdout_interface.dart' show StdoutWriter;
+export 'src/engine/stdout_interface_provider.dart' show stdoutInterfaceProvider;
 export 'src/engine/render_object.dart'
     show BoxParentData, ParentData, RenderObject, SingleChildRenderObject;
 export 'src/engine/render_object_extensions.dart' show RenderObjectTraversal;
