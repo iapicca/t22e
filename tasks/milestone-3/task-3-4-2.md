@@ -48,7 +48,7 @@ Out of scope (to be handled in later tasks):
 
 ## How
 
-Implement `AnsiWriter` with a method `String write(List<DiffOp> ops, TuiSize size)`. Maintain mutable state for the active foreground, background, and style flags. For each operation, append the appropriate escape sequence: cursor moves use `\x1B[{y+1};{x+1}H`; style changes compute the SGR parameter list from the cell's style and colors, emitting `\x1B[{params}m`; write operations append the cell character directly. When the active style changes to default, emit the reset sequence `\x1B[0m`. Keep color support limited to the 16 standard ANSI colors in this task.
+Implement `AnsiWriter` with a method `String write(List<DiffOp> ops, Size size)`. Maintain mutable state for the active foreground, background, and style flags. For each operation, append the appropriate escape sequence: cursor moves use `\x1B[{y+1};{x+1}H`; style changes compute the SGR parameter list from the cell's style and colors, emitting `\x1B[{params}m`; write operations append the cell character directly. When the active style changes to default, emit the reset sequence `\x1B[0m`. Keep color support limited to the 16 standard ANSI colors in this task.
 
 ## Why
 

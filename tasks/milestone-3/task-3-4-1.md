@@ -48,7 +48,7 @@ Out of scope (to be handled in later tasks):
 
 ## How
 
-Create a `DiffEngine` class with a method `List<DiffOp> diff(CellBuffer target, CellBuffer current, TuiSize size)`. Initialize the cursor index to 0 and the active style to a default/null cell. For each index, compare `target[index]` to `current[index]`. If they differ, append a cursor move operation if the index is not `cursor + 1`, append a style change operation if the cell style differs from the active style, append a write operation for the character, and update the tracked cursor and style. Keep the operation model simple and serializable so the ANSI writer can consume it without additional logic.
+Create a `DiffEngine` class with a method `List<DiffOp> diff(CellBuffer target, CellBuffer current, Size size)`. Initialize the cursor index to 0 and the active style to a default/null cell. For each index, compare `target[index]` to `current[index]`. If they differ, append a cursor move operation if the index is not `cursor + 1`, append a style change operation if the cell style differs from the active style, append a write operation for the character, and update the tracked cursor and style. Keep the operation model simple and serializable so the ANSI writer can consume it without additional logic.
 
 ## Why
 
