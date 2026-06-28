@@ -65,5 +65,7 @@ export 'src/view/single_child_render_object_element.dart'
     show SingleChildRenderObjectElement;
 export 'src/view/widget.dart' show Widget;
 export 'src/view/components/text.dart' show Text;
+export 'src/view/components/root.dart' show Root;
+export 'src/view/pipeline_widget_binding.dart' show PipelineWidgetBinding;
 export 'src/async_value/stdin_value_notifier_provider.dart'
     show stdinValueNotifierProvider;
