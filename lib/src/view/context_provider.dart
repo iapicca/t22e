@@ -7,9 +7,7 @@ part 'context_provider.g.dart';
 
 /// Provides the shared app [Context] backed by the active provider container.
 ///
-/// ViewModels that only hold a [Ref] can read this to obtain the [Context]
-/// that the widget tree compiles against, without touching the container
-/// directly.
+/// ViewModels holding only a [Ref] read this to reach the tree's [Context].
 @riverpod
 @internal
 Context context(Ref ref) => Context(ref.container);

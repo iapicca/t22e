@@ -8,4 +8,5 @@ part 'diff_engine_provider.g.dart';
 /// Provides a default [DiffEngine] instance.
 @riverpod
 @internal
+/// TODO why is this internal?
 DiffEngine diffEngine(Ref ref) => const DiffEngine();

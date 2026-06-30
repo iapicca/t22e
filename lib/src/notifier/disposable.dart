@@ -10,10 +10,7 @@ typedef CheckDisposed = void Function({String? message});
 
 /// Mixin providing guarded disposal lifecycle for resource-bearing classes.
 ///
-/// Use [with Disposable] on any class that needs to prevent method calls
-/// after disposal. Call [check] at the start of every public method.
-///
-/// Subclasses MUST call `super.dispose(message)` in their override.
+/// Call [check] before public methods; subclasses MUST call super.dispose.
 @internal
 mixin Disposable {
   var _disposed = const Disposed();
@@ -21,8 +18,7 @@ mixin Disposable {
   /// Whether this object has been disposed.
   bool get isDisposed => _disposed.safeCheck;
 
-  /// Guard: throws [StateError] if disposed. Call at the top of every
-  /// public method that should be blocked after disposal.
+  /// Guard: throws [StateError] if disposed.
   @protected
   CheckDisposed get check => _disposed.check;
 

@@ -33,6 +33,7 @@ class AnsiWriter {
     return buffer.toString();
   }
 
+  /// Builds the SGR escape sequence that activates [style].
   String _sgr(Cell style) {
     if (style.foreground == null &&
         style.background == null &&
@@ -60,6 +61,7 @@ class AnsiWriter {
     return '\x1B[${params.join(';')}m';
   }
 
+  /// Maps a [CellStyle] flag to its SGR parameter code.
   int _styleCode(CellStyle style) => switch (style) {
     CellStyle.bold => 1,
     CellStyle.italic => 3,
@@ -67,9 +69,11 @@ class AnsiWriter {
     CellStyle.inverse => 7,
   };
 
+  /// Maps an ANSI 16 code to its foreground SGR parameter.
   int _foregroundCode(int ansiCode) =>
       ansiCode < 8 ? 30 + ansiCode : 90 + (ansiCode - 8);
 
+  /// Maps an ANSI 16 code to its background SGR parameter.
   int _backgroundCode(int ansiCode) =>
       ansiCode < 8 ? 40 + ansiCode : 100 + (ansiCode - 8);
 }

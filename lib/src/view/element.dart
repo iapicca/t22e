@@ -44,14 +44,12 @@ abstract class Element {
 
   /// Marks this element as needing a rebuild and requests a new frame.
   ///
-  /// The host binding batches multiple requests in the same event-loop turn so
-  /// re-renders are coalesced into a single frame.
+  /// The host binding coalesces multiple requests per event-loop turn.
   void markNeedsBuild() => context.requestFrame();
 
   /// Tears down this element and its children, releasing resources.
   ///
-  /// Subclasses that own subscriptions or listeners override this to cancel
-  /// them before delegating to the superclass.
+  /// Override to cancel owned subscriptions/listeners, then call super.dispose.
   void dispose() {
     for (final child in children) {
       child.dispose();

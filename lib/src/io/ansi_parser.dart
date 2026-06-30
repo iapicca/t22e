@@ -6,6 +6,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'ansi_parser.freezed.dart';
 
 /// Recognized logical keys emitted by the parser.
+/// TODO Key should be in a separate folder, commments foe `key`s are idiotic!
+/// also add "unknown" value
 enum Key {
   /// Up arrow.
   up,
@@ -67,6 +69,7 @@ sealed class InputEvent with _$InputEvent {
 }
 
 /// Parser state while scanning an escape sequence.
+/// TODO this shouldn't be private, maybe internal, and should be in a separate files, maybe together with `key`
 enum _ParserState {
   /// Reading plain characters and control bytes.
   ground,
@@ -80,19 +83,19 @@ enum _ParserState {
 
 /// Converts raw terminal bytes into typed [InputEvent]s.
 ///
-/// Supports printable characters, common control bytes, arrow keys, and a
-/// small subset of CSI/SS3 sequences. Unknown sequences are emitted as
-/// [UnknownEvent] so callers can decide how to handle them.
+/// Covers printable chars, control bytes, arrows, and a CSI/SS3 subset.
 @internal
 class AnsiParser {
   /// Creates a parser with an empty buffer.
   AnsiParser()
+  /// TODO top-priority: WHAT THE FUCK! this should be somewhere else! and be initialized and disposed via riverpod!
     : _controller = StreamController<InputEvent>.broadcast(sync: true);
 
   bool _closed = false;
 
   final StreamController<InputEvent> _controller;
   final List<int> _buffer = <int>[];
+  /// TODO this should be a value notifier 
   _ParserState _state = _ParserState.ground;
 
   /// The broadcast stream of parsed input events.
@@ -105,6 +108,7 @@ class AnsiParser {
   }
 
   /// Flushes any remaining buffered bytes and closes the event stream.
+  /// TODO this should be handled with disposable mixin and be "dispose" rather than `close`
   void close() {
     if (_closed) return;
     _closed = true;
@@ -127,6 +131,7 @@ class AnsiParser {
   }
 
   /// Handles one byte or run in ground state.
+  /// TODO this can be an extension!
   bool _processGround() {
     final byte = _buffer.first;
     if (byte == _esc) {
@@ -159,6 +164,7 @@ class AnsiParser {
   }
 
   /// Handles the byte following ESC.
+    /// TODO this can be an extension!
   bool _processEscape() {
     if (_buffer.isEmpty) return false;
     final byte = _buffer.first;
@@ -191,6 +197,7 @@ class AnsiParser {
   }
 
   /// Handles a CSI sequence.
+/// TODO this can be an extension!
   bool _processCsi() {
     final start = 0;
     var i = start;
@@ -230,6 +237,7 @@ class AnsiParser {
   }
 
   /// Flushes remaining buffered bytes as events.
+    /// TODO this can be an extension!
   void _flush() {
     switch (_state) {
       case _ParserState.ground:
@@ -260,6 +268,7 @@ class AnsiParser {
   }
 
   /// Emits a control byte as a key or character event.
+      /// TODO this can be an extension!
   void _emitControl(int byte) {
     final key = _controlKey(byte);
     if (key != null) {
@@ -270,6 +279,9 @@ class AnsiParser {
   }
 
   /// Maps a control byte to a logical key, if recognized.
+    /// TODO this has nothing to do with AnsiParser and should be a factory of Key
+    /// returnin a non-null Key and `_ =>` return "Key.unknown"
+    /// finally bytes should be mapped in a final class as `static const int` 
   static Key? _controlKey(int byte) {
     return switch (byte) {
       0x03 => Key.ctrlC,
@@ -281,13 +293,15 @@ class AnsiParser {
     };
   }
 
-  /// Maps an SS3 final byte to a logical key.
-  ///
-  /// SS3 function-key sequences are not mapped in this milestone and fall
-  /// back to [UnknownEvent].
+  /// Maps an SS3 final byte to a logical key; unmapped in this phase.
+ /// TODO this has nothing to do with AnsiParser and should be a factory of Key
+    /// returnin  "Key.unknown"
   static Key? _ss3Key(int byte) => null;
 
   /// Maps a completed CSI sequence to a logical key.
+   /// TODO this has nothing to do with AnsiParser and should be a factory of Key
+    /// returnin a non-null Key and `_ =>` return "Key.unknown"
+    /// finally bytes should be mapped in a final class as `static const int` 
   static Key? _csiKey(List<int> params, int finalByte) {
     final paramString = String.fromCharCodes(params);
     return switch (finalByte) {
@@ -310,6 +324,8 @@ class AnsiParser {
   }
 
   /// Decodes a UTF-8 byte run to a single character string.
+  /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// utf8.decode should be "imported" through riverpod
   static String? _decodeUtf8(List<int> bytes) {
     try {
       return utf8.decode(bytes, allowMalformed: false);
@@ -318,8 +334,9 @@ class AnsiParser {
     }
   }
 
-  /// Returns the number of bytes in a UTF-8 code point starting with [byte],
-  /// or 0 if [byte] cannot start a sequence.
+  /// Bytes in the UTF-8 code point starting with [byte], or 0 if invalid lead.
+  /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static int _utf8Length(int byte) {
     if (byte < 0x80) return 1;
     if ((byte & 0xE0) == 0xC0) return 2;
@@ -329,18 +346,32 @@ class AnsiParser {
   }
 
   /// Whether [byte] is a control byte that should not be decoded as UTF-8.
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isControl(int byte) => byte < 0x20 || byte == 0x7F;
 
   /// Whether [byte] is a CSI parameter byte.
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isCsiParam(int byte) => byte >= 0x30 && byte <= 0x3F;
 
   /// Whether [byte] is a CSI intermediate byte.
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isCsiIntermediate(int byte) => byte >= 0x20 && byte <= 0x2F;
 
   /// Whether [byte] is a CSI final byte.
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isCsiFinal(int byte) => byte >= 0x40 && byte <= 0x7E;
 
+  /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static const int _esc = 0x1B;
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static const int _csiIntroducer = 0x5B; // '['
+    /// TODO this has nothing to do with AnsiParser and should be in a separate file
+    /// finally bytes should be mapped in a final class as `static const int` 
   static const int _ss3Introducer = 0x4F; // 'O'
 }

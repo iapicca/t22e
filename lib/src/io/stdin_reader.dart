@@ -5,8 +5,8 @@ import 'package:meta/meta.dart' show internal;
 
 /// Wraps a byte source as a broadcast stream for terminal input.
 ///
-/// Multiple listeners can subscribe to [bytes]. Call [dispose] when the
-/// reader is no longer needed to cancel the underlying subscription.
+/// Multiple listeners can subscribe to [bytes]; call [dispose] to release.
+/// TODO I want to rework this by hand!
 @internal
 class StdinReader {
   /// Creates a reader that forwards bytes from [source], defaulting to stdin.

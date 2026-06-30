@@ -6,8 +6,7 @@ import 'stdin_stream_provider.dart' show stdinStreamProvider;
 
 /// Provides the parsed input-event stream from stdin.
 ///
-/// Buffers raw bytes from [stdinStreamProvider] through [ansiParserProvider]
-/// and exposes the resulting [InputEvent] stream.
+/// Pipes [stdinStreamProvider] through [ansiParserProvider] to expose events.
 final inputEventStreamProvider = Provider<Stream<InputEvent>>((ref) {
   final parser = ref.watch(ansiParserProvider);
   final bytes = ref.watch(stdinStreamProvider);

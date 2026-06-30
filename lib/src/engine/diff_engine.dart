@@ -6,7 +6,7 @@ import 'cell.dart' show Cell;
 import 'cell_buffer.dart' show CellBuffer;
 import 'cell_buffer_extensions.dart' show CellBufferExtensions;
 
-/// TODO I don't like this one bit! looks like TEA approach!
+// TODO I don't like this one bit! looks like TEA approach!
 
 /// A terminal update operation emitted by [DiffEngine].
 @internal
@@ -40,8 +40,7 @@ final class DiffOpStyle extends DiffOp {
 
   /// The cell whose colors and style flags become active.
   ///
-  /// The [Cell.character] value is ignored and is only kept as a canonical
-  /// style carrier.
+  /// [Cell.character] is ignored; the cell is only a canonical style carrier.
   final Cell style;
 
   @override
@@ -77,8 +76,7 @@ class DiffEngine {
 
   /// Scans [target] against [current] and returns the update operations.
   ///
-  /// The [size] argument defines the logical grid dimensions and must match
-  /// both buffers.
+  /// [size] defines the grid dimensions and must match both buffers.
   List<DiffOp> diff(CellBuffer target, CellBuffer current, Size size) {
     assert(
       target.width == current.width,

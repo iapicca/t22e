@@ -5,6 +5,7 @@ import 'cell.dart' show Cell;
 import 'cell_buffer_builder.dart' show CellBufferBuilder;
 
 /// Batch write helpers for [CellBufferBuilder].
+// TODO this seems very "theoretical"; maybe not really "engine" material.
 @internal
 extension CellBufferBuilderBatch on CellBufferBuilder {
   /// Writes [cell] at each coordinate in [offsets] relative to [origin].

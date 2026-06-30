@@ -5,8 +5,7 @@ import 'element.dart' show Element;
 
 /// Immutable configuration for a piece of UI.
 ///
-/// TODO: Equality and Key support are deferred. Identity equality is correct
-/// for const widgets but not for value-equal non-const widgets.
+/// TODO: Equality/Key support deferred; identity equality is a stopgap.
 @immutable
 @internal
 abstract class Widget {

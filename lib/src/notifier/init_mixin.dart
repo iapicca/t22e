@@ -18,13 +18,9 @@ extension type const Initialized._(bool _isInitialized) {
   bool get safeCheck => _isInitialized;
 }
 
-/// Mixin providing guarded initialization lifecycle for resource-bearing classes.
+/// Mixin providing guarded initialization lifecycle for resource classes.
 ///
-/// Use [with InitMixin] on any class that needs to ensure methods are not called
-/// before initialization. Call [checkInit] at the start of every public method
-/// that requires prior initialization.
-///
-/// Subclasses MUST call `super.init()` in their override.
+/// Call [checkInit] before public methods; subclasses MUST call super.init.
 @internal
 mixin InitMixin {
   var _initialized = const Initialized();

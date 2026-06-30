@@ -4,10 +4,8 @@
 
 Before planning or building, read:
 
-- `.ai/refined-project-specifications.md` — architecture and scope
+- `.ai/project.md` — architecture and scope
 - `.ai/coding-standards.md` — style and conventions
-- `./tasks/task-template.md` — task hierarchy format
-- Relevant task files under `./tasks/`
 
 ## Generated files
 

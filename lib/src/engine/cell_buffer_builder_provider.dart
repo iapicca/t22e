@@ -9,5 +9,6 @@ part 'cell_buffer_builder_provider.g.dart';
 /// Provides a [CellBufferBuilder] of the given dimensions.
 @riverpod
 @internal
+/// TODO this is exporting bullshit and shouldn't be internal
 CellBufferBuilder cellBufferBuilder(Ref ref, int width, int height) =>
     CellBufferBuilder(Size(width, height));

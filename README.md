@@ -13,4 +13,4 @@ dart pub get
 dart analyze
 ```
 
-See `./.ai/refined-project-specifications.md` for architectural details.
+See `./.ai/project.md` for architectural details.

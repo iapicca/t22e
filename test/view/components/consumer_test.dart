@@ -38,7 +38,7 @@ void main() {
       );
     });
 
-    test('ref.watch obtains the same value as ref.read for this milestone', () {
+    test('ref.watch obtains the same value as ref.read in this phase', () {
       final name = Provider<String>((ref) => 'Ada');
       final container = ProviderContainer();
       addTearDown(container.dispose);

@@ -30,19 +30,14 @@ class Pipeline {
   Size layout(RenderObject root, Size terminalSize) =>
       root.layout(Constraints.tight(terminalSize));
 
-  /// Runs the paint pass for [root] into a [CellBuffer] of [terminalSize].
-  ///
-  /// Callers should run [layout] first so that sizes and offsets are resolved.
+  /// Paints [root] into a [CellBuffer] of [terminalSize]; run [layout] first.
   CellBuffer paint(RenderObject root, Size terminalSize) {
     final builder = CellBufferBuilder(terminalSize);
     root.paint(builder, const Offset(0, 0));
     return builder.build();
   }
 
-  /// Renders a full frame for [root] into a terminal of [size].
-  ///
-  /// Runs layout, paint, diff, ANSI generation, stdout flush, and copies the
-  /// target buffer into the current buffer.
+  /// Renders one frame: layout, paint, diff, ANSI emit, flush, buffer copy.
   void render(RenderObject root, Size size) {
     layout(root, size);
     final target = paint(root, size);
@@ -53,6 +48,7 @@ class Pipeline {
     _current = _diffEngine.copyTarget(target);
   }
 
+  /// Returns the current buffer, or a blank one sized for [size].
   CellBuffer _bufferForSize(Size size) {
     final buffer = _current;
     if (buffer != null && buffer.size == size) return buffer;

@@ -8,6 +8,7 @@ part 'ansi_parser_provider.g.dart';
 /// Provides a default [AnsiParser] instance.
 @riverpod
 @internal
+/// TODO why is this internal?
 AnsiParser ansiParser(Ref ref) {
   final parser = AnsiParser();
   ref.onDispose(parser.close);

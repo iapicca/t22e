@@ -29,11 +29,7 @@ abstract class SingleChildRenderObjectElement
     }
   }
 
-  /// Returns the render object for [element], descending past proxy elements
-  /// (such as `Consumer`) that own no render object.
-  ///
-  /// A single-child render element's render tree child is the nearest render
-  /// object among its element descendants, so transparent proxies are skipped.
+  /// Nearest [RenderObject] among [element]'s descendants, skipping proxies.
   static RenderObject _renderObjectDescendant(Element element) {
     if (element is RenderObjectElement) return element.renderObject;
     for (final child in element.children) {

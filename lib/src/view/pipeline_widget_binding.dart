@@ -13,11 +13,7 @@ import 'widget.dart' show Widget;
 extension PipelineWidgetBinding on Pipeline {
   /// Builds [appChild] into a full-screen [Root] and renders one frame.
   ///
-  /// Compiles the widget tree into an element tree, mounts it, and delegates
-  /// to [Pipeline.render] for the layout, paint, diff, and flush passes. When
-  /// [context] is omitted an empty [ProviderContainer] is used, which is only
-  /// suitable for provider-less subtrees; pass a real context to read
-  /// application providers.
+  /// Without [context] an empty container is used (provider-less only).
   @internal
   void renderWidget(
     Widget appChild,

@@ -5,13 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../io/stdin_stream_provider.dart';
 import '../notifier/value_notifier.dart';
 
-/// A [ValueNotifier] that synchronously holds the latest bytes from [stdin].
+/// Synchronously holds the latest stdin bytes; updates on every stream event.
 ///
-/// Watches [stdinStreamProvider] and updates its value on every stream event.
-/// The notifier is initialized with an empty list and is disposed when the
-/// provider is destroyed.
-
-/// TODO change naming for this! including the folder
+/// Watches [stdinStreamProvider] and is disposed with the provider.
+// TODO change naming for this! including the folder
 @internal
 final stdinValueNotifierProvider = Provider<Raw<ValueNotifier<List<int>>>>((
   ref,

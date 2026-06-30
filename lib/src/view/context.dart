@@ -2,19 +2,13 @@ import 'package:riverpod/riverpod.dart' show ProviderContainer;
 import 'package:riverpod_annotation/riverpod_annotation.dart'
     show ProviderListenable;
 
-/// Application context that exposes Riverpod provider access during the
-/// build pass.
+/// App context wrapping the active [ProviderContainer] for the whole tree.
 ///
-/// This is the "app context": it wraps the active [ProviderContainer] and is
-/// shared across the whole widget tree. Tree-local data (parent constraints,
-/// theme, style) is intentionally not stored here yet; a separate widget
-/// context can be introduced later without changing this surface.
+/// Tree-local data (constraints, theme) deferred to a later widget context.
 class Context {
   /// Creates an app context backed by [container].
   ///
-  /// The optional [requestFrame] callback is invoked by elements that need a
-  /// rebuild (see `Element.markNeedsBuild`); when omitted, provider-driven
-  /// rebuilds are not wired and widgets only update on an explicit recompile.
+  /// [requestFrame] drives provider rebuilds; omitted means not wired.
   const Context(this.container, {this._requestFrame});
 
   /// The Riverpod container used to read providers.
@@ -23,15 +17,13 @@ class Context {
   /// Frame-request hook set by the host binding that drives re-renders.
   final void Function()? _requestFrame;
 
-  /// Reads the current value of [provider] from the underlying container.
+  /// Reads the current value of [provider] as a one-shot, never subscribing.
   ///
-  /// This performs a one-shot read; it never subscribes. Use `WidgetRef.watch`
-  /// from a `Consumer` to register for rebuild-on-change.
+  /// Use `WidgetRef.watch` from a `Consumer` to register rebuild-on-change.
   T read<T>(ProviderListenable<T> provider) => container.read(provider);
 
   /// Requests a new frame from the host binding, if one is wired.
   ///
-  /// Called by `Element.markNeedsBuild` when a watched provider changes. It is
-  /// a no-op when no host binding supplied [requestFrame] at construction.
+  /// Called by `Element.markNeedsBuild`; a no-op when no binding is wired.
   void requestFrame() => _requestFrame?.call();
 }

@@ -13,17 +13,12 @@ import '../widget_ref.dart' show WidgetRef;
 
 /// Builds a widget subtree while reading providers through [ref].
 ///
-/// Mirrors `flutter_riverpod`'s `Consumer`: instead of taking a single
-/// provider as a field, it hands a [WidgetRef] to [builder] so the builder
-/// can read whichever providers it needs.
+/// Mirrors flutter_riverpod: hands [builder] a [WidgetRef] for any provider.
 typedef ConsumerBuilder = Widget Function(Context context, WidgetRef ref);
 
 /// A widget that reads Riverpod providers and rebuilds its subtree.
 ///
-/// The [builder] receives a [WidgetRef] and should obtain provider values via
-/// [WidgetRef.read] or [WidgetRef.watch]. The returned widget is compiled and
-/// mounted as the consumer's only child; `Consumer` itself owns no
-/// [RenderObject] and is transparent to layout and paint.
+/// [builder]'s widget is the only child; Consumer owns no render object.
 @immutable
 class Consumer extends Widget {
   /// Creates a consumer that builds its subtree from [builder].
@@ -37,27 +32,21 @@ class Consumer extends Widget {
       ConsumerElement(widget: this, context: context);
 }
 
-/// Runtime element for a [Consumer].
+/// Transparent proxy element for a [Consumer]; owns no render object.
 ///
-/// It is a transparent proxy: it evaluates [Consumer.builder] with itself as
-/// the [WidgetRef], compiles the returned widget into a single child element,
-/// and delegates layout and paint to that child. [WidgetRef.watch] subscribes
-/// to providers via the container and calls [markNeedsBuild] on change, which
-/// requests a new frame from the host binding.
+/// Compiles [Consumer.builder] into a child; [watch] calls [markNeedsBuild].
 @internal
 class ConsumerElement extends Element implements WidgetRef {
   /// Creates an element for [widget].
   ConsumerElement({required Consumer super.widget, required super.context});
 
+  /// The [Consumer] widget this element represents.
   Consumer get _widget => widget as Consumer;
 
   /// The child element produced by [Consumer.builder].
   Element? _child;
 
-  /// Subscriptions created by [watch], keyed by the listened provider.
-  ///
-  /// A provider watched once per build pass is subscribed at most once; the
-  /// subscriptions are cancelled in [dispose].
+  /// [watch] subscriptions keyed by listened provider; cancelled in [dispose].
   final Map<ProviderListenable<dynamic>, ProviderSubscription<dynamic>>
       _dependencies =
       <ProviderListenable<dynamic>, ProviderSubscription<dynamic>>{};

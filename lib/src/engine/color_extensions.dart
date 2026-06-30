@@ -48,6 +48,7 @@ const Map<int, Color> _ansiToRgb = {
   15: Color.brightWhite(),
 };
 
+/// Converts a 256-color palette index to its RGB triple.
 (int, int, int) _indexToRgb(int index) {
   if (index < _indexedColorCubeStart) {
     final color = _ansiToRgb[index]!;
@@ -65,6 +66,7 @@ const Map<int, Color> _ansiToRgb = {
   return (red, green, blue);
 }
 
+/// Finds the nearest 256-color palette index for the given RGB triple.
 int _rgbToIndexed(int red, int green, int blue) {
   var bestDistance = double.infinity;
   var bestIndex = 0;
@@ -105,6 +107,7 @@ int _rgbToIndexed(int red, int green, int blue) {
   return bestIndex;
 }
 
+/// Maps a 256-color index down to its nearest ANSI 16-color code.
 int _indexedToAnsi(int index) {
   if (index < _indexedColorCubeStart) return index;
   const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
@@ -126,6 +129,7 @@ int _indexedToAnsi(int index) {
   return maxValue >= 5 ? ansi + 8 : ansi;
 }
 
+/// Redmean-weighted squared distance between two RGB colors.
 double _redmeanDistance(
   int red1,
   int green1,
