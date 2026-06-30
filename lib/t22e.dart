@@ -39,6 +39,7 @@ export 'src/models/constraints.dart' show Constraints;
 export 'src/models/offset.dart' show Offset;
 export 'src/models/rect.dart' show Rect;
 export 'src/models/size.dart' show Size;
+export 'src/models/size_provider.dart' show terminalSizeProvider;
 
 export 'src/notifier/notifier.dart'
     show
@@ -59,13 +60,17 @@ export 'src/io/ansi_parser.dart'
 export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
 export 'src/io/input_event_stream_provider.dart' show inputEventStreamProvider;
 export 'src/view/context.dart' show Context;
+export 'src/view/context_provider.dart' show contextProvider;
 export 'src/view/element.dart' show Element;
+export 'src/view/widget_ref.dart' show WidgetRef;
 export 'src/view/render_object_element.dart' show RenderObjectElement;
 export 'src/view/single_child_render_object_element.dart'
     show SingleChildRenderObjectElement;
 export 'src/view/widget.dart' show Widget;
 export 'src/view/components/text.dart' show Text;
 export 'src/view/components/root.dart' show Root;
+export 'src/view/components/consumer.dart'
+    show Consumer, ConsumerBuilder, ConsumerElement;
 export 'src/view/pipeline_widget_binding.dart' show PipelineWidgetBinding;
 export 'src/async_value/stdin_value_notifier_provider.dart'
     show stdinValueNotifierProvider;

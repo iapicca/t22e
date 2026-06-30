@@ -1,3 +1,4 @@
+import 'package:riverpod/riverpod.dart' show ProviderContainer;
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
 
@@ -5,7 +6,7 @@ void main() {
   group('Text widget', () {
     test('compiles to a RenderObjectElement owning a RenderText', () {
       const widget = Text('hello');
-      final element = widget.compile(const Context());
+      final element = widget.compile(Context(ProviderContainer()));
 
       expect(element, isA<RenderObjectElement<RenderText>>());
       expect(element.widget, same(widget));
@@ -15,7 +16,7 @@ void main() {
 
     test('layout reports text length by one row', () {
       const widget = Text('abcd');
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.loose(const Size(20, 10)));
       expect(element.size, const Size(4, 1));
@@ -23,7 +24,7 @@ void main() {
 
     test('layout reports Size(0, 1) for empty text', () {
       const widget = Text('');
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.loose(const Size(20, 10)));
       expect(element.size, const Size(0, 1));
@@ -31,7 +32,7 @@ void main() {
 
     test('layout clamps width to constraints', () {
       const widget = Text('abcdefghijklmnopqrstuvwxyz');
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.loose(const Size(10, 10)));
       expect(element.size, const Size(10, 1));
@@ -39,7 +40,7 @@ void main() {
 
     test('paint writes characters at the element offset', () {
       const widget = Text('AB');
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
       element.layout(Constraints.loose(const Size(10, 10)));
 
       final builder = CellBufferBuilder(const Size(10, 10));
@@ -60,7 +61,7 @@ void main() {
         background: background,
         styles: styles,
       );
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
       element.layout(Constraints.loose(const Size(10, 10)));
 
       final builder = CellBufferBuilder(const Size(10, 10));
@@ -76,7 +77,7 @@ void main() {
 
     test('paint clips characters outside computed size', () {
       const widget = Text('ABCD');
-      final element = widget.compile(const Context())..mount(null);
+      final element = widget.compile(Context(ProviderContainer()))..mount(null);
       element.layout(Constraints.tight(const Size(2, 1)));
 
       final builder = CellBufferBuilder(const Size(2, 1));

@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart' show immutable;
+import 'package:riverpod/riverpod.dart' show ProviderContainer;
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
 
@@ -6,7 +7,7 @@ void main() {
   group('Element', () {
     test('stores widget, context, parent, children, size, and offset', () {
       const widget = _LeafWidget(text: 'a');
-      const context = Context();
+      final context = Context(ProviderContainer());
       final element = widget.compile(context);
 
       expect(element.widget, same(widget));
@@ -22,7 +23,7 @@ void main() {
     test('mount attaches parent and child elements', () {
       const leaf = _LeafWidget(text: 'child');
       final parentWidget = _ParentWidget(child: leaf);
-      final parent = parentWidget.compile(const Context());
+      final parent = parentWidget.compile(Context(ProviderContainer()));
 
       expect(parent.children, isEmpty);
       parent.mount(null);
@@ -33,7 +34,7 @@ void main() {
 
     test('RenderObjectElement delegates layout and paint to render object', () {
       const widget = _LeafWidget(text: 'hi');
-      final element = widget.compile(const Context());
+      final element = widget.compile(Context(ProviderContainer()));
       element.mount(null);
 
       element.layout(Constraints.loose(const Size(10, 10)));

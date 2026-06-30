@@ -1,3 +1,4 @@
+import 'package:riverpod/riverpod.dart' show ProviderContainer;
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
 
@@ -13,7 +14,7 @@ void main() {
 
     test('compiles to a SingleChildRenderObjectElement owning a RenderRoot', () {
       const root = Root(terminalSize: Size(80, 24), child: Text('hi'));
-      final element = root.compile(const Context());
+      final element = root.compile(Context(ProviderContainer()));
 
       expect(element, isA<SingleChildRenderObjectElement>());
       expect(element.renderObject, isA<RenderRoot>());
@@ -23,7 +24,7 @@ void main() {
     test('compiles the child recursively on mount', () {
       const child = Text('hi');
       const root = Root(terminalSize: Size(80, 24), child: child);
-      final element = root.compile(const Context());
+      final element = root.compile(Context(ProviderContainer()));
 
       expect(element.children, isEmpty);
       element.mount(null);
@@ -34,7 +35,7 @@ void main() {
 
     test('layout sets the root size to the terminal size', () {
       const root = Root(terminalSize: Size(80, 24), child: Text('hi'));
-      final element = root.compile(const Context())..mount(null);
+      final element = root.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.tight(const Size(80, 24)));
 
@@ -44,7 +45,7 @@ void main() {
 
     test('child render object is positioned at (0, 0) and fills the terminal', () {
       const root = Root(terminalSize: Size(30, 10), child: Text('hi'));
-      final element = root.compile(const Context())..mount(null);
+      final element = root.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.tight(const Size(30, 10)));
 
@@ -56,7 +57,7 @@ void main() {
 
     test('child render object receives constraints equal to the terminal size', () {
       const root = Root(terminalSize: Size(12, 3), child: Text('hi'));
-      final element = root.compile(const Context())..mount(null);
+      final element = root.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.tight(const Size(12, 3)));
 
@@ -69,7 +70,7 @@ void main() {
 
     test('layout reflects a different terminal size', () {
       const root = Root(terminalSize: Size(40, 12), child: Text('hi'));
-      final element = root.compile(const Context())..mount(null);
+      final element = root.compile(Context(ProviderContainer()))..mount(null);
 
       element.layout(Constraints.tight(const Size(40, 12)));
 

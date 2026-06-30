@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart' show immutable;
+import 'package:riverpod/riverpod.dart' show ProviderContainer;
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
 
@@ -6,7 +7,7 @@ void main() {
   group('Widget', () {
     test('can be const constructed and compiled into an Element', () {
       const widget = _StubWidget();
-      final element = widget.compile(const Context());
+      final element = widget.compile(Context(ProviderContainer()));
 
       expect(element, isA<Element>());
       expect(element.widget, same(widget));
