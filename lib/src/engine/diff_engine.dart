@@ -9,12 +9,14 @@ import 'cell_buffer_extensions.dart' show CellBufferExtensions;
 /// TODO I don't like this one bit! looks like TEA approach!
 
 /// A terminal update operation emitted by [DiffEngine].
+@internal
 sealed class DiffOp {
   /// Creates a diff operation.
   const DiffOp();
 }
 
 /// Positions the terminal cursor at [offset] using zero-indexed coordinates.
+@internal
 final class DiffOpMove extends DiffOp {
   /// Creates a cursor move operation.
   const DiffOpMove(this.offset);
@@ -31,6 +33,7 @@ final class DiffOpMove extends DiffOp {
 }
 
 /// Updates the active terminal style to match [style].
+@internal
 final class DiffOpStyle extends DiffOp {
   /// Creates a style change operation.
   const DiffOpStyle(this.style);
@@ -50,6 +53,7 @@ final class DiffOpStyle extends DiffOp {
 }
 
 /// Writes [character] at the current cursor position.
+@internal
 final class DiffOpWrite extends DiffOp {
   /// Creates a character write operation.
   const DiffOpWrite(this.character);

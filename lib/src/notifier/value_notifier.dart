@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart' show internal;
+
 import 'change_notifier.dart';
 
 /// A [ChangeNotifier] that holds a single value and notifies listeners
 /// whenever the value changes. Mirrors Flutter's [ValueNotifier].
+@internal
 class ValueNotifier<T> extends ChangeNotifier {
   T _value;
 

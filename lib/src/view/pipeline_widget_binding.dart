@@ -9,6 +9,7 @@ import 'render_object_element.dart' show RenderObjectElement;
 import 'widget.dart' show Widget;
 
 /// Build-pass bridge that drives a [Pipeline] from a declarative widget tree.
+@internal
 extension PipelineWidgetBinding on Pipeline {
   /// Builds [appChild] into a full-screen [Root] and renders one frame.
   ///

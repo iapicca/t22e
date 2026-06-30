@@ -7,6 +7,7 @@ part 'cell_buffer.freezed.dart';
 
 /// A flat buffer of immutable [Cell] values addressed as a 2D terminal grid.
 @freezed
+@internal
 abstract class CellBuffer with _$CellBuffer {
   const CellBuffer._();
 

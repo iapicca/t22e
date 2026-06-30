@@ -7,6 +7,7 @@ part 'cell.freezed.dart';
 
 /// A single terminal cell containing a visible character and its attributes.
 @freezed
+@internal
 abstract class Cell with _$Cell {
   const Cell._();
 

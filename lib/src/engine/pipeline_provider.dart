@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart' show internal;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'ansi_writer_provider.dart' show ansiWriterProvider;
@@ -9,6 +10,7 @@ part 'pipeline_provider.g.dart';
 
 /// Provides a default [Pipeline] instance with injected engine dependencies.
 @riverpod
+@internal
 Pipeline pipeline(Ref ref) => Pipeline(
       ansiWriter: ref.read(ansiWriterProvider),
       diffEngine: ref.read(diffEngineProvider),

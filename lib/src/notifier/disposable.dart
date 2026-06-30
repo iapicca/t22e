@@ -14,6 +14,7 @@ typedef CheckDisposed = void Function({String? message});
 /// after disposal. Call [check] at the start of every public method.
 ///
 /// Subclasses MUST call `super.dispose(message)` in their override.
+@internal
 mixin Disposable {
   var _disposed = const Disposed();
 

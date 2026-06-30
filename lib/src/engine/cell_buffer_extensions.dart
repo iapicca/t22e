@@ -1,9 +1,12 @@
+import 'package:meta/meta.dart' show internal;
+
 import '../models/offset.dart';
 import '../models/size.dart';
 import 'cell.dart';
 import 'cell_buffer.dart';
 
 /// Coordinate and mutation helpers for [CellBuffer].
+@internal
 extension CellBufferExtensions on CellBuffer {
   /// Buffer height derived from [width] and [cells].
   int get height => width == 0 ? 0 : (area / width).ceil();

@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart' show internal;
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,6 +12,7 @@ import '../notifier/value_notifier.dart';
 /// provider is destroyed.
 
 /// TODO change naming for this! including the folder
+@internal
 final stdinValueNotifierProvider = Provider<Raw<ValueNotifier<List<int>>>>((
   ref,
 ) {

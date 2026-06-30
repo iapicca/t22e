@@ -4,6 +4,7 @@ import 'disposable.dart';
 
 /// Observable object that manages a list of listeners and notifies them
 /// of changes. Mirrors Flutter's [ChangeNotifier] with structured disposal.
+@internal
 class ChangeNotifier with Disposable {
   final List<VoidCallback> _listeners = [];
 

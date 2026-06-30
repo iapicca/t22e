@@ -3,6 +3,7 @@ import 'dart:io' show IOSink, stdout;
 
 import 'package:meta/meta.dart' show internal;
 
+@internal
 mixin StdoutInterface {
   void write(String ansi);
 }

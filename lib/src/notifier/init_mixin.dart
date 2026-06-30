@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 typedef CheckInitialized = void Function({String? message});
 
 /// Immutable guard: throws [StateError] on use-before-init.
+@internal
 extension type const Initialized._(bool _isInitialized) {
   const Initialized({bool isInitialized = false})
     : _isInitialized = isInitialized;
@@ -24,6 +25,7 @@ extension type const Initialized._(bool _isInitialized) {
 /// that requires prior initialization.
 ///
 /// Subclasses MUST call `super.init()` in their override.
+@internal
 mixin InitMixin {
   var _initialized = const Initialized();
 
