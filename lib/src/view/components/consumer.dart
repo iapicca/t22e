@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart' show immutable, internal;
+import 'package:riverpod/riverpod.dart' show ProviderSubscription;
 import 'package:riverpod_annotation/riverpod_annotation.dart'
     show ProviderListenable;
 
@@ -40,7 +41,9 @@ class Consumer extends Widget {
 ///
 /// It is a transparent proxy: it evaluates [Consumer.builder] with itself as
 /// the [WidgetRef], compiles the returned widget into a single child element,
-/// and delegates layout and paint to that child.
+/// and delegates layout and paint to that child. [WidgetRef.watch] subscribes
+/// to providers via the container and calls [markNeedsBuild] on change, which
+/// requests a new frame from the host binding.
 @internal
 class ConsumerElement extends Element implements WidgetRef {
   /// Creates an element for [widget].
@@ -50,6 +53,14 @@ class ConsumerElement extends Element implements WidgetRef {
 
   /// The child element produced by [Consumer.builder].
   Element? _child;
+
+  /// Subscriptions created by [watch], keyed by the listened provider.
+  ///
+  /// A provider watched once per build pass is subscribed at most once; the
+  /// subscriptions are cancelled in [dispose].
+  final Map<ProviderListenable<dynamic>, ProviderSubscription<dynamic>>
+      _dependencies =
+      <ProviderListenable<dynamic>, ProviderSubscription<dynamic>>{};
 
   @override
   void mount(Element? parent) {
@@ -73,8 +84,26 @@ class ConsumerElement extends Element implements WidgetRef {
   }
 
   @override
+  void dispose() {
+    for (final subscription in _dependencies.values) {
+      subscription.close();
+    }
+    _dependencies.clear();
+    super.dispose();
+  }
+
+  @override
   T read<T>(ProviderListenable<T> provider) => context.read(provider);
 
   @override
-  T watch<T>(ProviderListenable<T> provider) => context.read(provider);
+  T watch<T>(ProviderListenable<T> provider) {
+    _dependencies.putIfAbsent(
+      provider,
+      () => context.container.listen<T>(
+        provider,
+        (_, _) => markNeedsBuild(),
+      ),
+    );
+    return context.read(provider);
+  }
 }

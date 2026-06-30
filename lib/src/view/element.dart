@@ -41,4 +41,21 @@ abstract class Element {
 
   /// Paints this element into [buffer] at [offset].
   void paint(CellBufferBuilder buffer, Offset offset);
+
+  /// Marks this element as needing a rebuild and requests a new frame.
+  ///
+  /// The host binding batches multiple requests in the same event-loop turn so
+  /// re-renders are coalesced into a single frame.
+  void markNeedsBuild() => context.requestFrame();
+
+  /// Tears down this element and its children, releasing resources.
+  ///
+  /// Subclasses that own subscriptions or listeners override this to cancel
+  /// them before delegating to the superclass.
+  void dispose() {
+    for (final child in children) {
+      child.dispose();
+    }
+    children.clear();
+  }
 }

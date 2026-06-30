@@ -7,10 +7,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart'
 /// This mirrors `flutter_riverpod`'s `WidgetRef`: widgets never touch the
 /// [ProviderContainer] directly, they go through a `WidgetRef`. The concrete
 /// implementation is the consumer's element, which is marked `@internal`.
-///
-/// `watch` currently behaves like [read] for this milestone; the subscription
-/// + `markNeedsBuild` technique that drives automatic rebuilds is added in a
-/// later milestone (see `tasks/milestone-6/NOTE-consumer-rebuild-wiring.md`).
 abstract class WidgetRef {
   /// Creates a widget ref.
   const WidgetRef();
@@ -20,9 +16,10 @@ abstract class WidgetRef {
 
   /// Reads [provider] and registers it for rebuild-on-change.
   ///
-  /// For this milestone this is equivalent to [read]. The later-milestone
-  /// implementation subscribes via `container.listen` and marks the owning
-  /// element dirty when the provider notifies, exactly like
-  /// `flutter_riverpod`'s `ConsumerStatefulElement.watch`.
+  /// Subscribes via `ProviderContainer.listen` so that, when [provider]
+  /// notifies, the owning element is marked dirty and a new frame is
+  /// requested, mirroring `flutter_riverpod`'s `ConsumerStatefulElement.watch`.
+  /// A provider watched more than once in a single build pass is subscribed at
+  /// most once.
   T watch<T>(ProviderListenable<T> provider);
 }
