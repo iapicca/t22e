@@ -1,13 +1,10 @@
 import 'dart:math' show max, min;
 
-import 'package:meta/meta.dart' show internal;
-
 import 'offset.dart';
 
 /// An immutable axis-aligned rectangle in terminal-cell coordinates.
 ///
 /// [right] and [bottom] are exclusive, following half-open semantics.
-@internal
 extension type const Rect._((int left, int top, int right, int bottom) _value) {
   /// Creates a rectangle from left, top, right, and bottom values.
   const Rect(int left, int top, int right, int bottom)

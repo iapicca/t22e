@@ -1,7 +1,4 @@
-import 'package:meta/meta.dart' show internal;
-
 /// An immutable integer offset in terminal-cell coordinates.
-@internal
 extension type const Offset._((int x, int y) _value) {
   /// Creates an offset from explicit x and y values.
   const Offset(int x, int y) : this._((x, y));

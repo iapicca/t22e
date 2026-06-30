@@ -6,7 +6,6 @@ part 'constraints.freezed.dart';
 
 /// Immutable bounds describing the sizes a widget may occupy.
 @freezed
-@internal
 abstract class Constraints with _$Constraints {
   /// Creates constraints with the given min and max bounds.
   const factory Constraints({
