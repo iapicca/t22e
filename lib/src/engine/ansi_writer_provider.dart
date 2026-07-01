@@ -7,5 +7,5 @@ part 'ansi_writer_provider.g.dart';
 
 /// Provides a default [AnsiWriter] instance.
 @riverpod
-@internal // TODO this shouldn't be internal
+@internal
 AnsiWriter ansiWriter(Ref ref) => const AnsiWriter();

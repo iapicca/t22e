@@ -62,6 +62,8 @@ class AnsiWriter {
   }
 
   /// Maps a [CellStyle] flag to its SGR parameter code.
+  /// TODO this should be simplified with enanced enumns!
+  /// TODO this should be in CellStyle file!
   int _styleCode(CellStyle style) => switch (style) {
     CellStyle.bold => 1,
     CellStyle.italic => 3,
@@ -70,10 +72,12 @@ class AnsiWriter {
   };
 
   /// Maps an ANSI 16 code to its foreground SGR parameter.
+  /// TODO should create an ansi code extension type to handle this! 
   int _foregroundCode(int ansiCode) =>
       ansiCode < 8 ? 30 + ansiCode : 90 + (ansiCode - 8);
 
   /// Maps an ANSI 16 code to its background SGR parameter.
+    /// TODO should create an ansi code extension type to handle this! 
   int _backgroundCode(int ansiCode) =>
       ansiCode < 8 ? 40 + ansiCode : 100 + (ansiCode - 8);
 }
