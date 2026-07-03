@@ -51,13 +51,12 @@ export 'src/notifier/notifier.dart'
         ValueNotifier,
         VoidCallback;
 
-export 'src/io/stdin_reader.dart' show StdinReader;
-export 'src/io/stdin_reader_provider.dart' show stdinReaderProvider;
-export 'src/io/stdin_stream_provider.dart' show stdinStreamProvider;
+export 'src/io/input_stream_provider.dart' show inputStreamProvider;
 export 'src/io/ansi_parser.dart'
     show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent, Key;
 export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
-export 'src/io/input_event_stream_provider.dart' show inputEventStreamProvider;
+export 'src/io/input_value_notifier_provider.dart'
+    show inputValueProvider;
 export 'src/view/context.dart' show Context;
 export 'src/view/context_provider.dart' show contextProvider;
 export 'src/view/element.dart' show Element;
@@ -71,5 +70,3 @@ export 'src/view/components/root.dart' show Root;
 export 'src/view/components/consumer.dart'
     show Consumer, ConsumerBuilder, ConsumerElement;
 export 'src/view/pipeline_widget_binding.dart' show PipelineWidgetBinding;
-export 'src/async_value/stdin_value_notifier_provider.dart'
-    show stdinValueNotifierProvider;

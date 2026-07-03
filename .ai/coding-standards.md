@@ -109,23 +109,97 @@
 
 ## Riverpod Providers
 
-- All lifecycle-managed objects must be exposed as `@riverpod` providers
-- All classes (except "data-classes") and functions have provider wrappers and must be marked `@internal`
-- Always export providers from package barrel files
-- When a class or function is exposed through a provider, that provider must
-  be defined in a dedicated file following the naming scheme:
-  `my_class.dart` → `my_class_provider.dart`
-- Data structures do not need providers
+- Use plain `package:riverpod` only. Do **not** use `riverpod_generator`,
+  `riverpod_annotation`, or `@riverpod`. Declare providers as
+  `final myProvider = Provider<T>((ref) => ...)` (or `NotifierProvider`,
+  `FutureProvider`, `StreamProvider` as needed).
+- Use non-autoDispose providers only. Do **not** use `Provider.autoDispose`
+  and do **not** pass `isAutoDispose: true`. The host's
+  `ProviderContainer.dispose()` is the lifecycle safeguard.
+- **Never use `ref.watch`.** It is a Flutter reactivity primitive and is
+  not used in this Dart-only project. Use `ref.read` for one-shot
+  dependency values and `ref.listen` for side-effects on change.
+- All classes (except "data-classes") and functions have provider wrappers
+  and must be marked `@internal`.
+- Always export providers from package barrel files.
+- When a class or function is exposed through a provider, that provider
+  must be defined in a dedicated file following the naming scheme:
+  `my_class.dart` → `my_class_provider.dart`.
+- Data structures do not need providers.
 
+## Riverpod Provider Lifecycle (pure-Dart)
+
+t22e is pure-Dart: there is no `ProviderScope`. The `ProviderContainer`
+created by the host (`main`, a binding, or a test) is the **lifecycle
+root**. Providers hold no state; state lives in the container. The
+container owns the provider graph — `container.dispose()` disposes every
+mounted provider and fires its `ref.onDispose` callbacks.
+
+### Critical: `ref.read` / `container.read` are NOT ephemeral
+
+This is the single most misunderstood part of Riverpod in a pure-Dart,
+non-autoDispose project. **Read it carefully. Do not gloss over it. Do
+not run a counter-test to "verify" it — this is settled behavior.**
+
+A `ProviderContainer` owns every provider that has been *materialized*
+(had its element mounted). For a **non-autoDispose** provider — which is
+all of them in t22e — the provider stays mounted and **alive until
+`container.dispose()` is called**, regardless of how many listeners it
+has. Listener count is irrelevant to the lifetime of a non-autoDispose
+provider. Only `container.dispose()` destroys it.
+
+`ref.read` and `container.read` are the same read (`Ref.read` delegates
+to `ProviderContainer.read`, with only a debug-only dependency assertion
+added). Internally the call does `listen` → read the value →
+`sub.close()`: a subscription is added and removed within the same call,
+so the *net* listener delta is zero. **But the call materializes the
+target provider**, and once materialized the provider is alive for the
+life of the container.
+
+The past-instance mistake to avoid: believing "`ref.read`/
+`container.read` are fire-and-forget and dispose the provider
+immediately." **That is false in this project.** With non-autoDispose
+providers, a read pins the provider to the container's lifetime. A read
+is the correct and sufficient mechanism for wiring the dependency graph;
+the container, disposed by the host, is the safeguard.
+
+(The momentary-listen mechanic inside `read` only matters for
+*autoDispose* providers, which t22e does not use. For an autoDispose
+provider a read would let it be destroyed ~one frame later because
+listeners hit zero. Since t22e mandates non-autoDispose, that case never
+applies here.)
+
+### `ref.read` inside a provider does link disposal
+
+When provider A's create body calls `ref.read(B)`, B is materialized.
+Both A and B are now mounted in the same container, so
+`container.dispose()` disposes both and fires both `ref.onDispose`
+callbacks — there is no leak of B even though A only read it. Wires
+fine. Do not rely on a particular *order* of those two disposals (it
+follows the container's iteration order, not a dependency cascade); rely
+only on the guarantee that both are disposed before `container.dispose()`
+returns.
+
+### Rules for t22e
+
+- **Outside providers** (entry points, host binding, tests): go through
+  the container. `container.read` for one-shot reads, `container.listen`
+  to subscribe and receive changes. Always pair with
+  `container.dispose()` (`finally`, or `ProviderContainer.test()` in
+  tests) — this owns the graph and cascades disposal.
+- **Inside a provider**: `ref.read` for one-shot dependency values;
+  `ref.listen` for side-effects on dependency change. Never `ref.watch`.
+- Always register cleanup with `ref.onDispose` (close controllers,
+  cancel timers/subscriptions, dispose notifiers). Register one
+  `onDispose` per disposable object, next to its creation.
 
 ## Code Generation
 
 - `freezed` for immutable data classes (`@freezed` annotation)
-- `riverpod_generator` for providers (`@riverpod` annotation)
 - Run `dart run build_runner build` before analysis or tests to generate files
-- Generated files are committed to the repository
+- Generated files (`.freezed.dart`) are committed to the repository
 
 ## Dependencies
 - External deps: `riverpod`, `freezed_annotation`, `meta`
-- Dev deps: `build_runner`, `freezed`, `riverpod_generator`, `lints`, `test`
+- Dev deps: `build_runner`, `freezed`, `lints`, `test`
 - No circular dependencies between packages

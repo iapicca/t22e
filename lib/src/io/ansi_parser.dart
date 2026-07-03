@@ -84,6 +84,7 @@ enum _ParserState {
 /// Converts raw terminal bytes into typed [InputEvent]s.
 ///
 /// Covers printable chars, control bytes, arrows, and a CSI/SS3 subset.
+/// TODO replace the Stream with inputValueNotifier and listen to it instead.
 @internal
 class AnsiParser {
   /// Creates a parser with an empty buffer.

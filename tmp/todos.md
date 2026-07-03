@@ -425,3 +425,34 @@ Difficulty: `Easy` / `Medium` / `Hard`
   have `paint` early-return. Document the chosen contract on `RenderText` and
   add a regression test asserting zero-width constraints paint nothing and
   report a zero-width size.
+
+## 33. Remove all `ref.watch` usages (banned primitive)
+
+- **Target files**: `.ai/project.md` §2.4; `lib/src/view/components/consumer.dart`;
+  `test/view/components/consumer_test.dart`
+- **Priority**: High
+- **Difficulty**: Easy
+- **Description**: `.ai/coding-standards.md` now bans `ref.watch` (it is a
+  Flutter reactivity primitive; t22e is Dart-only and uses
+  non-autoDispose providers only). Three places still reference it:
+  - `.ai/project.md` §2.4 states "ViewModels are plain Riverpod Notifiers
+    that `ref.watch` the input stream" — inaccurate and contradicts the
+    coding standard.
+  - `consumer.dart` exposes a `WidgetRef.watch` path (mirroring
+    `flutter_riverpod`).
+  - `consumer_test.dart` has a test titled "ref.watch obtains the same
+    value as ref.read".
+- **Proposed fix**:
+  - `.ai/project.md` §2.4: rewrite the line so ViewModels use
+    `ref.listen` (or `ref.read` for one-shot) — never `ref.watch`.
+  - `consumer.dart`: drop the `WidgetRef.watch` implementation; have
+    `Consumer`/`WidgetRef` expose only `read` and `listen` (mirroring the
+    project-standard lifecycle). See `.ai/coding-standards.md`
+    "Riverpod Provider Lifecycle (pure-Dart)" and the rework notes in
+    `tmp/riverpod-rework.md` for why `ref.watch` is wrong here and why
+    `ref.read` is *not* ephemeral (the host's `ProviderContainer.dispose`
+    is the lifecycle safeguard, since providers are non-autoDispose).
+  - `consumer_test.dart`: replace the `ref.watch` test with one that
+    asserts the value obtained via `ref.read` matches `container.read`
+    for the same provider.
+  - After edits: `dart analyze` clean, `dart test` green.

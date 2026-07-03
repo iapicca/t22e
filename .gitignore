@@ -9,3 +9,5 @@
 # Dart tooling
 .dart_tool/
 pubspec.lock
+proving_ai_agent_that_i_am_right/
+maybe_ai_agent_has_a_point/
