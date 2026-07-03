@@ -1,12 +1,9 @@
 import 'package:meta/meta.dart' show internal;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod/riverpod.dart';
 
 import 'diff_engine.dart' show DiffEngine;
 
-part 'diff_engine_provider.g.dart';
-
 /// Provides a default [DiffEngine] instance.
-@riverpod
 @internal
 /// TODO why is this internal?
-DiffEngine diffEngine(Ref ref) => const DiffEngine();
+final diffEngineProvider = Provider<DiffEngine>((ref) => const DiffEngine());

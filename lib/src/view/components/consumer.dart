@@ -1,7 +1,6 @@
 import 'package:meta/meta.dart' show immutable, internal;
+import 'package:riverpod/misc.dart' show ProviderListenable;
 import 'package:riverpod/riverpod.dart' show ProviderSubscription;
-import 'package:riverpod_annotation/riverpod_annotation.dart'
-    show ProviderListenable;
 
 import '../../engine/cell_buffer_builder.dart' show CellBufferBuilder;
 import '../../models/constraints.dart' show Constraints;

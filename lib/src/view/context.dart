@@ -1,6 +1,5 @@
+import 'package:riverpod/misc.dart' show ProviderListenable;
 import 'package:riverpod/riverpod.dart' show ProviderContainer;
-import 'package:riverpod_annotation/riverpod_annotation.dart'
-    show ProviderListenable;
 
 /// App context wrapping the active [ProviderContainer] for the whole tree.
 ///

@@ -1,14 +1,15 @@
 import 'package:meta/meta.dart' show internal;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod/riverpod.dart';
 
 import 'size.dart' show Size;
 
-part 'size_provider.g.dart';
-
 /// Settable terminal-size state; defaults to `Size(80, 24)`.
-@riverpod
 @internal
-class TerminalSize extends _$TerminalSize {
+final terminalSizeProvider =
+    NotifierProvider<TerminalSizeNotifier, Size>(TerminalSizeNotifier.new);
+
+@internal
+class TerminalSizeNotifier extends Notifier<Size> {
   @override
   Size build() => const Size(80, 24);
 

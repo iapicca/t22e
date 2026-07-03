@@ -1,5 +1,4 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart'
-    show ProviderListenable;
+import 'package:riverpod/misc.dart' show ProviderListenable;
 
 /// Read handle to Riverpod providers passed to [Consumer] builders.
 ///

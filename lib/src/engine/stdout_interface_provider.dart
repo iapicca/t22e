@@ -1,11 +1,9 @@
 import 'package:meta/meta.dart' show internal;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod/riverpod.dart';
 
 import 'stdout_interface.dart' show StdoutWriter, StdoutInterface;
 
-part 'stdout_interface_provider.g.dart';
-
 /// Provides a default [StdoutWriter] instance.
-@riverpod
 @internal
-StdoutInterface stdoutInterface(Ref ref) => StdoutWriter();
+final stdoutInterfaceProvider =
+    Provider<StdoutInterface>((ref) => StdoutWriter());
