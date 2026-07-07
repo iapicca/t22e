@@ -21,7 +21,7 @@ void main() {
 
     test('writes a single changed cell without moving the cursor', () {
       final current = blankBuffer(3, 3);
-      final target = current.set(0, 0, const Cell(character: 'A'));
+      final target = current.set(0, 0, const Cell(character: Grapheme('A')));
 
       final ops = engine.diff(target, current, Size(3, 3));
 
@@ -30,7 +30,7 @@ void main() {
 
     test('emits a cursor move when the next change is not sequential', () {
       final current = blankBuffer(3, 3);
-      final target = current.set(2, 0, const Cell(character: 'A'));
+      final target = current.set(2, 0, const Cell(character: Grapheme('A')));
 
       final ops = engine.diff(target, current, Size(3, 3));
 
@@ -43,12 +43,12 @@ void main() {
         width: 2,
         cells: const [
           Cell(
-            character: 'A',
+            character: Grapheme('A'),
             foreground: Color.red(),
             styles: {CellStyle.bold},
           ),
           Cell(
-            character: 'B',
+            character: Grapheme('B'),
             foreground: Color.red(),
             styles: {CellStyle.bold},
           ),
@@ -62,7 +62,7 @@ void main() {
         ops[0],
         const DiffOpStyle(
           Cell(
-            character: ' ',
+            character: Grapheme(' '),
             foreground: Color.red(),
             styles: {CellStyle.bold},
           ),
@@ -77,8 +77,8 @@ void main() {
       final target = CellBuffer(
         width: 2,
         cells: const [
-          Cell(character: 'A', foreground: Color.red()),
-          Cell(character: 'B'),
+          Cell(character: Grapheme('A'), foreground: Color.red()),
+          Cell(character: Grapheme('B')),
         ],
       );
 
@@ -87,19 +87,35 @@ void main() {
       expect(ops.length, 4);
       expect(
         ops[0],
-        const DiffOpStyle(Cell(character: ' ', foreground: Color.red())),
+        const DiffOpStyle(Cell(character: Grapheme(' '), foreground: Color.red())),
       );
       expect(ops[1], const DiffOpWrite('A'));
       expect(ops[2], const DiffOpStyle(Cell.blank));
       expect(ops[3], const DiffOpWrite('B'));
     });
 
+    test('wide glyph produces one write and skips its continuation cell', () {
+      final current = blankBuffer(3, 1);
+      final primary = const Cell(character: Grapheme('漢'));
+      final continuation = Cell(
+        character: Grapheme.space,
+        styles: const {CellStyle.continuation},
+      );
+      final target = current
+          .set(0, 0, primary)
+          .set(1, 0, continuation);
+
+      final ops = engine.diff(target, current, const Size(3, 1));
+
+      expect(ops, const [DiffOpWrite('漢')]);
+    });
+
     test('copyTarget returns an equal buffer with independent storage', () {
       final target = CellBuffer(
         width: 2,
         cells: const [
-          Cell(character: 'A'),
-          Cell(character: 'B'),
+          Cell(character: Grapheme('A')),
+          Cell(character: Grapheme('B')),
         ],
       );
 

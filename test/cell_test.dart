@@ -14,7 +14,7 @@ void main() {
     test('copyWith overrides fields', () {
       const cell = Cell.blank;
       final updated = cell.copyWith(
-        character: 'A',
+        character: Grapheme('A'),
         foreground: const Color.red(),
         styles: {CellStyle.bold},
       );
@@ -24,9 +24,22 @@ void main() {
     });
 
     test('equals another cell with same values', () {
-      const a = Cell(character: 'X', foreground: Color.blue());
-      const b = Cell(character: 'X', foreground: Color.blue());
+      const a = Cell(character: Grapheme('X'), foreground: Color.blue());
+      const b = Cell(character: Grapheme('X'), foreground: Color.blue());
       expect(a, b);
+    });
+
+    test('wide grapheme reports width 2', () {
+      const cell = Cell(character: Grapheme('漢'));
+      expect(cell.character.width, 2);
+    });
+
+    test('validated rejects multi-cluster strings', () {
+      expect(() => Grapheme.validated('xy'), throwsArgumentError);
+    });
+
+    test('validated accepts combining-mark cluster', () {
+      expect(Grapheme.validated('e\u{0301}').string, 'e\u{0301}');
     });
   });
 }

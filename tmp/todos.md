@@ -23,19 +23,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   `stdinBytesProvider` (or `lastStdinBytesProvider`) and update the barrel +
   callers in `test/providers_test.dart`.
 
-## 2. Enforce grapheme clusters / multi-cell width for `Cell.character`
-
-- **Target file**: `lib/src/engine/cell.dart:16`
-- **Priority**: Medium
-- **Difficulty**: Hard
-- **Description**: `Cell.character` is a plain `String`. No single-grapheme
-  enforcement and no multi-cell width handling (emoji, CJK). Listed in
-  `.ai/project.md` §8 as a deferred risk.
-- **Proposed fix**: Introduce a `Grapheme` value type (validated single
-  grapheme cluster) and a `CellWidth` property derived from a character-width
-  table. Have `RenderText`/layout skip the appropriate number of cells for
-  wide characters. Add tests for emoji and CJK.
-
 ## 3. Add `ColorSgr` extension for ANSI SGR sequence generation
 
 - **Target file**: `lib/src/engine/color.dart:28`

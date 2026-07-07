@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'cell_style.dart';
 import 'color.dart';
+import 'grapheme.dart';
 
 part 'cell.freezed.dart';
 
@@ -13,10 +14,11 @@ abstract class Cell with _$Cell {
 
   /// Creates a cell with the given character, optional colors, and styles.
   ///
-  // TODO: character is currently a plain String. This does not enforce a
-  // single grapheme cluster and ignores multi-cell widths (e.g. emojis, CJK).
+  // TODO: `Grapheme` is const-unchecked; `Grapheme.validated` enforces the
+  // single-cluster contract at runtime (text-to-cell boundaries). Wide
+  // characters occupy two cells; the second carries `CellStyle.continuation`.
   const factory Cell({
-    @Default(' ') String character,
+    @Default(Grapheme.space) Grapheme character,
     Color? foreground,
     Color? background,
     @Default(<CellStyle>{}) Set<CellStyle> styles,

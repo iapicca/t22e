@@ -131,5 +131,17 @@ void main() {
 
       expect(sink.output, '\x1B[1;2Ho');
     });
+
+    test('flushes a wide CJK glyph as a single write', () {
+      final sink = FakeIOSink();
+      final pipeline = Pipeline(ansiWriter: const AnsiWriter(), diffEngine: const DiffEngine(), stdoutInterface: StdoutWriter(sink: sink));
+      final root = RenderRoot();
+      root.child = RenderText(text: '漢');
+
+      pipeline.render(root, const Size(5, 5));
+
+      expect(sink.output, '漢');
+      expect(sink.flushes, const ['漢']);
+    });
   });
 }

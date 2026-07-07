@@ -22,9 +22,16 @@ class AnsiWriter {
         case DiffOpMove(:final offset):
           buffer.write('\x1B[${offset.y + 1};${offset.x + 1}H');
         case DiffOpStyle(:final style):
-          if (activeStyle == style) continue;
-          activeStyle = style;
-          buffer.write(_sgr(style));
+          final normalized = style.styles.contains(CellStyle.continuation)
+              ? style.copyWith(
+                  styles: style.styles
+                      .where((s) => s != CellStyle.continuation)
+                      .toSet(),
+                )
+              : style;
+          if (activeStyle == normalized) continue;
+          activeStyle = normalized;
+          buffer.write(_sgr(normalized));
         case DiffOpWrite(:final character):
           buffer.write(character);
       }
@@ -35,14 +42,18 @@ class AnsiWriter {
 
   /// Builds the SGR escape sequence that activates [style].
   String _sgr(Cell style) {
+    final visibleStyles = style.styles.where(
+      (flag) => flag != CellStyle.continuation,
+    );
     if (style.foreground == null &&
         style.background == null &&
-        style.styles.isEmpty) {
+        visibleStyles.isEmpty) {
       return '\x1B[0m';
     }
 
     final params = <int>[];
     for (final flag in CellStyle.values) {
+      if (flag == CellStyle.continuation) continue;
       if (style.styles.contains(flag)) {
         params.add(_styleCode(flag));
       }
@@ -69,6 +80,8 @@ class AnsiWriter {
     CellStyle.italic => 3,
     CellStyle.underline => 4,
     CellStyle.inverse => 7,
+    CellStyle.continuation =>
+      throw StateError('continuation must never emit an SGR code'),
   };
 
   /// Maps an ANSI 16 code to its foreground SGR parameter.

@@ -11,4 +11,11 @@ enum CellStyle {
 
   /// Inverse foreground and background.
   inverse,
+
+  /// Continuation cell for a wide (2-cell) glyph.
+  ///
+  /// Internal layout metadata: marks the second cell occupied by a wide
+  /// character so the diff engine and ANSI writer skip it. Never emitted as
+  /// an SGR parameter.
+  continuation,
 }

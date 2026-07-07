@@ -67,6 +67,15 @@ void main() {
       expect(output, '\x1B[32m\x1B[0mA');
     });
 
+    test('continuation style is never emitted as an SGR code', () {
+      final output = writer.write(const [
+        DiffOpStyle(Cell(styles: {CellStyle.continuation})),
+        DiffOpWrite('A'),
+      ], Size(1, 1));
+
+      expect(output, 'A');
+    });
+
     test('provider exposes a default ANSI writer instance', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);

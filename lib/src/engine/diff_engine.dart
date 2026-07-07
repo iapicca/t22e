@@ -5,6 +5,8 @@ import '../models/size.dart' show Size;
 import 'cell.dart' show Cell;
 import 'cell_buffer.dart' show CellBuffer;
 import 'cell_buffer_extensions.dart' show CellBufferExtensions;
+import 'cell_style.dart' show CellStyle;
+import 'grapheme.dart' show Grapheme;
 
 // TODO I don't like this one bit! looks like TEA approach!
 
@@ -93,6 +95,12 @@ class DiffEngine {
 
     for (var i = 0; i < target.area; i++) {
       final targetCell = target.getAt(i);
+
+      // Continuation cells are layout metadata for wide glyphs; never emit
+      // them as writes or moves. Their primary cell advances the logical
+      // cursor by 2 so the next cell index is implicitly skipped.
+      if (targetCell.styles.contains(CellStyle.continuation)) continue;
+
       if (targetCell == current.getAt(i)) continue;
 
       if (cursor + 1 != i) {
@@ -100,18 +108,20 @@ class DiffEngine {
       }
 
       final targetStyle = Cell(
-        character: ' ',
+        character: Grapheme.space,
         foreground: targetCell.foreground,
         background: targetCell.background,
-        styles: targetCell.styles,
+        styles: targetCell.styles
+            .where((s) => s != CellStyle.continuation)
+            .toSet(),
       );
       if (activeStyle != targetStyle) {
         ops.add(DiffOpStyle(targetStyle));
         activeStyle = targetStyle;
       }
 
-      ops.add(DiffOpWrite(targetCell.character));
-      cursor = i;
+      ops.add(DiffOpWrite(targetCell.character.string));
+      cursor = i + (targetCell.character.width >= 2 ? 1 : 0);
     }
 
     return ops;

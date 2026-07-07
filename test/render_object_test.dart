@@ -62,6 +62,24 @@ void main() {
       text.layout(Constraints.loose(Size(10, 10)));
       expect(text.size, Size(10, 1));
     });
+
+    test('sizes CJK lines by sum of grapheme widths', () {
+      final text = RenderText(text: '漢A');
+      text.layout(Constraints.loose(Size(100, 100)));
+      expect(text.size, Size(3, 1));
+    });
+
+    test('sizes an emoji line to width 2', () {
+      final text = RenderText(text: '😀');
+      text.layout(Constraints.loose(Size(100, 100)));
+      expect(text.size, Size(2, 1));
+    });
+
+    test('counts combining marks as part of the base grapheme', () {
+      final text = RenderText(text: 'e\u{0301}');
+      text.layout(Constraints.loose(Size(100, 100)));
+      expect(text.size, Size(1, 1));
+    });
   });
 
   group('RenderRoot layout', () {
@@ -114,6 +132,37 @@ void main() {
       final buffer = builder.build();
 
       expect(buffer.get(0, 0).character, 'X');
+    });
+
+    test('RenderText paints a wide glyph plus continuation marker', () {
+      final text = RenderText(text: '漢A');
+      text.layout(Constraints.loose(Size(10, 10)));
+
+      final builder = CellBufferBuilder(Size(10, 10));
+      text.paint(builder, Offset(0, 0));
+      final buffer = builder.build();
+
+      expect(buffer.get(0, 0).character, '漢');
+      expect(buffer.get(0, 0).character.width, 2);
+      expect(buffer.get(1, 0).character, ' ');
+      expect(
+        buffer.get(1, 0).styles,
+        contains(CellStyle.continuation),
+      );
+      expect(buffer.get(2, 0).character, 'A');
+    });
+
+    test('RenderText clips a wide glyph that does not fit', () {
+      final text = RenderText(text: '漢A');
+      text.layout(Constraints.tight(Size(2, 1)));
+
+      final builder = CellBufferBuilder(Size(2, 1));
+      text.paint(builder, Offset(0, 0));
+      final buffer = builder.build();
+
+      expect(buffer.get(0, 0).character, '漢');
+      expect(buffer.get(1, 0).character, ' ');
+      expect(buffer.get(1, 0).styles, contains(CellStyle.continuation));
     });
   });
 }

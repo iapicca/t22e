@@ -18,7 +18,7 @@ void main() {
 
     test('set returns a new buffer and leaves the original unchanged', () {
       final original = CellBuffer(width: 2, cells: List.filled(4, Cell.blank));
-      final updated = original.set(1, 0, Cell(character: 'X'));
+      final updated = original.set(1, 0, Cell(character: Grapheme('X')));
       expect(original.get(1, 0).character, ' ');
       expect(updated.get(1, 0).character, 'X');
     });

@@ -6,6 +6,9 @@ library;
 
 export 'src/engine/cell.dart' show Cell;
 export 'src/engine/cell_buffer.dart' show CellBuffer;
+export 'src/engine/char_width.dart' show charWidth;
+export 'src/engine/char_width_symbols.dart' show CharWidthSymbols;
+export 'src/engine/grapheme.dart' show Grapheme;
 export 'src/engine/cell_buffer_builder.dart' show CellBufferBuilder;
 export 'src/engine/cell_buffer_builder_extensions.dart'
     show CellBufferBuilderBatch;
