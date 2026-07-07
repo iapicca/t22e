@@ -193,6 +193,42 @@ returns.
   cancel timers/subscriptions, dispose notifiers). Register one
   `onDispose` per disposable object, next to its creation.
 
+## Constant Classes (`...Symbols`)
+
+Pure byte/value constant classes are **data**, not lifecycle participants.
+They therefore do **not** get a Riverpod provider, a `*_provider.dart` file, or
+a barrel re-export. They are declared `@internal` and consumed via `lib/src/`
+imports only.
+
+### Naming and placement
+
+- Constants used by **more than one** `lib/src/` file live in a `final class`
+  named `'project name' + Symbols` (e.g. `t22eSymbols`), in a dedicated
+  `...symbols.dart` file under the most appropriate `lib/src/` subfolder.
+- Constants used by **exactly one** file live in a `final class` named
+  `'file name' + Symbols` (PascalCase; snake_case file stem converted, e.g.
+  `ansi_parser.dart` → `AnsiParserSymbols`), in a sibling `..._symbols.dart`
+  file.
+
+### Promotion rule
+
+When a file-scoped `...Symbols` constant gains a second consumer, promote it
+(move it) to the project-scoped `t22eSymbols` class and update both call sites.
+
+### Scope boundary
+
+Treat boolean predicates as **logic, not constants** — do not extract their
+range bounds into `...Symbols` unless the bound is itself a meaningful terminal
+symbol independent of the predicate. Predicate extraction is a separate task
+that lives on its own and may pull selected bounds out at that time.
+
+### Comment convention
+
+Doc comments on `...Symbols` classes and members follow the standard rules in
+§Comment Style: class doc describes what the class holds and the file/project
+boundary; member docs are single-line and describe the value, not how callers
+use it.
+
 ## Code Generation
 
 - `freezed` for immutable data classes (`@freezed` annotation)

@@ -5,7 +5,6 @@ import 'ansi_parser.dart' show AnsiParser;
 
 /// Provides a default [AnsiParser] instance.
 @internal
-/// TODO why is this internal?
 final ansiParserProvider = Provider<AnsiParser>((ref) {
   final parser = AnsiParser();
   ref.onDispose(parser.close);

@@ -3,6 +3,8 @@ import 'dart:convert' show utf8;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'ansi_parser_symbols.dart' show AnsiParserSymbols;
+
 part 'ansi_parser.freezed.dart';
 
 /// Recognized logical keys emitted by the parser.
@@ -135,7 +137,7 @@ class AnsiParser {
   /// TODO this can be an extension!
   bool _processGround() {
     final byte = _buffer.first;
-    if (byte == _esc) {
+    if (byte == AnsiParserSymbols.esc) {
       _state = _ParserState.escape;
       _buffer.removeAt(0);
       return true;
@@ -169,12 +171,12 @@ class AnsiParser {
   bool _processEscape() {
     if (_buffer.isEmpty) return false;
     final byte = _buffer.first;
-    if (byte == _csiIntroducer) {
+    if (byte == AnsiParserSymbols.csiIntroducer) {
       _state = _ParserState.csi;
       _buffer.removeAt(0);
       return true;
     }
-    if (byte == _ss3Introducer) {
+    if (byte == AnsiParserSymbols.ss3Introducer) {
       // SS3 sequences are ESC O <final>; need one more byte.
       if (_buffer.length < 2) return false;
       final finalByte = _buffer[1];
@@ -183,7 +185,7 @@ class AnsiParser {
         _controller.add(InputEvent.key(key: key));
       } else {
         _controller.add(
-          InputEvent.unknown(raw: <int>[_esc, _ss3Introducer, finalByte]),
+          InputEvent.unknown(raw: <int>[AnsiParserSymbols.esc, AnsiParserSymbols.ss3Introducer, finalByte]),
         );
       }
       _buffer.removeRange(0, 2);
@@ -191,7 +193,7 @@ class AnsiParser {
       return true;
     }
     // Lone ESC followed by a normal byte: treat as Alt+key or unknown.
-    _controller.add(InputEvent.unknown(raw: <int>[_esc, byte]));
+    _controller.add(InputEvent.unknown(raw: <int>[AnsiParserSymbols.esc, byte]));
     _buffer.removeAt(0);
     _state = _ParserState.ground;
     return true;
@@ -216,7 +218,7 @@ class AnsiParser {
         } else {
           _controller.add(
             InputEvent.unknown(
-              raw: <int>[_esc, _csiIntroducer, ...params, byte],
+              raw: <int>[AnsiParserSymbols.esc, AnsiParserSymbols.csiIntroducer, ...params, byte],
             ),
           );
         }
@@ -227,7 +229,7 @@ class AnsiParser {
       // Invalid byte inside CSI: drop the introducer and return to ground.
       _controller.add(
         InputEvent.unknown(
-          raw: <int>[_esc, _csiIntroducer, ..._buffer.sublist(start, i + 1)],
+          raw: <int>[AnsiParserSymbols.esc, AnsiParserSymbols.csiIntroducer, ..._buffer.sublist(start, i + 1)],
         ),
       );
       _buffer.removeRange(0, i + 1);
@@ -250,7 +252,7 @@ class AnsiParser {
         if (_buffer.isEmpty) {
           _controller.add(const InputEvent.key(key: Key.escape));
         } else {
-          _controller.add(InputEvent.unknown(raw: <int>[_esc, _buffer.first]));
+          _controller.add(InputEvent.unknown(raw: <int>[AnsiParserSymbols.esc, _buffer.first]));
           _buffer.removeAt(0);
           _state = _ParserState.ground;
           while (_buffer.isNotEmpty) {
@@ -260,7 +262,7 @@ class AnsiParser {
       case _ParserState.csi:
         _controller.add(
           InputEvent.unknown(
-            raw: <int>[_esc, _csiIntroducer, ..._buffer],
+            raw: <int>[AnsiParserSymbols.esc, AnsiParserSymbols.csiIntroducer, ..._buffer],
           ),
         );
         _buffer.clear();
@@ -285,11 +287,11 @@ class AnsiParser {
     /// finally bytes should be mapped in a final class as `static const int` 
   static Key? _controlKey(int byte) {
     return switch (byte) {
-      0x03 => Key.ctrlC,
-      0x04 => Key.ctrlD,
-      0x09 => Key.tab,
-      0x0D => Key.enter,
-      0x7F => Key.backspace,
+      AnsiParserSymbols.ctrlC => Key.ctrlC,
+      AnsiParserSymbols.ctrlD => Key.ctrlD,
+      AnsiParserSymbols.tab => Key.tab,
+      AnsiParserSymbols.enter => Key.enter,
+      AnsiParserSymbols.del => Key.backspace,
       _ => null,
     };
   }
@@ -306,13 +308,13 @@ class AnsiParser {
   static Key? _csiKey(List<int> params, int finalByte) {
     final paramString = String.fromCharCodes(params);
     return switch (finalByte) {
-      0x41 => Key.up,
-      0x42 => Key.down,
-      0x43 => Key.right,
-      0x44 => Key.left,
-      0x48 => Key.home,
-      0x46 => Key.end,
-      0x7E => switch (paramString) {
+      AnsiParserSymbols.csiUp => Key.up,
+      AnsiParserSymbols.csiDown => Key.down,
+      AnsiParserSymbols.csiRight => Key.right,
+      AnsiParserSymbols.csiLeft => Key.left,
+      AnsiParserSymbols.csiHome => Key.home,
+      AnsiParserSymbols.csiEnd => Key.end,
+      AnsiParserSymbols.csiTilde => switch (paramString) {
           '1' => Key.home,
           '3' => Key.delete,
           '4' => Key.end,
@@ -339,10 +341,19 @@ class AnsiParser {
   /// TODO this has nothing to do with AnsiParser and should be in a separate file
     /// finally bytes should be mapped in a final class as `static const int` 
   static int _utf8Length(int byte) {
-    if (byte < 0x80) return 1;
-    if ((byte & 0xE0) == 0xC0) return 2;
-    if ((byte & 0xF0) == 0xE0) return 3;
-    if ((byte & 0xF8) == 0xF0) return 4;
+    if (byte < AnsiParserSymbols.utf8AsciiMax) return 1;
+    if ((byte & AnsiParserSymbols.utf8TwoByteMask) ==
+        AnsiParserSymbols.utf8TwoByteLead) {
+      return 2;
+    }
+    if ((byte & AnsiParserSymbols.utf8ThreeByteMask) ==
+        AnsiParserSymbols.utf8ThreeByteLead) {
+      return 3;
+    }
+    if ((byte & AnsiParserSymbols.utf8FourByteMask) ==
+        AnsiParserSymbols.utf8FourByteLead) {
+      return 4;
+    }
     return 0;
   }
 
@@ -361,18 +372,8 @@ class AnsiParser {
     /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isCsiIntermediate(int byte) => byte >= 0x20 && byte <= 0x2F;
 
-  /// Whether [byte] is a CSI final byte.
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
+/// Whether [byte] is a CSI final byte.
+     /// TODO this has nothing to do with AnsiParser and should be in a separate file
+     /// finally bytes should be mapped in a final class as `static const int` 
   static bool _isCsiFinal(int byte) => byte >= 0x40 && byte <= 0x7E;
-
-  /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static const int _esc = 0x1B;
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static const int _csiIntroducer = 0x5B; // '['
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static const int _ss3Introducer = 0x4F; // 'O'
 }
