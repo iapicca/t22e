@@ -50,9 +50,10 @@ void main() {
       expect(color.blue, 30);
     });
 
-    test('rejects out-of-bound components', () {
-      expect(() => Color(red: -1), throwsA(isA<AssertionError>()));
-      expect(() => Color(green: 256), throwsA(isA<AssertionError>()));
+    test('clamps components above the max to 255', () {
+      expect(const Color(red: 300).red, 255);
+      expect(const Color(green: 256).green, 255);
+      expect(const Color(blue: 9999).blue, 255);
     });
 
     test('ANSI named colors are correct', () {
