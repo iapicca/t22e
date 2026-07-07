@@ -76,4 +76,54 @@ void main() {
       expect(const Color.brightWhite().ansi.code, 15);
     });
   });
+
+  group('AnsiColorSgr', () {
+    test('emits dark foreground SGR (codes 0–7)', () {
+      expect(AnsiColor(code: 0).toSgr(), '\x1B[30m');
+      expect(AnsiColor(code: 7).toSgr(), '\x1B[37m');
+    });
+
+    test('emits bright foreground SGR (codes 8–15)', () {
+      expect(AnsiColor(code: 8).toSgr(), '\x1B[90m');
+      expect(AnsiColor(code: 15).toSgr(), '\x1B[97m');
+    });
+
+    test('emits background SGR when background is true', () {
+      expect(AnsiColor(code: 1).toSgr(background: true), '\x1B[41m');
+      expect(AnsiColor(code: 9).toSgr(background: true), '\x1B[101m');
+    });
+  });
+
+  group('IndexedColorSgr', () {
+    test('emits 256-color foreground SGR', () {
+      expect(IndexedColor(index: 42).toSgr(), '\x1B[38;5;42m');
+    });
+
+    test('emits 256-color background SGR', () {
+      expect(IndexedColor(index: 200).toSgr(background: true), '\x1B[48;5;200m');
+    });
+  });
+
+  group('ColorSgr', () {
+    test('emits 24-bit true-color foreground SGR', () {
+      expect(
+        const Color(red: 255, green: 0, blue: 0).toSgr(),
+        '\x1B[38;2;255;0;0m',
+      );
+    });
+
+    test('emits 24-bit true-color background SGR', () {
+      expect(
+        const Color(red: 1, green: 2, blue: 3).toSgr(background: true),
+        '\x1B[48;2;1;2;3m',
+      );
+    });
+
+    test('clamped components round-trip through the SGR sequence', () {
+      expect(
+        const Color(red: 9999).toSgr(),
+        '\x1B[38;2;255;0;0m',
+      );
+    });
+  });
 }

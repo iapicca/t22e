@@ -34,7 +34,7 @@ void main() {
         DiffOpStyle(Cell(foreground: Color.red(), styles: {CellStyle.bold})),
       ], Size(1, 1));
 
-      expect(output, '\x1B[1;31m');
+      expect(output, '\x1B[1m\x1B[31m');
     });
 
     test('emits SGR for background colors', () {
@@ -54,7 +54,7 @@ void main() {
         DiffOpWrite('X'),
       ], Size(5, 1));
 
-      expect(output, '\x1B[1;2H\x1B[4;34mX');
+      expect(output, '\x1B[1;2H\x1B[4m\x1B[34mX');
     });
 
     test('emits reset when transitioning to the default style', () {

@@ -3,7 +3,7 @@ import 'package:meta/meta.dart' show internal;
 import '../models/size.dart' show Size;
 import 'cell.dart' show Cell;
 import 'cell_style.dart' show CellStyle;
-import 'color_extensions.dart' show ColorAnsi;
+import 'color_extensions.dart' show AnsiColorSgr, ColorAnsi;
 import 'diff_engine.dart' show DiffOp, DiffOpMove, DiffOpStyle, DiffOpWrite;
 
 /// Converts [DiffOp] update operations into ANSI escape sequences.
@@ -51,25 +51,30 @@ class AnsiWriter {
       return '\x1B[0m';
     }
 
-    final params = <int>[];
-    for (final flag in CellStyle.values) {
-      if (flag == CellStyle.continuation) continue;
-      if (style.styles.contains(flag)) {
-        params.add(_styleCode(flag));
+    final buffer = StringBuffer();
+
+    if (visibleStyles.isNotEmpty) {
+      final styleParams = <int>[];
+      for (final flag in CellStyle.values) {
+        if (flag == CellStyle.continuation) continue;
+        if (style.styles.contains(flag)) {
+          styleParams.add(_styleCode(flag));
+        }
       }
+      buffer.write('\x1B[${styleParams.join(';')}m');
     }
 
     final foreground = style.foreground;
     if (foreground != null) {
-      params.add(_foregroundCode(foreground.ansi.code));
+      buffer.write(foreground.ansi.toSgr());
     }
 
     final background = style.background;
     if (background != null) {
-      params.add(_backgroundCode(background.ansi.code));
+      buffer.write(background.ansi.toSgr(background: true));
     }
 
-    return '\x1B[${params.join(';')}m';
+    return buffer.toString();
   }
 
   /// Maps a [CellStyle] flag to its SGR parameter code.
@@ -83,14 +88,4 @@ class AnsiWriter {
     CellStyle.continuation =>
       throw StateError('continuation must never emit an SGR code'),
   };
-
-  /// Maps an ANSI 16 code to its foreground SGR parameter.
-  /// TODO should create an ansi code extension type to handle this! 
-  int _foregroundCode(int ansiCode) =>
-      ansiCode < 8 ? 30 + ansiCode : 90 + (ansiCode - 8);
-
-  /// Maps an ANSI 16 code to its background SGR parameter.
-    /// TODO should create an ansi code extension type to handle this! 
-  int _backgroundCode(int ansiCode) =>
-      ansiCode < 8 ? 40 + ansiCode : 100 + (ansiCode - 8);
 }

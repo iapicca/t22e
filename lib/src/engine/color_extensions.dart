@@ -1,6 +1,7 @@
 import 'dart:math' show max;
 
 import 'color.dart';
+import 'color_extensions_symbols.dart' show ColorExtensionsSymbols;
 
 /// Converts an ANSI 16-color code to its RGB equivalent.
 extension AnsiToColor on AnsiColor {
@@ -12,21 +13,130 @@ extension AnsiToColor on AnsiColor {
 extension IndexedToColor on IndexedColor {
   /// The RGB representation of this indexed color.
   Color toColor() {
-    final (red, green, blue) = _indexToRgb(index);
-    return Color(red: red, green: green, blue: blue);
+  if (index < ColorExtensionsSymbols.indexedColorCubeStart) {
+    final color = _ansiToRgb[index]!;
+    return color;
   }
+  if (index >= ColorExtensionsSymbols.indexedColorGrayStart) {
+    final value = (index - ColorExtensionsSymbols.indexedColorGrayStart) * ColorExtensionsSymbols.grayStep + ColorExtensionsSymbols.grayBase;
+    return Color(red: value, green: value, blue: value);
+  }
+  final cubeIndex = index - ColorExtensionsSymbols.indexedColorCubeStart;
+  final area = ColorExtensionsSymbols.indexedColorCubeSize * ColorExtensionsSymbols.indexedColorCubeSize;
+  final red = (cubeIndex ~/ area) * ColorExtensionsSymbols.cubeStep;
+  final green = ((cubeIndex % area) ~/ ColorExtensionsSymbols.indexedColorCubeSize) * ColorExtensionsSymbols.cubeStep;
+  final blue = (cubeIndex % ColorExtensionsSymbols.indexedColorCubeSize) * ColorExtensionsSymbols.cubeStep;
+  return Color(red: red, green: green, blue: blue);
+}
 }
 
 /// Finds the nearest 256-color palette index for an RGB color.
 extension ColorIndex on Color {
   /// The nearest 256-color palette index.
-  int get index => _rgbToIndexed(red, green, blue);
+  int get index {
+  var bestDistance = double.infinity;
+  var bestIndex = 0;
+
+  final cubeEnd =
+      ColorExtensionsSymbols.indexedColorCubeStart +
+      ColorExtensionsSymbols.indexedColorCubeSize * ColorExtensionsSymbols.indexedColorCubeSize * ColorExtensionsSymbols.indexedColorCubeSize;
+
+  for (var index = ColorExtensionsSymbols.indexedColorCubeStart; index < cubeEnd; index++) {
+    final cubeIndex = index - ColorExtensionsSymbols.indexedColorCubeStart;
+    final area = ColorExtensionsSymbols.indexedColorCubeSize * ColorExtensionsSymbols.indexedColorCubeSize;
+    final cubeRed = (cubeIndex ~/ area) * ColorExtensionsSymbols.cubeStep;
+    final cubeGreen = ((cubeIndex % area) ~/ ColorExtensionsSymbols.indexedColorCubeSize) * ColorExtensionsSymbols.cubeStep;
+    final cubeBlue = (cubeIndex % ColorExtensionsSymbols.indexedColorCubeSize) * ColorExtensionsSymbols.cubeStep;
+    final distance = _redmeanDistance(
+      red,
+      green,
+      blue,
+      cubeRed,
+      cubeGreen,
+      cubeBlue,
+    );
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  }
+
+  for (var index = 0; index < ColorExtensionsSymbols.indexedColorGrayCount; index++) {
+    final gray = index * ColorExtensionsSymbols.grayStep + ColorExtensionsSymbols.grayBase;
+    final distance = _redmeanDistance(red, green, blue, gray, gray, gray);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = ColorExtensionsSymbols.indexedColorGrayStart + index;
+    }
+  }
+
+  return bestIndex;
+}
 }
 
 /// Converts an RGB color to its nearest ANSI 16-color equivalent.
 extension ColorAnsi on Color {
   /// The nearest ANSI 16-color code.
-  AnsiColor get ansi => AnsiColor(code: _indexedToAnsi(index));
+  AnsiColor get ansi {
+    final code =(){
+  if (index < ColorExtensionsSymbols.indexedColorCubeStart) return index;
+  const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
+  final gray = index - ColorExtensionsSymbols.indexedColorGrayStart;
+  if (gray >= 0 && gray < ColorExtensionsSymbols.indexedColorGrayCount) {
+    return gray < 12 ? 8 : 15;
+  }
+  final cube = index - ColorExtensionsSymbols.indexedColorCubeStart;
+  final area = ColorExtensionsSymbols.indexedColorCubeSize * ColorExtensionsSymbols.indexedColorCubeSize;
+  final cubeRed = cube ~/ area;
+  final cubeGreen = (cube % area) ~/ ColorExtensionsSymbols.indexedColorCubeSize;
+  final cubeBlue = cube % ColorExtensionsSymbols.indexedColorCubeSize;
+  final ansiRed = cubeRed < 3 ? 0 : 1;
+  final ansiGreen = cubeGreen < 3 ? 0 : 1;
+  final ansiBlue = cubeBlue < 3 ? 0 : 1;
+  final ansiIndex = ansiRed * 4 + ansiGreen * 2 + ansiBlue;
+  final ansi = map[ansiIndex];
+  final maxValue = max(max(cubeRed, cubeGreen), cubeBlue);
+  return maxValue >= 5 ? ansi + 8 : ansi;
+}();
+
+  return AnsiColor(code: code);
+}}
+
+/// Generates ANSI 16-color SGR escape sequences for [AnsiColor] values.
+extension AnsiColorSgr on AnsiColor {
+  /// The SGR escape sequence that activates this color.
+  ///
+  /// Set [background] to `true` to emit a background SGR sequence.
+  String toSgr({bool background = false}) {
+    final base = background ? ColorExtensionsSymbols.sgrBgAnsiBase : ColorExtensionsSymbols.sgrFgAnsiBase;
+    final code = this.code;
+    if (code < ColorExtensionsSymbols.sgrAnsiDarkThreshold) {
+      return '\x1B[${base + code}m';
+    }
+    return '\x1B[${base + ColorExtensionsSymbols.sgrBrightOffset + (code - ColorExtensionsSymbols.sgrAnsiDarkThreshold)}m';
+  }
+}
+
+/// Generates ANSI 256-color SGR escape sequences for [IndexedColor] values.
+extension IndexedColorSgr on IndexedColor {
+  /// The SGR escape sequence that activates this palette entry.
+  ///
+  /// Set [background] to `true` to emit a background SGR sequence.
+  String toSgr({bool background = false}) {
+    final prefix = background ? ColorExtensionsSymbols.sgrExtendedBg : ColorExtensionsSymbols.sgrExtendedFg;
+    return '\x1B[$prefix;${ColorExtensionsSymbols.sgrColor256};${index}m';
+  }
+}
+
+/// Generates ANSI 24-bit true-color SGR escape sequences for [Color] values.
+extension ColorSgr on Color {
+  /// The SGR escape sequence that activates this RGB color.
+  ///
+  /// Set [background] to `true` to emit a background SGR sequence.
+  String toSgr({bool background = false}) {
+    final prefix = background ? ColorExtensionsSymbols.sgrExtendedBg : ColorExtensionsSymbols.sgrExtendedFg;
+    return '\x1B[$prefix;${ColorExtensionsSymbols.sgrColorRgb};$red;$green;${blue}m';
+  }
 }
 
 const Map<int, Color> _ansiToRgb = {
@@ -48,86 +158,6 @@ const Map<int, Color> _ansiToRgb = {
   15: Color.brightWhite(),
 };
 
-/// Converts a 256-color palette index to its RGB triple.
-(int, int, int) _indexToRgb(int index) {
-  if (index < _indexedColorCubeStart) {
-    final color = _ansiToRgb[index]!;
-    return (color.red, color.green, color.blue);
-  }
-  if (index >= _indexedColorGrayStart) {
-    final value = (index - _indexedColorGrayStart) * _grayStep + _grayBase;
-    return (value, value, value);
-  }
-  final cubeIndex = index - _indexedColorCubeStart;
-  final area = _indexedColorCubeSize * _indexedColorCubeSize;
-  final red = (cubeIndex ~/ area) * _cubeStep;
-  final green = ((cubeIndex % area) ~/ _indexedColorCubeSize) * _cubeStep;
-  final blue = (cubeIndex % _indexedColorCubeSize) * _cubeStep;
-  return (red, green, blue);
-}
-
-/// Finds the nearest 256-color palette index for the given RGB triple.
-int _rgbToIndexed(int red, int green, int blue) {
-  var bestDistance = double.infinity;
-  var bestIndex = 0;
-
-  final cubeEnd =
-      _indexedColorCubeStart +
-      _indexedColorCubeSize * _indexedColorCubeSize * _indexedColorCubeSize;
-
-  for (var index = _indexedColorCubeStart; index < cubeEnd; index++) {
-    final cubeIndex = index - _indexedColorCubeStart;
-    final area = _indexedColorCubeSize * _indexedColorCubeSize;
-    final cubeRed = (cubeIndex ~/ area) * _cubeStep;
-    final cubeGreen = ((cubeIndex % area) ~/ _indexedColorCubeSize) * _cubeStep;
-    final cubeBlue = (cubeIndex % _indexedColorCubeSize) * _cubeStep;
-    final distance = _redmeanDistance(
-      red,
-      green,
-      blue,
-      cubeRed,
-      cubeGreen,
-      cubeBlue,
-    );
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      bestIndex = index;
-    }
-  }
-
-  for (var index = 0; index < _indexedColorGrayCount; index++) {
-    final gray = index * _grayStep + _grayBase;
-    final distance = _redmeanDistance(red, green, blue, gray, gray, gray);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      bestIndex = _indexedColorGrayStart + index;
-    }
-  }
-
-  return bestIndex;
-}
-
-/// Maps a 256-color index down to its nearest ANSI 16-color code.
-int _indexedToAnsi(int index) {
-  if (index < _indexedColorCubeStart) return index;
-  const map = [0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15];
-  final gray = index - _indexedColorGrayStart;
-  if (gray >= 0 && gray < _indexedColorGrayCount) {
-    return gray < 12 ? 8 : 15;
-  }
-  final cube = index - _indexedColorCubeStart;
-  final area = _indexedColorCubeSize * _indexedColorCubeSize;
-  final cubeRed = cube ~/ area;
-  final cubeGreen = (cube % area) ~/ _indexedColorCubeSize;
-  final cubeBlue = cube % _indexedColorCubeSize;
-  final ansiRed = cubeRed < 3 ? 0 : 1;
-  final ansiGreen = cubeGreen < 3 ? 0 : 1;
-  final ansiBlue = cubeBlue < 3 ? 0 : 1;
-  final ansiIndex = ansiRed * 4 + ansiGreen * 2 + ansiBlue;
-  final ansi = map[ansiIndex];
-  final maxValue = max(max(cubeRed, cubeGreen), cubeBlue);
-  return maxValue >= 5 ? ansi + 8 : ansi;
-}
 
 /// Redmean-weighted squared distance between two RGB colors.
 double _redmeanDistance(
@@ -146,12 +176,3 @@ double _redmeanDistance(
       4 * deltaGreen * deltaGreen +
       (2 + (255 - redMean) / 256) * deltaBlue * deltaBlue;
 }
-
-const int _indexedColorCubeStart = 16;
-const int _indexedColorGrayStart = 232;
-const int _indexedColorGrayCount = 24;
-const int _indexedColorCubeSize = 6;
-const int _rgbComponentMax = 255;
-const int _cubeStep = _rgbComponentMax ~/ (_indexedColorCubeSize - 1);
-const int _grayStep = 10;
-const int _grayBase = 8;

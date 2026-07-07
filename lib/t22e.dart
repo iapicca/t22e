@@ -23,7 +23,14 @@ export 'src/engine/diff_engine.dart'
 export 'src/engine/diff_engine_provider.dart' show diffEngineProvider;
 export 'src/engine/color.dart' show AnsiColor, Color, IndexedColor;
 export 'src/engine/color_extensions.dart'
-    show AnsiToColor, ColorAnsi, ColorIndex, IndexedToColor;
+    show
+        AnsiColorSgr,
+        AnsiToColor,
+        ColorAnsi,
+        ColorIndex,
+        ColorSgr,
+        IndexedColorSgr,
+        IndexedToColor;
 export 'src/engine/pipeline.dart' show Pipeline;
 export 'src/engine/pipeline_provider.dart' show pipelineProvider;
 export 'src/engine/stdout_interface.dart' show StdoutWriter;

@@ -26,10 +26,6 @@ extension type const IndexedColor._(int _index) {
 
 const int _indexedColorCount = 256;
 
-// TODO: Add ColorSgr extension for ANSI SGR sequence generation.
-// Reference implementation:
-// https://raw.githubusercontent.com/iapicca/t22e/refs/heads/no_ffi/packages/core/lib/src/color.dart
-
 /// An exact RGB terminal color.
 extension type const Color._((int, int, int) _rgb) {
   /// Creates an RGB color with components in the range 0–255.

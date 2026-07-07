@@ -23,33 +23,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   `stdinBytesProvider` (or `lastStdinBytesProvider`) and update the barrel +
   callers in `test/providers_test.dart`.
 
-## 3. Add `ColorSgr` extension for ANSI SGR sequence generation
-
-- **Target file**: `lib/src/engine/color.dart:28`
-- **Priority**: Medium
-- **Difficulty**: Medium
-- **Description**: `// TODO: Add ColorSgr extension for ANSI SGR sequence
-  generation.` A reference implementation exists in the `no_ffi` branch of the
-  repo. Currently `AnsiWriter` does not emit RGB/256/16-color SGR sequences
-  from `Color` values.
-- **Proposed fix**: Port the `ColorSgr` extension from the reference link into
-  `lib/src/engine/color_extensions.dart`, exposing `toSgr()` over
-  `AnsiColor`/`IndexedColor`/`Color`. Wire it into `AnsiWriter` style emission
-  and add unit tests covering each color depth.
-
-## 4. Convert named `Color` constants to `const factory`
-
-- **Target file**: `lib/src/engine/color.dart:42`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `// TODO the "const" below shouel be const factory(s)`. The
-  named constructors (`Color.black()`, `Color.red()`, ...) use direct
-  representation assignment instead of delegating to the primary `const
-  Color({...})` factory.
-- **Proposed fix**: Rewrite each named constructor as `const Color.black() :
-  this(red: 0, green: 0, blue: 0);` etc., so they all route through the
-  validated primary constructor.
-
 ## 5. Re-evaluate `@internal` marker on `renderText` provider
 
 - **Target file**: `lib/src/engine/render_text_provider.dart:11`
