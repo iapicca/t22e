@@ -4,58 +4,9 @@ import 'dart:convert' show utf8;
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'ansi_parser_symbols.dart' show AnsiParserSymbols;
+import 'key/key.dart' show Key;
 
 part 'ansi_parser.freezed.dart';
-
-/// Recognized logical keys emitted by the parser.
-/// TODO Key should be in a separate folder, commments foe `key`s are idiotic!
-/// also add "unknown" value
-enum Key {
-  /// Up arrow.
-  up,
-
-  /// Down arrow.
-  down,
-
-  /// Left arrow.
-  left,
-
-  /// Right arrow.
-  right,
-
-  /// Return / Enter key.
-  enter,
-
-  /// Horizontal tab.
-  tab,
-
-  /// Backspace.
-  backspace,
-
-  /// Escape key.
-  escape,
-
-  /// Home key.
-  home,
-
-  /// End key.
-  end,
-
-  /// Page up.
-  pageUp,
-
-  /// Page down.
-  pageDown,
-
-  /// Delete key.
-  delete,
-
-  /// Ctrl+C.
-  ctrlC,
-
-  /// Ctrl+D.
-  ctrlD,
-}
 
 /// Sealed input event produced by [AnsiParser].
 @freezed

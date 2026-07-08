@@ -106,6 +106,11 @@
 - When resolving questions about Dart or a package API, consult the official
   documentation first (e.g. `https://dart.dev`, `https://pub.dev/packages/<pkg>`).
 - Do not rely on local package cache source files as authoritative references.
+- It is **FORBIDDEN** to read, search, or list files under `~/.pub-cache/`
+  (or any local package cache). Treat the cache as off-limits for all file
+  operations (read, glob, grep, bash `cat`/`ls`/`find`). The cache is an
+  unpublished build artifact; official docs and the project's own
+  `pubspec.yaml` / lockfile are the only authoritative sources.
 
 ## Riverpod Providers
 

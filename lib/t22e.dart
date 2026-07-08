@@ -63,8 +63,9 @@ export 'src/notifier/notifier.dart'
 
 export 'src/io/input_stream_provider.dart' show inputStreamProvider;
 export 'src/io/ansi_parser.dart'
-    show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent, Key;
+    show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent;
 export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
+export 'src/io/key/key.dart' show Key;
 export 'src/io/input_value_notifier_provider.dart'
     show inputValueProvider;
 export 'src/view/context.dart' show Context;
