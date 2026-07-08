@@ -1,6 +1,11 @@
-.dart_tool/
-*.lock
-.idea
-*.iml
-*.freezed.dart
+# Generated files
 *.g.dart
+*.freezed.dart
+# TODO: Generated .freezed.dart files are currently committed to the repository
+# while this ignore rule is active. Reconcile the ignore rule with the committed
+# files (either remove the generated files from version control or stop ignoring
+# them).
+
+# Dart tooling
+.dart_tool/
+pubspec.lock

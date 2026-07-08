@@ -1,42 +1,19 @@
-name: t22e_workspace
-publish_to: none
+name: t22e
+description: A pure-Dart Terminal User Interface (TUI) framework.
+version: 0.0.1
+repository: https://github.com/francesco/t22e
 
 environment:
   sdk: ^3.12.0
 
-workspace:
-  - packages/protocol
-  - packages/ansi
-  - packages/unicode
-  - packages/parser
-  - packages/terminal
-  - packages/core
-  - packages/renderer
-  - packages/capability
-  - packages/lifecycle
-  - packages/notifier
-  - packages/widgets
-  - packages/testing
+dependencies:
+  characters: ^1.4.1
+  freezed_annotation: ^3.1.0
+  meta: ^1.18.3
+  riverpod: ^3.3.2
 
 dev_dependencies:
-  melos: ^7.7.0
+  build_runner: ^2.15.0
+  freezed: ^3.2.5
   lints: ^6.1.0
-
-melos:
-  scripts:
-    build:
-      description: Run build_runner code generation in all packages.
-      exec: dart run build_runner build
-    analyze:
-      description: Run code generation then static analysis on all packages.
-      run: |
-        melos build
-        melos exec -- dart analyze
-    test:
-      description: Run code generation then tests in all workspace packages.
-      run: |
-        melos build
-        melos exec -- dart test
-    format:
-      description: Check code formatting across all packages.
-      exec: dart format --output=none --set-exit-if-changed .
+  test: ^1.31.1
