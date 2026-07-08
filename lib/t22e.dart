@@ -63,7 +63,15 @@ export 'src/io/input_stream_provider.dart' show inputStreamProvider;
 export 'src/io/ansi_parser.dart'
     show AnsiParser, InputEvent, CharEvent, KeyEvent, UnknownEvent;
 export 'src/io/ansi_parser_provider.dart' show ansiParserProvider;
+export 'src/io/ansi_parser_state.dart' show AnsiParserState;
+export 'src/io/ansi_parser_symbols.dart' show AnsiParserSymbols;
 export 'src/io/key/key.dart' show Key;
+export 'src/io/terminal_bytes.dart'
+    show isControlByte, isCsiParamByte, isCsiIntermediateByte, isCsiFinalByte;
+export 'src/io/terminal_bytes_symbols.dart' show TerminalBytesSymbols;
+export 'src/io/utf8_decoder.dart' show Utf8Decoder, utf8Length;
+export 'src/io/utf8_decoder_provider.dart' show utf8DecoderProvider;
+export 'src/io/utf8_decoder_symbols.dart' show Utf8DecoderSymbols;
 export 'src/io/input_value_notifier_provider.dart'
     show inputValueProvider;
 export 'src/view/context.dart' show Context;

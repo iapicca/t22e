@@ -132,6 +132,20 @@
   `my_class.dart` → `my_class_provider.dart`.
 - Data structures do not need providers.
 
+## Internal override-seam exports
+
+All `@internal` classes and functions are re-exported from the barrel as
+override-seams. The project-wide `analyzer: errors:
+invalid_use_of_internal_member: ignore` in `analysis_options.yaml` silences
+the consumer-side lint so app/test code can reach these internals without
+per-call `// ignore` comments.
+
+`@internal` from `package:meta` is a documentation marker, not a hard
+access barrier. The intent: discourage depending on internals in shipped
+app code, but allow a developer to act on internal files at their own
+risk — inject a fake stdin, construct a parser in tests, override a
+provider — without importing internals directly.
+
 ## Riverpod Provider Lifecycle (pure-Dart)
 
 t22e is pure-Dart: there is no `ProviderScope`. The `ProviderContainer`

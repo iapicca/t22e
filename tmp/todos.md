@@ -23,18 +23,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   `stdinBytesProvider` (or `lastStdinBytesProvider`) and update the barrel +
   callers in `test/providers_test.dart`.
 
-## 5. Re-evaluate `@internal` marker on `renderText` provider
-
-- **Target file**: `lib/src/engine/render_text_provider.dart:11`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `/// TODO why is this internal?` — the provider for
-  `RenderText` is annotated `@internal` even though `RenderText` itself is
-  inherently an engine-leaf render object that users rarely reach directly.
-- **Proposed fix**: Decide intent. If the provider is only an override-seam,
-  keep `@internal` and update the doc comment with the rationale (and remove
-  the TODO). If users plausibly need a default `RenderText`, drop `@internal`
-  and export it from the barrel.
 
 ## 6. Revisit the diff-engine approach
 
@@ -64,34 +52,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   with the `Disposable` mixin, and inject the byte source through a Riverpod
   provider for testability.
 
-## 8. Split `Key` out of `ansi_parser.dart` and add `Key.unknown`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:9`
-- **Priority**: High
-- **Difficulty**: Easy
-- **Description**: `// TODO Key should be in a separate folder, commments foe
-  'key's are idiotic! also add "unknown" value`. The `Key` enum is defined
-  inside the parser file, has no `unknown` variant, and the per-value doc
-  comments are criticized as low-value.
-- **Proposed fix**: Create `lib/src/io/key/key.dart` (or
-  `lib/src/models/key.dart`) exporting only the `Key` enum. Add `Key.unknown`.
-  Remove the trivial one-liner per-variant doc comments (or replace with a
-  single class-level doc). Update the barrel and `InputEvent` references.
-
-## 9. Move `_ParserState` out of `ansi_parser.dart`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:72`
-- **Priority**: Medium
-- **Difficulty**: Easy
-- **Description**: `// TODO this shouldn't be private, maybe internal, and
-  should be in a separate files, maybe together with 'key'`. The
-  `_ParserState` enum is private to the parser file but is genuinely a parser
-  implementation detail that could be exposed as `@internal`.
-- **Proposed fix**: Extract `_ParserState` to
-  `lib/src/io/ansi_parser_state.dart`, mark it `@internal`, and rename to
-  `AnsiParserState`. Alternatively co-locate it with the `Key` file if the
-  author prefers a single `io/keys` folder.
-
 ## 10. Inject the parser's `StreamController` via Riverpod
 
 - **Target file**: `lib/src/io/ansi_parser.dart:91`
@@ -120,20 +80,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   (using the local `ValueNotifier` clone under `lib/src/notifier/`) so test
   harnesses and tooling can observe parser state transitions. Update
   `_process` to read/write through the notifier.
-
-## 12. Replace `AnsiParser.close()` with a disposable pattern
-
-- **Target file**: `lib/src/io/ansi_parser.dart:111`
-- **Priority**: Medium
-- **Difficulty**: Easy
-- **Description**: `// TODO this should be handled with disposable mixin and
-  be 'dispose' rather than 'close'`. `AnsiParser.close()` is a hand-rolled
-  teardown that duplicates the disposable lifecycle already present in
-  `lib/src/notifier/disposable.dart` and `init_mixin.dart`.
-- **Proposed fix**: Make `AnsiParser` `with Disposable` (or the
-  `InitMixin`/`Disposed` pattern) and rename `close()` to `dispose()`. Update
-  `ansiParserProvider` to call `ref.onDispose(parser.dispose)` and any
-  call-site in tests.
 
 ## 13. Extract ground/escape/csi/flush/emitControl as extensions
 
@@ -168,117 +114,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   constants to a `final class TerminalBytes { static const int esc = ...; }`
   (relates to tasks #17–#19). Remove the statics from `AnsiParser`.
 
-## 15. Move `_decodeUtf8` out of `AnsiParser` and inject `utf8.decode`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:327`
-- **Priority**: Medium
-- **Difficulty**: Easy
-- **Description**: `// TODO this has nothing to do with AnsiParser and should
-  be in a separate file; utf8.decode should be "imported" through riverpod`.
-  `AnsiParser` statically calls `utf8.decode` from `dart:convert`, coupling the
-  parser to a specific UTF-8 implementation.
-- **Proposed fix**: Move `_decodeUtf8` to `lib/src/io/utf8_decoder.dart` (or
-  `lib/src/convert/`). Define a `Utf8Decoder` typedef/interface and expose a
-  `utf8DecoderProvider` so the decoder is injected via Riverpod and fakes can
-  replace it in tests.
-
-## 16. Move `_utf8Length` out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:338`
-- **Priority**: Medium
-- **Difficulty**: Easy
-- **Description**: `_utf8Length` is a static UTF-8 lead-byte classifier the
-  author feels does not belong on `AnsiParser`; also requests byte constants
-  live in a `final class` as `static const int`.
-- **Proposed fix**: Relocate to `lib/src/io/utf8_decoder.dart` (alongside
-  `_decodeUtf8` from #15). Define the magic bounds (0x80, 0xC0, 0xE0, 0xF0,
-  0xF8) as `static const int` in a `final class Utf8Bytes`.
-
-## 17. Move `_isControl` out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:349`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `// TODO this ... should be in a separate file; finally
-  bytes should be mapped in a final class as 'static const int'`. The control
-  byte predicate is a parser-agnostic byte classification.
-- **Proposed fix**: Move to `lib/src/io/terminal_bytes.dart` as
-  `bool isControlByte(int byte)`; define `static const int controlMax = 0x20`
-  and `static const int del = 0x7F` on a `final class TerminalBytes`.
-
-## 18. Move `_isCsiParam` out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:354`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: Same rationale as #17 — CSI parameter range predicate
-  belongs in a separate byte-classification file.
-- **Proposed fix**: Move to `lib/src/io/terminal_bytes.dart` as
-  `bool isCsiParamByte(int byte)` backed by `static const int csiParamMin =
-  0x30` / `csiParamMax = 0x3F` on `TerminalBytes`.
-
-## 19. Move `_isCsiIntermediate` out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:359`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: Same rationale as #17/#18 — CSI intermediate predicate.
-- **Proposed fix**: Move to `lib/src/io/terminal_bytes.dart` as
-  `bool isCsiIntermediateByte(int byte)` with `static const int
-  csiIntermediateMin = 0x20` / `csiIntermediateMax = 0x2F`.
-
-## 20. Move `_isCsiFinal` out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:364`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: Same rationale as #17–#19 — CSI final predicate.
-- **Proposed fix**: Move to `lib/src/io/terminal_bytes.dart` as
-  `bool isCsiFinalByte(int byte)` with `static const int csiFinalMin = 0x40` /
-  `csiFinalMax = 0x7E`.
-
-## 21. Move `_esc` constant out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:368`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `// TODO this has nothing to do with AnsiParser and should
-  be in a separate file; finally bytes should be mapped in a final class as
-  'static const int'`.
-- **Proposed fix**: Define `static const int esc = 0x1B;` on `TerminalBytes`
-  (see #17) and reference it via that class.
-
-## 22. Move `_csiIntroducer` constant out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:371`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: Same as #21 for the `'['` (0x5B) introducer.
-- **Proposed fix**: Define `static const int csiIntroducer = 0x5B;` on
-  `TerminalBytes`.
-
-## 23. Move `_ss3Introducer` constant out of `AnsiParser`
-
-- **Target file**: `lib/src/io/ansi_parser.dart:374`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: Same as #21 for the `'O'` (0x4F) SS3 introducer.
-- **Proposed fix**: Define `static const int ss3Introducer = 0x4F;` on
-  `TerminalBytes`.
-
-## 24. Re-evaluate `@internal` marker on `diffEngine` provider
-
-- **Target file**: `lib/src/engine/diff_engine_provider.dart:11`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `/// TODO why is this internal?` — mirrors #5: the `DiffEngine`
-  provider is annotated `@internal` for the override-seam rationale but the
-  doc comment questions the choice.
-- **Proposed fix**: Resolve the intent. Either keep `@internal` and replace
-  the TODO with a one-line rationale ("override-seam; users inject custom
-  diff strategies"), or remove `@internal` and export from the barrel if a
-  default `DiffEngine` is a supported user entry point.
-
 ## 25. Re-evaluate `StdoutInterface` folder structure
 
 - **Target file**: `lib/src/engine/stdout_interface.dart:13`
@@ -292,17 +127,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   implementation to `lib/src/io/stdout_writer.dart` and keep only the
   `StdoutInterface` mixin under `engine/`. Update the barrel and provider
   exports accordingly.
-
-## 26. Re-evaluate `@internal` marker on `ansiParser` provider
-
-- **Target file**: `lib/src/io/ansi_parser_provider.dart:11`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `/// TODO why is this internal?` — same pattern as #5/#24.
-  The `ansiParser` provider is an override-seam marked `@internal`.
-- **Proposed fix**: Either keep `@internal` and document the override-seam
-  rationale (removing the TODO), or drop `@internal` and export the provider
-  from the barrel if application code is expected to build a parser directly.
 
 ## 27. Revisit `CellBufferBuilder` design
 
@@ -332,18 +156,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   `Widget.canUpdate(Widget other)` based on `runtimeType` + key. Follow up
   with `StatefulWidget`/`StatefulElement` dirty-flag work called out in §8.
 
-## 29. Re-evaluate `@internal` marker on `ansiWriter` provider
-
-- **Target file**: `lib/src/engine/ansi_writer_provider.dart:10`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `@internal // TODO this shouldn't be internal` — the
-  `ansiWriter` provider is marked `@internal` but the author disagrees.
-- **Proposed fix**: If `AnsiWriter` is meant as a user-injectable
-  override-seam, keep `@internal` and document why (tree-shake-friendly default
-  via provider). Otherwise drop `@internal` and export the provider from the
-  barrel. Resolve the TODO with the decision.
-
 ## 30. Re-evaluate `@internal` marker on `cellBufferBuilder` provider
 
 - **Target file**: `lib/src/engine/cell_buffer_builder_provider.dart:12`
@@ -358,18 +170,6 @@ Difficulty: `Easy` / `Medium` / `Hard`
   directly via `terminalSizeProvider`. Alternatively, keep it `@internal` as an
   override-seam and document the rationale.
 
-## 31. Reassess whether `CellBufferBuilderBatch` belongs in `engine/`
-
-- **Target file**: `lib/src/engine/cell_buffer_builder_extensions.dart:8`
-- **Priority**: Low
-- **Difficulty**: Easy
-- **Description**: `// TODO this seems very "theoretical"; maybe not really
-  "engine" material.` The `setMany` batch helper is a single trivial loop with
-  no current call-site in the engine.
-- **Proposed fix**: Either delete the extension (no users, "theoretical"), or
-  move it under `lib/src/view/` next to the widget helpers that would plausibly
-  consume it, or elevate to a documented public API on `CellBufferBuilder`
-  once a real consumer exists. Resolve the TODO with the chosen path.
 
 ## 32. Define `RenderText` behavior when constraints force width to 0
 

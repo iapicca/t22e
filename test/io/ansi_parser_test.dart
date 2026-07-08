@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show utf8;
 
 import 'package:t22e/t22e.dart';
 import 'package:test/test.dart';
@@ -9,7 +10,7 @@ void main() {
     late List<InputEvent> events;
 
     setUp(() {
-      parser = AnsiParser();
+      parser = AnsiParser(decodeUtf8: utf8.decode);
       events = <InputEvent>[];
       parser.events.listen(events.add);
     });
@@ -119,6 +120,18 @@ void main() {
       await Future.microtask(() {});
 
       expect(done, isTrue);
+    });
+
+    test('uses an injected fake decoder seam', () async {
+      final custom = AnsiParser(decodeUtf8: (_) => 'custom');
+      addTearDown(custom.dispose);
+      final decoded = <InputEvent>[];
+      custom.events.listen(decoded.add);
+
+      custom.add([0x41]); // printable byte
+      await Future.microtask(() {});
+
+      expect(decoded, [const InputEvent.char(character: 'custom')]);
     });
   });
 }

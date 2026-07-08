@@ -1,5 +1,4 @@
 import 'dart:async' show Stream, StreamController;
-import 'dart:convert' show utf8;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -7,6 +6,13 @@ import '../notifier/disposable.dart' show Disposable;
 import 'ansi_parser_state.dart' show AnsiParserState;
 import 'ansi_parser_symbols.dart' show AnsiParserSymbols;
 import 'key/key.dart' show Key;
+import 'terminal_bytes.dart'
+    show
+        isControlByte,
+        isCsiFinalByte,
+        isCsiIntermediateByte,
+        isCsiParamByte;
+import 'utf8_decoder.dart' show Utf8Decoder, utf8Length;
 
 part 'ansi_parser.freezed.dart';
 
@@ -30,12 +36,16 @@ sealed class InputEvent with _$InputEvent {
 @internal
 class AnsiParser with Disposable {
   /// Creates a parser with an empty buffer.
-  AnsiParser()
+  ///
+  /// The [decodeUtf8] seam is injected via [utf8DecoderProvider]; pass a
+  /// fake in tests.
+  AnsiParser({required this._decodeUtf8})
   /// TODO top-priority: WHAT THE FUCK! this should be somewhere else! and be initialized and disposed via riverpod!
     : _controller = StreamController<InputEvent>.broadcast(sync: true);
 
   final StreamController<InputEvent> _controller;
   final List<int> _buffer = <int>[];
+  final Utf8Decoder _decodeUtf8;
   /// TODO this should be a value notifier 
   AnsiParserState _state = AnsiParserState.ground;
 
@@ -82,12 +92,12 @@ class AnsiParser with Disposable {
       _buffer.removeAt(0);
       return true;
     }
-    if (_isControl(byte)) {
+    if (isControlByte(byte)) {
       _emitControl(byte);
       _buffer.removeAt(0);
       return true;
     }
-    final length = _utf8Length(byte);
+    final length = utf8Length(byte);
     if (length == 0) {
       // Invalid UTF-8 lead byte; emit it as unknown.
       _controller.add(InputEvent.unknown(raw: <int>[byte]));
@@ -146,11 +156,11 @@ class AnsiParser with Disposable {
     var i = start;
     while (i < _buffer.length) {
       final byte = _buffer[i];
-      if (_isCsiParam(byte) || _isCsiIntermediate(byte)) {
+      if (isCsiParamByte(byte) || isCsiIntermediateByte(byte)) {
         i++;
         continue;
       }
-      if (_isCsiFinal(byte)) {
+      if (isCsiFinalByte(byte)) {
         final params = _buffer.sublist(start, i);
         final key = _csiKey(params, byte);
         if (key != null) {
@@ -265,55 +275,4 @@ class AnsiParser with Disposable {
       _ => null,
     };
   }
-
-  /// Decodes a UTF-8 byte run to a single character string.
-  /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// utf8.decode should be "imported" through riverpod
-  static String? _decodeUtf8(List<int> bytes) {
-    try {
-      return utf8.decode(bytes, allowMalformed: false);
-    } on FormatException {
-      return null;
-    }
-  }
-
-  /// Bytes in the UTF-8 code point starting with [byte], or 0 if invalid lead.
-  /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static int _utf8Length(int byte) {
-    if (byte < AnsiParserSymbols.utf8AsciiMax) return 1;
-    if ((byte & AnsiParserSymbols.utf8TwoByteMask) ==
-        AnsiParserSymbols.utf8TwoByteLead) {
-      return 2;
-    }
-    if ((byte & AnsiParserSymbols.utf8ThreeByteMask) ==
-        AnsiParserSymbols.utf8ThreeByteLead) {
-      return 3;
-    }
-    if ((byte & AnsiParserSymbols.utf8FourByteMask) ==
-        AnsiParserSymbols.utf8FourByteLead) {
-      return 4;
-    }
-    return 0;
-  }
-
-  /// Whether [byte] is a control byte that should not be decoded as UTF-8.
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static bool _isControl(int byte) => byte < 0x20 || byte == 0x7F;
-
-  /// Whether [byte] is a CSI parameter byte.
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static bool _isCsiParam(int byte) => byte >= 0x30 && byte <= 0x3F;
-
-  /// Whether [byte] is a CSI intermediate byte.
-    /// TODO this has nothing to do with AnsiParser and should be in a separate file
-    /// finally bytes should be mapped in a final class as `static const int` 
-  static bool _isCsiIntermediate(int byte) => byte >= 0x20 && byte <= 0x2F;
-
-/// Whether [byte] is a CSI final byte.
-     /// TODO this has nothing to do with AnsiParser and should be in a separate file
-     /// finally bytes should be mapped in a final class as `static const int` 
-  static bool _isCsiFinal(int byte) => byte >= 0x40 && byte <= 0x7E;
 }

@@ -53,25 +53,4 @@ final class AnsiParserSymbols {
 
   /// CSI final byte for tilde sequences (`~`).
   static const int csiTilde = 0x7E;
-
-  /// Upper bound of the single-byte ASCII range.
-  static const int utf8AsciiMax = 0x80;
-
-  /// Mask for a two-byte UTF-8 lead byte.
-  static const int utf8TwoByteMask = 0xE0;
-
-  /// Lead-byte value of a two-byte UTF-8 sequence.
-  static const int utf8TwoByteLead = 0xC0;
-
-  /// Mask for a three-byte UTF-8 lead byte.
-  static const int utf8ThreeByteMask = 0xF0;
-
-  /// Lead-byte value of a three-byte UTF-8 sequence.
-  static const int utf8ThreeByteLead = 0xE0;
-
-  /// Mask for a four-byte UTF-8 lead byte.
-  static const int utf8FourByteMask = 0xF8;
-
-  /// Lead-byte value of a four-byte UTF-8 sequence.
-  static const int utf8FourByteLead = 0xF0;
 }
