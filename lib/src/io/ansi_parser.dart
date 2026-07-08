@@ -3,6 +3,7 @@ import 'dart:convert' show utf8;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'ansi_parser_state.dart' show AnsiParserState;
 import 'ansi_parser_symbols.dart' show AnsiParserSymbols;
 import 'key/key.dart' show Key;
 
@@ -21,19 +22,6 @@ sealed class InputEvent with _$InputEvent {
   const factory InputEvent.unknown({required List<int> raw}) = UnknownEvent;
 }
 
-/// Parser state while scanning an escape sequence.
-/// TODO this shouldn't be private, maybe internal, and should be in a separate files, maybe together with `key`
-enum _ParserState {
-  /// Reading plain characters and control bytes.
-  ground,
-
-  /// Saw ESC, waiting for the next byte.
-  escape,
-
-  /// Inside a CSI sequence (`ESC [`).
-  csi,
-}
-
 /// Converts raw terminal bytes into typed [InputEvent]s.
 ///
 /// Covers printable chars, control bytes, arrows, and a CSI/SS3 subset.
@@ -50,7 +38,7 @@ class AnsiParser {
   final StreamController<InputEvent> _controller;
   final List<int> _buffer = <int>[];
   /// TODO this should be a value notifier 
-  _ParserState _state = _ParserState.ground;
+  AnsiParserState _state = AnsiParserState.ground;
 
   /// The broadcast stream of parsed input events.
   Stream<InputEvent> get events => _controller.stream;
@@ -74,11 +62,11 @@ class AnsiParser {
   void _process() {
     while (_buffer.isNotEmpty) {
       switch (_state) {
-        case _ParserState.ground:
+        case AnsiParserState.ground:
           if (!_processGround()) return;
-        case _ParserState.escape:
+        case AnsiParserState.escape:
           if (!_processEscape()) return;
-        case _ParserState.csi:
+        case AnsiParserState.csi:
           if (!_processCsi()) return;
       }
     }
@@ -89,7 +77,7 @@ class AnsiParser {
   bool _processGround() {
     final byte = _buffer.first;
     if (byte == AnsiParserSymbols.esc) {
-      _state = _ParserState.escape;
+      _state = AnsiParserState.escape;
       _buffer.removeAt(0);
       return true;
     }
@@ -123,7 +111,7 @@ class AnsiParser {
     if (_buffer.isEmpty) return false;
     final byte = _buffer.first;
     if (byte == AnsiParserSymbols.csiIntroducer) {
-      _state = _ParserState.csi;
+      _state = AnsiParserState.csi;
       _buffer.removeAt(0);
       return true;
     }
@@ -140,13 +128,13 @@ class AnsiParser {
         );
       }
       _buffer.removeRange(0, 2);
-      _state = _ParserState.ground;
+      _state = AnsiParserState.ground;
       return true;
     }
     // Lone ESC followed by a normal byte: treat as Alt+key or unknown.
     _controller.add(InputEvent.unknown(raw: <int>[AnsiParserSymbols.esc, byte]));
     _buffer.removeAt(0);
-    _state = _ParserState.ground;
+    _state = AnsiParserState.ground;
     return true;
   }
 
@@ -174,7 +162,7 @@ class AnsiParser {
           );
         }
         _buffer.removeRange(0, i + 1);
-        _state = _ParserState.ground;
+        _state = AnsiParserState.ground;
         return true;
       }
       // Invalid byte inside CSI: drop the introducer and return to ground.
@@ -184,7 +172,7 @@ class AnsiParser {
         ),
       );
       _buffer.removeRange(0, i + 1);
-      _state = _ParserState.ground;
+      _state = AnsiParserState.ground;
       return true;
     }
     return false;
@@ -194,30 +182,30 @@ class AnsiParser {
     /// TODO this can be an extension!
   void _flush() {
     switch (_state) {
-      case _ParserState.ground:
+      case AnsiParserState.ground:
         while (_buffer.isNotEmpty) {
           if (!_processGround()) break;
         }
-      case _ParserState.escape:
+      case AnsiParserState.escape:
         // A trailing lone ESC is treated as the Escape key.
         if (_buffer.isEmpty) {
           _controller.add(const InputEvent.key(key: Key.escape));
         } else {
           _controller.add(InputEvent.unknown(raw: <int>[AnsiParserSymbols.esc, _buffer.first]));
           _buffer.removeAt(0);
-          _state = _ParserState.ground;
+          _state = AnsiParserState.ground;
           while (_buffer.isNotEmpty) {
             if (!_processGround()) break;
           }
         }
-      case _ParserState.csi:
+      case AnsiParserState.csi:
         _controller.add(
           InputEvent.unknown(
             raw: <int>[AnsiParserSymbols.esc, AnsiParserSymbols.csiIntroducer, ..._buffer],
           ),
         );
         _buffer.clear();
-        _state = _ParserState.ground;
+        _state = AnsiParserState.ground;
     }
   }
 
