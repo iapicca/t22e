@@ -7,6 +7,6 @@ import 'ansi_parser.dart' show AnsiParser;
 @internal
 final ansiParserProvider = Provider<AnsiParser>((ref) {
   final parser = AnsiParser();
-  ref.onDispose(parser.close);
+  ref.onDispose(parser.dispose);
   return parser;
 });

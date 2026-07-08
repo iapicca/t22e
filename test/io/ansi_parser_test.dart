@@ -14,7 +14,7 @@ void main() {
       parser.events.listen(events.add);
     });
 
-    tearDown(() => parser.close());
+    tearDown(() => parser.dispose());
 
     test('emits CharEvent for plain ASCII characters', () async {
       parser.add([65, 66, 67]); // ABC
@@ -65,12 +65,12 @@ void main() {
       ]);
     });
 
-    test('emits KeyEvent.escape on close for trailing ESC', () async {
+    test('emits KeyEvent.escape on dispose for trailing ESC', () async {
       parser.add([0x1B]);
       await Future.microtask(() {});
       expect(events, isEmpty);
 
-      parser.close();
+      parser.dispose();
       await Future.microtask(() {});
 
       expect(events, [const InputEvent.key(key: Key.escape)]);
@@ -111,11 +111,11 @@ void main() {
       expect(events, [const InputEvent.unknown(raw: [0x80])]);
     });
 
-    test('closes the event stream on close', () async {
+    test('closes the event stream on dispose', () async {
       var done = false;
       parser.events.listen(null, onDone: () => done = true);
 
-      parser.close();
+      parser.dispose();
       await Future.microtask(() {});
 
       expect(done, isTrue);

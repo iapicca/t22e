@@ -3,6 +3,7 @@ import 'dart:convert' show utf8;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../notifier/disposable.dart' show Disposable;
 import 'ansi_parser_state.dart' show AnsiParserState;
 import 'ansi_parser_symbols.dart' show AnsiParserSymbols;
 import 'key/key.dart' show Key;
@@ -27,13 +28,11 @@ sealed class InputEvent with _$InputEvent {
 /// Covers printable chars, control bytes, arrows, and a CSI/SS3 subset.
 /// TODO replace the Stream with inputValueNotifier and listen to it instead.
 @internal
-class AnsiParser {
+class AnsiParser with Disposable {
   /// Creates a parser with an empty buffer.
   AnsiParser()
   /// TODO top-priority: WHAT THE FUCK! this should be somewhere else! and be initialized and disposed via riverpod!
     : _controller = StreamController<InputEvent>.broadcast(sync: true);
-
-  bool _closed = false;
 
   final StreamController<InputEvent> _controller;
   final List<int> _buffer = <int>[];
@@ -45,15 +44,17 @@ class AnsiParser {
 
   /// Feeds more bytes into the parser and emits any complete events.
   void add(List<int> bytes) {
+    check(message: 'Cannot add to a disposed AnsiParser');
     _buffer.addAll(bytes);
     _process();
   }
 
-  /// Flushes any remaining buffered bytes and closes the event stream.
-  /// TODO this should be handled with disposable mixin and be "dispose" rather than `close`
-  void close() {
-    if (_closed) return;
-    _closed = true;
+  /// Flushes remaining buffered bytes and closes the event stream.
+  @mustCallSuper
+  @override
+  void dispose({String? message}) {
+    if (isDisposed) return;
+    super.dispose(message: message);
     _flush();
     _controller.close();
   }
