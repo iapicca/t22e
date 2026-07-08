@@ -18,7 +18,7 @@ class Context {
 
   /// Reads the current value of [provider] as a one-shot, never subscribing.
   ///
-  /// Use `WidgetRef.watch` from a `Consumer` to register rebuild-on-change.
+  /// Use `WidgetRef.listen` from a `Consumer` to register rebuild-on-change.
   T read<T>(ProviderListenable<T> provider) => container.read(provider);
 
   /// Requests a new frame from the host binding, if one is wired.

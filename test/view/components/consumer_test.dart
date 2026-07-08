@@ -38,16 +38,20 @@ void main() {
       );
     });
 
-    test('ref.watch obtains the same value as ref.read in this phase', () {
+    test('ref.read matches container.read for the same provider', () {
       final name = Provider<String>((ref) => 'Ada');
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
       final consumer = Consumer(
-        builder: (context, ref) => Text(ref.watch(name)),
+        builder: (context, ref) {
+          ref.listen(name);
+          return Text(ref.read(name));
+        },
       );
       final element = consumer.compile(Context(container))..mount(null);
 
+      expect(container.read(name), 'Ada');
       final child = element.children.single as RenderObjectElement<RenderText>;
       expect(child.renderObject.text, 'Ada');
     });

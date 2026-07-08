@@ -142,11 +142,14 @@ In the shipped code:
 - Stdin bytes are parsed by `AnsiParser` into a sealed `InputEvent` union
   (`CharEvent`, `KeyEvent`, `UnknownEvent`) and exposed as a `Stream` via
   **`inputEventStreamProvider`** — the only genuinely public provider.
-- ViewModels are plain Riverpod `Notifier`s that `ref.watch` the input stream
-  and emit immutable model snapshots (see `test/smoke_test.dart`'s `_Display`).
-- `Consumer` widgets `ref.watch` a provider; provider changes call
-  `markNeedsBuild`, which calls `Context.requestFrame`, which the host binding
-  coalesces into a single microtask-scheduled re-render.
+- ViewModels are plain Riverpod `Notifier`s that `ref.read` the input stream
+  (or `ref.listen` for reactive side-effects — never `ref.watch`, which is a
+  Flutter reactivity primitive banned in t22e; see coding-standards.md) and
+  emit immutable model snapshots (see `test/smoke_test.dart`'s `_Display`).
+- `Consumer` widgets `ref.listen` to register rebuild-on-change and `ref.read`
+  for one-shot values; provider changes call `markNeedsBuild`, which calls
+  `Context.requestFrame`, which the host binding coalesces into a single
+  microtask-scheduled re-render.
 
 There is **no scheduler and no polling frame loop**. Frames are exclusively
 reactive, triggered by provider change or an explicit `requestFrame`.
@@ -194,7 +197,7 @@ lib/
         ├── single_child_render_object_element.dart
         ├── context.dart               # App Context = ProviderContainer + requestFrame
         ├── context_provider.dart
-        ├── widget_ref.dart            # WidgetRef contract (read/watch)
+        ├── widget_ref.dart            # WidgetRef contract (read/listen)
         ├── pipeline_widget_binding.dart  # Build-pass bridge (view → Pipeline)
         └── components/
             ├── text.dart  root.dart  consumer.dart
@@ -283,8 +286,10 @@ see "Known risks and deferred work".
 Instead of a single-provider `Consumer<P, T>`, the implementation mirrors
 `flutter_riverpod`: `Consumer` takes a `ConsumerBuilder = Widget
 Function(Context, WidgetRef)` and the builder reads whichever providers it
-needs via `ref.read` / `ref.watch`. The concrete `WidgetRef` is the
-`ConsumerElement` itself (`@internal`). `Consumer` owns no `RenderObject` and
+needs via `ref.read` / `ref.listen` (`ref.watch` is a Flutter reactivity
+  primitive banned in t22e — see coding-standards.md). The concrete `WidgetRef`
+  is the `ConsumerElement` itself (`@internal`). `Consumer` owns no
+  `RenderObject` and
 is transparent to layout and paint; a single-child render element descends
 past it to find the real render-tree child. Selective element reuse is
 deferred; a full recompile is acceptable for the first phase.
@@ -345,9 +350,10 @@ code is the source of truth; the spec predates several decisions.
   theme, inherited style) needs to flow down the tree, a separate *widget
   context* (analogous to Flutter's `BuildContext`) can be introduced without
   changing existing `compile` signatures.
-- **`Consumer.watch` follows the WidgetRef model.** Instead of a single
+- **`Consumer.listen` follows the WidgetRef model.** Instead of a single
   provider field, `Consumer` hands a `WidgetRef` to its builder, so multiple
-  providers can be read per build.
+  providers can be read (`ref.read`) and subscribed for rebuild (`ref.listen`)
+  per build. `ref.watch` is a Flutter reactivity primitive banned in t22e.
 - **`terminalSizeProvider` and `contextProvider` are `@internal`**, not
   public. Only `inputEventStreamProvider` is genuinely public. They remain
   re-exported from the barrel as override-seams.

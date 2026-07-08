@@ -12,7 +12,9 @@ import '../widget_ref.dart' show WidgetRef;
 
 /// Builds a widget subtree while reading providers through [ref].
 ///
-/// Mirrors flutter_riverpod: hands [builder] a [WidgetRef] for any provider.
+/// Hands [builder] a [WidgetRef]; rebuild-on-change is wired through
+/// [WidgetRef.listen] (`ref.watch` is banned in t22e — see
+/// `.ai/coding-standards.md`).
 typedef ConsumerBuilder = Widget Function(Context context, WidgetRef ref);
 
 /// A widget that reads Riverpod providers and rebuilds its subtree.
@@ -33,7 +35,7 @@ class Consumer extends Widget {
 
 /// Transparent proxy element for a [Consumer]; owns no render object.
 ///
-/// Compiles [Consumer.builder] into a child; [watch] calls [markNeedsBuild].
+/// Compiles [Consumer.builder] into a child; [listen] calls [markNeedsBuild].
 @internal
 class ConsumerElement extends Element implements WidgetRef {
   /// Creates an element for [widget].
@@ -45,7 +47,7 @@ class ConsumerElement extends Element implements WidgetRef {
   /// The child element produced by [Consumer.builder].
   Element? _child;
 
-  /// [watch] subscriptions keyed by listened provider; cancelled in [dispose].
+  /// [listen] subscriptions keyed by listened provider; cancelled in [dispose].
   final Map<ProviderListenable<dynamic>, ProviderSubscription<dynamic>>
       _dependencies =
       <ProviderListenable<dynamic>, ProviderSubscription<dynamic>>{};
@@ -84,7 +86,7 @@ class ConsumerElement extends Element implements WidgetRef {
   T read<T>(ProviderListenable<T> provider) => context.read(provider);
 
   @override
-  T watch<T>(ProviderListenable<T> provider) {
+  void listen<T>(ProviderListenable<T> provider) {
     _dependencies.putIfAbsent(
       provider,
       () => context.container.listen<T>(
@@ -92,6 +94,5 @@ class ConsumerElement extends Element implements WidgetRef {
         (_, _) => markNeedsBuild(),
       ),
     );
-    return context.read(provider);
   }
 }
